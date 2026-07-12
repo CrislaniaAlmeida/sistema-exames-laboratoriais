@@ -1,0 +1,95 @@
+from sqlalchemy import (
+    Column, Integer, String, Text, Boolean, ForeignKey, TIMESTAMP, CheckConstraint
+)
+from sqlalchemy.orm import relationship
+from sqlalchemy.sql import func
+from app.database.connection import Base
+
+
+class Usuario(Base):
+    __tablename__ = "usuarios"
+
+    id = Column(Integer, primary_key=True, index=True)
+    nome = Column(String(150), nullable=False)
+    email = Column(String(150), nullable=False, unique=True, index=True)
+    senha_hash = Column(String(255), nullable=False)
+    perfil = Column(String(20), nullable=False, default="usuario")
+    ativo = Column(Boolean, nullable=False, default=True)
+    criado_em = Column(TIMESTAMP(timezone=True), server_default=func.now())
+    atualizado_em = Column(TIMESTAMP(timezone=True), server_default=func.now())
+
+    __table_args__ = (
+        CheckConstraint("perfil IN ('admin', 'usuario')",
+                        name="check_perfil_valido"),
+    )
+
+
+class Laboratorio(Base):
+    __tablename__ = "laboratorios"
+
+    id = Column(Integer, primary_key=True, index=True)
+    nome = Column(String(150), nullable=False)
+    telefone = Column(String(20))
+    email = Column(String(150))
+    cidade = Column(String(100))
+    estado = Column(String(2))
+    site = Column(String(200))
+    criado_em = Column(TIMESTAMP(timezone=True), server_default=func.now())
+
+    exames = relationship("Exame", back_populates="laboratorio")
+
+
+class Material(Base):
+    __tablename__ = "materiais"
+
+    id = Column(Integer, primary_key=True, index=True)
+    nome = Column(String(100), nullable=False, unique=True)
+
+    exames = relationship("Exame", back_populates="material")
+
+
+class Tubo(Base):
+    __tablename__ = "tubos"
+
+    id = Column(Integer, primary_key=True, index=True)
+    cor = Column(String(50), nullable=False)
+    descricao = Column(String(200))
+    foto_url = Column(String(300))
+
+    exames = relationship("Exame", back_populates="tubo")
+
+
+class Exame(Base):
+    __tablename__ = "exames"
+
+    id = Column(Integer, primary_key=True, index=True)
+    nome = Column(String(200), nullable=False, index=True)
+    sigla = Column(String(30), index=True)
+    codigo = Column(String(30), index=True)
+
+    laboratorio_id = Column(Integer, ForeignKey(
+        "laboratorios.id", ondelete="SET NULL"))
+    setor_responsavel = Column(String(100))
+    material_id = Column(Integer, ForeignKey(
+        "materiais.id", ondelete="SET NULL"))
+    tubo_id = Column(Integer, ForeignKey("tubos.id", ondelete="SET NULL"))
+
+    volume_minimo = Column(String(50))
+    volume_ideal = Column(String(50))
+    jejum_necessario = Column(String(100))
+    preparo_paciente = Column(Text)
+    forma_coleta = Column(Text)
+    temperatura_armazenamento = Column(String(100))
+    tempo_maximo_envio = Column(String(100))
+    dias_realizacao = Column(String(200))
+    prazo_liberacao_resultado = Column(String(100))
+    metodo_utilizado = Column(String(150))
+    observacoes = Column(Text)
+    ativo = Column(Boolean, nullable=False, default=True)
+
+    criado_em = Column(TIMESTAMP(timezone=True), server_default=func.now())
+    atualizado_em = Column(TIMESTAMP(timezone=True), server_default=func.now())
+
+    laboratorio = relationship("Laboratorio", back_populates="exames")
+    material = relationship("Material", back_populates="exames")
+    tubo = relationship("Tubo", back_populates="exames")
