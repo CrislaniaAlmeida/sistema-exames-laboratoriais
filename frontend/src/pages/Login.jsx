@@ -21,7 +21,7 @@ function Login() {
       const resposta = await api.post('/login', { email, senha });
       const { access_token, usuario } = resposta.data;
       login(access_token, usuario);
-      navigate('/');
+      navigate('/exames');
     } catch (erroRequisicao) {
       if (erroRequisicao.response && erroRequisicao.response.status === 401) {
         setErro('Email ou senha invalidos.');
