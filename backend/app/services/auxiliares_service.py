@@ -1,6 +1,10 @@
 from sqlalchemy.orm import Session
 from app.database.models import Laboratorio, Material, Tubo
-from app.schemas.auxiliares import LaboratorioCriar, LaboratorioAtualizar, MaterialCriar, TuboCriar
+from app.schemas.auxiliares import (
+    LaboratorioCriar, LaboratorioAtualizar,
+    MaterialCriar,
+    TuboCriar, TuboAtualizar,
+)
 
 
 # ---------- Laboratório ----------
@@ -75,6 +79,10 @@ def listar_tubos(db: Session):
     return db.query(Tubo).all()
 
 
+def buscar_tubo_por_id(db: Session, tubo_id: int):
+    return db.query(Tubo).filter(Tubo.id == tubo_id).first()
+
+
 def criar_tubo(db: Session, dados: TuboCriar):
     novo = Tubo(**dados.model_dump())
     db.add(novo)
@@ -83,8 +91,22 @@ def criar_tubo(db: Session, dados: TuboCriar):
     return novo
 
 
+def atualizar_tubo(db: Session, tubo_id: int, dados: TuboAtualizar):
+    tubo = buscar_tubo_por_id(db, tubo_id)
+    if not tubo:
+        return None
+
+    dados_para_atualizar = dados.model_dump(exclude_unset=True)
+    for campo, valor in dados_para_atualizar.items():
+        setattr(tubo, campo, valor)
+
+    db.commit()
+    db.refresh(tubo)
+    return tubo
+
+
 def excluir_tubo(db: Session, tubo_id: int):
-    tubo = db.query(Tubo).filter(Tubo.id == tubo_id).first()
+    tubo = buscar_tubo_por_id(db, tubo_id)
     if not tubo:
         return None
 

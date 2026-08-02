@@ -57,6 +57,10 @@ class TuboCriar(TuboBase):
     pass
 
 
+class TuboAtualizar(TuboBase):
+    cor: Optional[str] = None
+
+
 class TuboResposta(TuboBase):
     id: int
 

@@ -7,7 +7,7 @@ from app.database.models import Usuario
 from app.schemas.auxiliares import (
     LaboratorioCriar, LaboratorioAtualizar, LaboratorioResposta,
     MaterialCriar, MaterialResposta,
-    TuboCriar, TuboResposta,
+    TuboCriar, TuboAtualizar, TuboResposta,
 )
 from app.services import auxiliares_service
 from app.auth.dependencies import obter_usuario_atual, exigir_admin
@@ -110,6 +110,19 @@ def criar_tubo(
     usuario_atual: Usuario = Depends(exigir_admin),
 ):
     return auxiliares_service.criar_tubo(db, dados)
+
+
+@router.put("/tubos/{tubo_id}", response_model=TuboResposta)
+def atualizar_tubo(
+    tubo_id: int,
+    dados: TuboAtualizar,
+    db: Session = Depends(get_db),
+    usuario_atual: Usuario = Depends(exigir_admin),
+):
+    tubo = auxiliares_service.atualizar_tubo(db, tubo_id, dados)
+    if not tubo:
+        raise HTTPException(status_code=404, detail="Tubo nao encontrado.")
+    return tubo
 
 
 @router.delete("/tubos/{tubo_id}")
