@@ -444,3 +444,64 @@
     width: 100%;
   }
 }
+
+/* ---------- Micro-interacoes ---------- */
+
+.dashboard-busca-botao,
+.dashboard-limpar-botao,
+.categoria-pill,
+.exame-detalhes-botao,
+.acesso-rapido-card-link {
+  transition: transform 0.12s ease, box-shadow 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.dashboard-busca-botao:active:not(:disabled),
+.exame-detalhes-botao:active {
+  transform: scale(0.97);
+}
+
+.categoria-pill:active {
+  transform: scale(0.95);
+}
+
+.stat-card,
+.exame-card,
+.acesso-rapido-card-link {
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+  border-color: #dbeafe;
+}
+
+.exame-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.07);
+}
+
+.acesso-rapido-card-link:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.12);
+}
+
+/* Fade-in suave ao carregar a pagina */
+.dashboard {
+  animation: fadeInSubir 0.35s ease both;
+}
+
+.exames-lista .exame-card {
+  animation: fadeInSubir 0.3s ease both;
+}
+
+@keyframes fadeInSubir {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

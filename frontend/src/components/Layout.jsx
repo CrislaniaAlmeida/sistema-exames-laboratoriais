@@ -13,6 +13,8 @@ const navItems = [
 const titulosPagina = {
   '/exames': { titulo: 'Dashboard', subtitulo: 'Visao geral e consulta de exames' },
   '/exames/gerenciar': { titulo: 'Gerenciar Exames', subtitulo: 'Cadastre, edite ou remova exames do sistema' },
+  '/tubos': { titulo: 'Gerenciar Tubos', subtitulo: 'Cadastre, edite ou remova tubos de coleta' },
+  '/laboratorios': { titulo: 'Laboratorios de Apoio', subtitulo: 'Cadastre laboratorios externos' },
 };
 
 const icons = {
