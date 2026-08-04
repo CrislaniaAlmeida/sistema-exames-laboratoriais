@@ -1,14 +1,12 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import Layout from '../components/Layout';
 import api from '../services/api';
 import './TubosGerenciar.css';
 
 const LABORATORIO_VAZIO = { nome: '', telefone: '', email: '', cidade: '', estado: '', site: '' };
 
 function LaboratoriosGerenciar() {
-  const { usuario, logout } = useAuth();
-
   const [laboratorios, setLaboratorios] = useState([]);
   const [formAberto, setFormAberto] = useState(false);
   const [editandoId, setEditandoId] = useState(null);
@@ -117,139 +115,136 @@ function LaboratoriosGerenciar() {
   }
 
   return (
-    <div className="gerenciar">
-      <header className="gerenciar-header">
-        <div>
+    <Layout>
+      <div className="gerenciar">
+        <Link to="/exames" className="gerenciar-voltar-topo">← Voltar para o dashboard</Link>
+
+        <div className="gerenciar-cabecalho">
           <h1>Gerenciar laboratorios de apoio</h1>
           <p>Cadastre laboratorios externos para onde exames podem ser encaminhados.</p>
         </div>
-        <div className="gerenciar-user">
-          <Link to="/exames" className="gerenciar-voltar">← Voltar para o dashboard</Link>
-          <span>Ola, {usuario?.nome}</span>
-          <button onClick={logout} className="gerenciar-sair">Sair</button>
-        </div>
-      </header>
 
-      {erro && <p className="gerenciar-erro">{erro}</p>}
-      {mensagem && <p className="gerenciar-mensagem">{mensagem}</p>}
+        {erro && <p className="gerenciar-erro">{erro}</p>}
+        {mensagem && <p className="gerenciar-mensagem">{mensagem}</p>}
 
-      {!formAberto && (
-        <button className="gerenciar-novo" onClick={abrirNovo}>
-          + Novo laboratorio
-        </button>
-      )}
+        {!formAberto && (
+          <button className="gerenciar-novo" onClick={abrirNovo}>
+            + Novo laboratorio
+          </button>
+        )}
 
-      {formAberto && (
-        <form className="gerenciar-form" onSubmit={handleSalvar}>
-          <h2>{editandoId ? 'Editar laboratorio' : 'Novo laboratorio'}</h2>
+        {formAberto && (
+          <form className="gerenciar-form" onSubmit={handleSalvar}>
+            <h2>{editandoId ? 'Editar laboratorio' : 'Novo laboratorio'}</h2>
 
-          <div className="form-grid">
-            <label>
-              Nome *
-              <input
-                type="text"
-                required
-                value={form.nome}
-                onChange={(e) => handleChange('nome', e.target.value)}
-                placeholder="Ex: Laboratorio Central de Analises"
-              />
-            </label>
+            <div className="form-grid">
+              <label>
+                Nome *
+                <input
+                  type="text"
+                  required
+                  value={form.nome}
+                  onChange={(e) => handleChange('nome', e.target.value)}
+                  placeholder="Ex: Laboratorio Central de Analises"
+                />
+              </label>
 
-            <label>
-              Telefone
-              <input
-                type="text"
-                value={form.telefone}
-                onChange={(e) => handleChange('telefone', e.target.value)}
-              />
-            </label>
+              <label>
+                Telefone
+                <input
+                  type="text"
+                  value={form.telefone}
+                  onChange={(e) => handleChange('telefone', e.target.value)}
+                />
+              </label>
 
-            <label>
-              Email
-              <input
-                type="email"
-                value={form.email}
-                onChange={(e) => handleChange('email', e.target.value)}
-              />
-            </label>
+              <label>
+                Email
+                <input
+                  type="email"
+                  value={form.email}
+                  onChange={(e) => handleChange('email', e.target.value)}
+                />
+              </label>
 
-            <label>
-              Cidade
-              <input
-                type="text"
-                value={form.cidade}
-                onChange={(e) => handleChange('cidade', e.target.value)}
-              />
-            </label>
+              <label>
+                Cidade
+                <input
+                  type="text"
+                  value={form.cidade}
+                  onChange={(e) => handleChange('cidade', e.target.value)}
+                />
+              </label>
 
-            <label>
-              Estado
-              <input
-                type="text"
-                value={form.estado}
-                onChange={(e) => handleChange('estado', e.target.value)}
-                placeholder="Ex: CE"
-                maxLength={2}
-              />
-            </label>
+              <label>
+                Estado
+                <input
+                  type="text"
+                  value={form.estado}
+                  onChange={(e) => handleChange('estado', e.target.value)}
+                  placeholder="Ex: CE"
+                  maxLength={2}
+                />
+              </label>
 
-            <label>
-              Site
-              <input
-                type="text"
-                value={form.site}
-                onChange={(e) => handleChange('site', e.target.value)}
-                placeholder="https://..."
-              />
-            </label>
-          </div>
+              <label>
+                Site
+                <input
+                  type="text"
+                  value={form.site}
+                  onChange={(e) => handleChange('site', e.target.value)}
+                  placeholder="https://..."
+                />
+              </label>
+            </div>
 
-          <div className="form-acoes">
-            <button type="submit" disabled={salvando}>
-              {salvando ? 'Salvando...' : 'Salvar'}
-            </button>
-            <button type="button" className="form-cancelar" onClick={fecharForm}>
-              Cancelar
-            </button>
-          </div>
-        </form>
-      )}
+            <div className="form-acoes">
+              <button type="submit" disabled={salvando}>
+                {salvando ? 'Salvando...' : 'Salvar'}
+              </button>
+              <button type="button" className="form-cancelar" onClick={fecharForm}>
+                Cancelar
+              </button>
+            </div>
+          </form>
+        )}
 
-      {carregando ? (
-        <p>Carregando laboratorios...</p>
-      ) : laboratorios.length === 0 ? (
-        <p>Nenhum laboratorio de apoio cadastrado ainda.</p>
-      ) : (
-        <table className="gerenciar-tabela">
-          <thead>
-            <tr>
-              <th>Nome</th>
-              <th>Cidade/Estado</th>
-              <th>Telefone</th>
-              <th>Email</th>
-              <th>Acoes</th>
-            </tr>
-          </thead>
-          <tbody>
-            {laboratorios.map((laboratorio) => (
-              <tr key={laboratorio.id}>
-                <td>{laboratorio.nome}</td>
-                <td>
-                  {laboratorio.cidade || '-'}
-                  {laboratorio.estado ? `/${laboratorio.estado}` : ''}
-                </td>
-                <td>{laboratorio.telefone || '-'}</td>
-                <td>{laboratorio.email || '-'}</td>
-                <td className="gerenciar-acoes">
-                  <button onClick={() => abrirEdicao(laboratorio)}>Editar</button>
-                  <button className="btn-excluir" onClick={() => handleExcluir(laboratorio)}>Excluir</button>
-                </td>
+        {carregando ? (
+          <p>Carregando laboratorios...</p>
+        ) : laboratorios.length === 0 ? (
+          <p>Nenhum laboratorio de apoio cadastrado ainda.</p>
+        ) : (
+          <table className="gerenciar-tabela">
+            <thead>
+              <tr>
+                <th>Nome</th>
+                <th>Cidade/Estado</th>
+                <th>Telefone</th>
+                <th>Email</th>
+                <th>Acoes</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
-    </div>
+            </thead>
+            <tbody>
+              {laboratorios.map((laboratorio) => (
+                <tr key={laboratorio.id}>
+                  <td>{laboratorio.nome}</td>
+                  <td>
+                    {laboratorio.cidade || '-'}
+                    {laboratorio.estado ? `/${laboratorio.estado}` : ''}
+                  </td>
+                  <td>{laboratorio.telefone || '-'}</td>
+                  <td>{laboratorio.email || '-'}</td>
+                  <td className="gerenciar-acoes">
+                    <button onClick={() => abrirEdicao(laboratorio)}>Editar</button>
+                    <button className="btn-excluir" onClick={() => handleExcluir(laboratorio)}>Excluir</button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
+    </Layout>
   );
 }
 
