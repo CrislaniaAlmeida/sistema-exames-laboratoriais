@@ -1,8 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import Layout from '../components/Layout';
 import api from '../services/api';
 import './ExamesGerenciar.css';
+
+const ITENS_POR_PAGINA = 25;
 
 const EXAME_VAZIO = {
   nome: '', sigla: '', codigo: '', laboratorio_id: '', setor_responsavel: '',
@@ -10,6 +12,7 @@ const EXAME_VAZIO = {
   jejum_necessario: '', preparo_paciente: '', forma_coleta: '',
   temperatura_armazenamento: '', tempo_maximo_envio: '', dias_realizacao: '',
   prazo_liberacao_resultado: '', metodo_utilizado: '', observacoes: '',
+  quantidade_contratada: '', quantidade_restante: '',
 };
 
 function ExamesGerenciar() {
@@ -17,6 +20,9 @@ function ExamesGerenciar() {
   const [materiais, setMateriais] = useState([]);
   const [tubos, setTubos] = useState([]);
   const [laboratorios, setLaboratorios] = useState([]);
+
+  const [termoFiltro, setTermoFiltro] = useState('');
+  const [pagina, setPagina] = useState(1);
 
   const [formAberto, setFormAberto] = useState(false);
   const [editandoId, setEditandoId] = useState(null);
@@ -51,6 +57,32 @@ function ExamesGerenciar() {
     carregarTudo();
   }, []);
 
+  const examesFiltrados = useMemo(() => {
+    if (termoFiltro.trim() === '') return exames;
+    const termo = termoFiltro.trim().toLowerCase();
+    return exames.filter((e) =>
+      e.nome.toLowerCase().includes(termo) ||
+      (e.sigla && e.sigla.toLowerCase().includes(termo))
+    );
+  }, [exames, termoFiltro]);
+
+  const totalPaginas = Math.max(1, Math.ceil(examesFiltrados.length / ITENS_POR_PAGINA));
+
+  const examesPaginados = useMemo(() => {
+    const inicio = (pagina - 1) * ITENS_POR_PAGINA;
+    return examesFiltrados.slice(inicio, inicio + ITENS_POR_PAGINA);
+  }, [examesFiltrados, pagina]);
+
+  function handleFiltro(valor) {
+    setTermoFiltro(valor);
+    setPagina(1);
+  }
+
+  function irParaPagina(novaPagina) {
+    setPagina(novaPagina);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
   function abrirNovo() {
     setForm(EXAME_VAZIO);
     setEditandoId(null);
@@ -79,6 +111,8 @@ function ExamesGerenciar() {
       prazo_liberacao_resultado: exame.prazo_liberacao_resultado || '',
       metodo_utilizado: exame.metodo_utilizado || '',
       observacoes: exame.observacoes || '',
+      quantidade_contratada: exame.quantidade_contratada ?? '',
+      quantidade_restante: exame.quantidade_restante ?? '',
     });
     setEditandoId(exame.id);
     setFormAberto(true);
@@ -98,7 +132,7 @@ function ExamesGerenciar() {
 
   function montarPayload() {
     const payload = { ...form };
-    ['laboratorio_id', 'material_id', 'tubo_id'].forEach((campo) => {
+    ['laboratorio_id', 'material_id', 'tubo_id', 'quantidade_contratada', 'quantidade_restante'].forEach((campo) => {
       payload[campo] = payload[campo] === '' ? null : Number(payload[campo]);
     });
     Object.keys(payload).forEach((campo) => {
@@ -154,7 +188,7 @@ function ExamesGerenciar() {
 
         <div className="gerenciar-cabecalho">
           <h1>Gerenciar exames</h1>
-          <p>Cadastre, edite ou remova exames do sistema.</p>
+          <p>Cadastre, edite ou remova exames do sistema. ({exames.length} exames no total)</p>
         </div>
 
         {erro && <p className="gerenciar-erro">{erro}</p>}
@@ -327,6 +361,24 @@ function ExamesGerenciar() {
                   onChange={(e) => handleChange('metodo_utilizado', e.target.value)}
                 />
               </label>
+
+              <label>
+                Quantidade contratada (anual)
+                <input
+                  type="number"
+                  value={form.quantidade_contratada}
+                  onChange={(e) => handleChange('quantidade_contratada', e.target.value)}
+                />
+              </label>
+
+              <label>
+                Quantidade restante
+                <input
+                  type="number"
+                  value={form.quantidade_restante}
+                  onChange={(e) => handleChange('quantidade_restante', e.target.value)}
+                />
+              </label>
             </div>
 
             <label className="form-full">
@@ -358,40 +410,74 @@ function ExamesGerenciar() {
           </form>
         )}
 
+        {!formAberto && (
+          <input
+            type="text"
+            className="gerenciar-filtro"
+            placeholder="Filtrar por nome ou sigla..."
+            value={termoFiltro}
+            onChange={(e) => handleFiltro(e.target.value)}
+          />
+        )}
+
         {carregando ? (
           <p>Carregando exames...</p>
         ) : (
-          <table className="gerenciar-tabela">
-            <thead>
-              <tr>
-                <th>Nome</th>
-                <th>Sigla</th>
-                <th>Setor</th>
-                <th>Material</th>
-                <th>Tubo</th>
-                <th>Acoes</th>
-              </tr>
-            </thead>
-            <tbody>
-              {exames.map((exame) => {
-                const material = materiais.find((m) => m.id === exame.material_id);
-                const tubo = tubos.find((t) => t.id === exame.tubo_id);
-                return (
-                  <tr key={exame.id}>
-                    <td>{exame.nome}</td>
-                    <td>{exame.sigla || '-'}</td>
-                    <td>{exame.setor_responsavel || '-'}</td>
-                    <td>{material ? material.nome : '-'}</td>
-                    <td>{tubo ? tubo.cor : '-'}</td>
-                    <td className="gerenciar-acoes">
-                      <button onClick={() => abrirEdicao(exame)}>Editar</button>
-                      <button className="btn-excluir" onClick={() => handleExcluir(exame)}>Excluir</button>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+          <>
+            <table className="gerenciar-tabela">
+              <thead>
+                <tr>
+                  <th>Nome</th>
+                  <th>Sigla</th>
+                  <th>Setor</th>
+                  <th>Material</th>
+                  <th>Tubo</th>
+                  <th>Acoes</th>
+                </tr>
+              </thead>
+              <tbody>
+                {examesPaginados.map((exame) => {
+                  const material = materiais.find((m) => m.id === exame.material_id);
+                  const tubo = tubos.find((t) => t.id === exame.tubo_id);
+                  return (
+                    <tr key={exame.id}>
+                      <td>{exame.nome}</td>
+                      <td>{exame.sigla || '-'}</td>
+                      <td>{exame.setor_responsavel || '-'}</td>
+                      <td>{material ? material.nome : '-'}</td>
+                      <td>{tubo ? tubo.cor : '-'}</td>
+                      <td className="gerenciar-acoes">
+                        <button onClick={() => abrirEdicao(exame)}>Editar</button>
+                        <button className="btn-excluir" onClick={() => handleExcluir(exame)}>Excluir</button>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+
+            {totalPaginas > 1 && (
+              <div className="paginacao">
+                <button
+                  className="paginacao-botao"
+                  onClick={() => irParaPagina(pagina - 1)}
+                  disabled={pagina === 1}
+                >
+                  ← Anterior
+                </button>
+                <span className="paginacao-info">
+                  Pagina {pagina} de {totalPaginas} ({examesFiltrados.length} exames)
+                </span>
+                <button
+                  className="paginacao-botao"
+                  onClick={() => irParaPagina(pagina + 1)}
+                  disabled={pagina === totalPaginas}
+                >
+                  Proxima →
+                </button>
+              </div>
+            )}
+          </>
         )}
       </div>
     </Layout>

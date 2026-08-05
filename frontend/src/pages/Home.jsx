@@ -5,6 +5,8 @@ import Layout from '../components/Layout';
 import api from '../services/api';
 import './Home.css';
 
+const ITENS_POR_PAGINA = 20;
+
 function Home() {
   const { usuario } = useAuth();
   const [termo, setTermo] = useState('');
@@ -13,6 +15,7 @@ function Home() {
   const [tubos, setTubos] = useState({});
   const [totais, setTotais] = useState({ exames: 0, ativos: 0, laboratorios: 0, materiais: 0, tubos: 0 });
   const [categoriaAtiva, setCategoriaAtiva] = useState('Todos');
+  const [pagina, setPagina] = useState(1);
   const [carregando, setCarregando] = useState(false);
   const [erro, setErro] = useState('');
   const [buscou, setBuscou] = useState(false);
@@ -63,12 +66,20 @@ function Home() {
     return exames.filter((exame) => exame.setor_responsavel === categoriaAtiva);
   }, [exames, categoriaAtiva]);
 
+  const totalPaginas = Math.max(1, Math.ceil(examesFiltrados.length / ITENS_POR_PAGINA));
+
+  const examesPaginados = useMemo(() => {
+    const inicio = (pagina - 1) * ITENS_POR_PAGINA;
+    return examesFiltrados.slice(inicio, inicio + ITENS_POR_PAGINA);
+  }, [examesFiltrados, pagina]);
+
   async function handleBuscar(evento) {
     evento.preventDefault();
     setErro('');
     setBuscou(true);
     setCarregando(true);
     setCategoriaAtiva('Todos');
+    setPagina(1);
     try {
       if (termo.trim() === '') {
         const resposta = await api.get('/exames/');
@@ -92,6 +103,17 @@ function Home() {
     setTermo('');
     setCategoriaAtiva('Todos');
     setBuscou(false);
+    setPagina(1);
+  }
+
+  function selecionarCategoria(categoria) {
+    setCategoriaAtiva(categoria);
+    setPagina(1);
+  }
+
+  function irParaPagina(novaPagina) {
+    setPagina(novaPagina);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   return (
@@ -129,7 +151,7 @@ function Home() {
             <button
               key={categoria}
               className={`categoria-pill ${categoriaAtiva === categoria ? 'categoria-pill-ativa' : ''}`}
-              onClick={() => setCategoriaAtiva(categoria)}
+              onClick={() => selecionarCategoria(categoria)}
               type="button"
             >
               {categoria}
@@ -255,7 +277,7 @@ function Home() {
           </div>
 
           <div className="exames-lista">
-            {examesFiltrados.map((exame) => (
+            {examesPaginados.map((exame) => (
               <div key={exame.id} className="exame-card">
                 <div className="exame-card-principal">
                   <div className="exame-card-titulo">
@@ -297,6 +319,28 @@ function Home() {
               </div>
             ))}
           </div>
+
+          {totalPaginas > 1 && (
+            <div className="paginacao">
+              <button
+                className="paginacao-botao"
+                onClick={() => irParaPagina(pagina - 1)}
+                disabled={pagina === 1}
+              >
+                ← Anterior
+              </button>
+              <span className="paginacao-info">
+                Pagina {pagina} de {totalPaginas}
+              </span>
+              <button
+                className="paginacao-botao"
+                onClick={() => irParaPagina(pagina + 1)}
+                disabled={pagina === totalPaginas}
+              >
+                Proxima →
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </Layout>

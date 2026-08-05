@@ -14,7 +14,7 @@ router = APIRouter(prefix="/exames", tags=["Exames"])
 @router.get("/", response_model=List[ExameResposta])
 def listar(
     skip: int = 0,
-    limit: int = 50,
+    limit: int = 3000,
     db: Session = Depends(get_db),
     usuario_atual: Usuario = Depends(obter_usuario_atual),
 ):

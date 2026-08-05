@@ -22,6 +22,8 @@ class ExameBase(BaseModel):
     prazo_liberacao_resultado: Optional[str] = None
     metodo_utilizado: Optional[str] = None
     observacoes: Optional[str] = None
+    quantidade_contratada: Optional[int] = None
+    quantidade_restante: Optional[int] = None
 
 
 class ExameCriar(ExameBase):

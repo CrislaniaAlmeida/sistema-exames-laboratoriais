@@ -85,6 +85,8 @@ class Exame(Base):
     prazo_liberacao_resultado = Column(String(100))
     metodo_utilizado = Column(String(150))
     observacoes = Column(Text)
+    quantidade_contratada = Column(Integer)
+    quantidade_restante = Column(Integer)
     ativo = Column(Boolean, nullable=False, default=True)
 
     criado_em = Column(TIMESTAMP(timezone=True), server_default=func.now())
