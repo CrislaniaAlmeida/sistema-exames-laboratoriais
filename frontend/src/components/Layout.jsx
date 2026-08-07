@@ -6,7 +6,7 @@ const navItems = [
   { label: 'Dashboard', path: '/exames', icon: 'dashboard', disponivel: true },
   { label: 'Gerenciar Exames', path: '/exames/gerenciar', icon: 'exames', disponivel: true, adminOnly: true },
   { label: 'Laboratorios', path: '/laboratorios', icon: 'laboratorio', disponivel: true, adminOnly: true },
-  { label: 'Materiais', path: '/materiais', icon: 'materiais', disponivel: false },
+  { label: 'Materiais', path: '/materiais', icon: 'materiais', disponivel: false, adminOnly: true },
   { label: 'Tubos', path: '/tubos', icon: 'tubos', disponivel: true, adminOnly: true },
 ];
 
@@ -19,12 +19,7 @@ const titulosPagina = {
 
 const icons = {
   dashboard: (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <rect x="3" y="3" width="7" height="9" rx="1" />
-      <rect x="14" y="3" width="7" height="5" rx="1" />
-      <rect x="14" y="12" width="7" height="9" rx="1" />
-      <rect x="3" y="16" width="7" height="5" rx="1" />
-    </svg>
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="7" height="9" rx="2" /><rect x="14" y="3" width="7" height="5" rx="2" /><rect x="14" y="12" width="7" height="9" rx="2" /><rect x="3" y="16" width="7" height="5" rx="2" /></svg>
   ),
   exames: (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -41,8 +36,7 @@ const icons = {
   ),
   materiais: (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <circle cx="12" cy="12" r="9" />
-      <path d="M12 7v5l3 3" />
+      <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
     </svg>
   ),
   tubos: (
@@ -70,10 +64,12 @@ function Layout({ children }) {
     <div className="layout">
       <aside className="layout-sidebar">
         <div className="layout-logo">
-          <span className="layout-logo-icone">🧪</span>
+          <span className="layout-logo-icone">
+            <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#04070d" strokeWidth="2.2"><path d="M9 2v6.34a2 2 0 0 1-.4 1.2L4 16a2 2 0 0 0 1.6 3.2h12.8A2 2 0 0 0 20 16l-4.6-6.46a2 2 0 0 1-.4-1.2V2" /><path d="M8.5 2h7" /></svg>
+          </span>
           <div>
             <h1>NexLab</h1>
-            <p>Sistema de Consulta</p>
+            <p>Plataforma Laboratorial</p>
           </div>
         </div>
 
@@ -111,7 +107,9 @@ function Layout({ children }) {
             <span className="layout-usuario-nome">{usuario?.nome}</span>
             <span className="layout-usuario-perfil">{usuario?.perfil === 'admin' ? 'Administrador' : 'Usuario'}</span>
           </div>
-          <button onClick={logout} className="layout-sair">Sair</button>
+          <button onClick={logout} className="layout-sair">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><polyline points="16 17 21 12 16 7" /><line x1="21" y1="12" x2="9" y2="12" /></svg>
+          </button>
         </div>
       </aside>
 
@@ -123,13 +121,8 @@ function Layout({ children }) {
           </div>
 
           <div className="layout-topbar-direita">
+            <span className="layout-topbar-tag">NexLab • Unidade Central</span>
             <div className="layout-avatar">{gerarIniciais(usuario?.nome)}</div>
-            <div className="layout-topbar-usuario-info">
-              <span className="layout-topbar-usuario-nome">{usuario?.nome}</span>
-              <span className="layout-topbar-usuario-perfil">
-                {usuario?.perfil === 'admin' ? 'Administrador' : 'Usuario'}
-              </span>
-            </div>
           </div>
         </header>
 
