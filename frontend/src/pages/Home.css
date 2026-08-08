@@ -402,6 +402,37 @@
 
 /* ---------- Mensagens ---------- */
 
+.dashboard-resultados-vazio {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  text-align: center;
+  padding: 56px 24px;
+  background: var(--surface);
+  border: 1px dashed var(--border-strong);
+  border-radius: 20px;
+  color: var(--text-faint);
+}
+
+.dashboard-resultados-vazio-icone {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: var(--surface-strong);
+  color: var(--text-faint);
+}
+
+.dashboard-resultados-vazio p {
+  margin: 0;
+  font-size: 14px;
+  max-width: 320px;
+}
+
 .dashboard-erro {
   color: #dc2626;
   font-size: 14px;

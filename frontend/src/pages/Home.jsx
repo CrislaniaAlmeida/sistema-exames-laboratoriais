@@ -87,6 +87,8 @@ function Home() {
     return exames.filter((exame) => exame.setor_responsavel === categoriaAtiva);
   }, [exames, categoriaAtiva]);
 
+  const mostrarResultados = buscou || categoriaAtiva !== 'Todos';
+
   const totalPaginas = Math.max(1, Math.ceil(examesFiltrados.length / ITENS_POR_PAGINA));
 
   const examesPaginados = useMemo(() => {
@@ -293,9 +295,20 @@ function Home() {
           <p className="dashboard-vazio">Nenhum exame encontrado para esse filtro.</p>
         )}
 
+        {!mostrarResultados ? (
+          <div className="dashboard-resultados-vazio">
+            <span className="dashboard-resultados-vazio-icone">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="11" cy="11" r="7" />
+                <path d="m21 21-4.3-4.3" />
+              </svg>
+            </span>
+            <p>Pesquise um exame ou escolha uma categoria para ver os resultados aqui.</p>
+          </div>
+        ) : (
         <div className="dashboard-resultados">
           <div className="dashboard-resultados-cabecalho">
-            <h2>{buscou || categoriaAtiva !== 'Todos' ? 'Resultados da consulta' : 'Exames recentes'}</h2>
+            <h2>Resultados da consulta</h2>
             <span className="dashboard-resultados-contagem">
               {examesFiltrados.length} {examesFiltrados.length === 1 ? 'exame encontrado' : 'exames encontrados'}
             </span>
@@ -377,6 +390,7 @@ function Home() {
             </div>
           )}
         </div>
+        )}
       </div>
     </Layout>
   );
