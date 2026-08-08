@@ -6,7 +6,7 @@
   display: inline-block;
   font-size: 13px;
   font-weight: 600;
-  color: #2563eb;
+  color: var(--accent-blue);
   text-decoration: none;
   margin-bottom: 16px;
 }
@@ -20,14 +20,16 @@
 }
 
 .gerenciar-cabecalho h1 {
-  font-size: 26px;
-  font-weight: 800;
-  color: #0f172a;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 30px;
+  font-weight: 400;
+  color: var(--text-primary);
   margin: 0 0 4px;
 }
 
 .gerenciar-cabecalho p {
-  color: #64748b;
+  color: var(--text-muted);
   margin: 0;
 }
 
@@ -35,42 +37,51 @@
   background: #fee2e2;
   color: #b91c1c;
   padding: 10px 16px;
-  border-radius: 8px;
+  border-radius: 10px;
   margin-bottom: 16px;
 }
 
 .gerenciar-mensagem {
-  background: #dcfce7;
-  color: #15803d;
+  background: rgba(0, 191, 168, 0.14);
+  color: #048a78;
   padding: 10px 16px;
-  border-radius: 8px;
+  border-radius: 10px;
   margin-bottom: 16px;
 }
 
 .gerenciar-novo {
-  background: #2563eb;
-  color: #fff;
+  background: var(--grad-primary);
+  color: #ffffff;
   border: none;
-  padding: 12px 20px;
-  border-radius: 8px;
+  padding: 12px 22px;
+  border-radius: 12px;
   font-weight: 700;
   cursor: pointer;
   margin-bottom: 24px;
   font-family: inherit;
+  box-shadow: 0 8px 20px rgba(0, 87, 224, 0.25);
+  transition: box-shadow 0.15s ease, transform 0.12s ease;
+}
+
+.gerenciar-novo:hover {
+  box-shadow: 0 10px 24px rgba(0, 87, 224, 0.35);
 }
 
 .gerenciar-form {
-  background: #fff;
-  border: 1px solid #e2e8f0;
-  border-radius: 14px;
-  padding: 24px;
+  background: var(--surface);
+  border: 1px solid var(--border-soft);
+  border-radius: 18px;
+  padding: 28px;
   margin-bottom: 28px;
 }
 
 .gerenciar-form h2 {
   margin: 0 0 16px;
-  font-size: 19px;
-  color: #0f172a;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 22px;
+  font-weight: 400;
+  color: var(--text-primary);
 }
 
 .form-grid {
@@ -85,19 +96,29 @@
   flex-direction: column;
   font-size: 13px;
   font-weight: 600;
-  color: #334155;
+  color: var(--text-muted);
   gap: 4px;
 }
 
 .gerenciar-form input,
 .gerenciar-form select,
 .gerenciar-form textarea {
-  padding: 9px 10px;
-  border-radius: 7px;
-  border: 1px solid #cbd5e1;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border-soft);
+  background: var(--surface);
+  color: var(--text-primary);
   font-size: 14px;
   font-weight: 400;
   font-family: inherit;
+  transition: border-color 0.15s ease;
+}
+
+.gerenciar-form input:focus,
+.gerenciar-form select:focus,
+.gerenciar-form textarea:focus {
+  outline: none;
+  border-color: var(--accent-blue-light);
 }
 
 .form-full {
@@ -111,47 +132,66 @@
 }
 
 .form-acoes button[type="submit"] {
-  background: #2563eb;
-  color: #fff;
+  background: var(--grad-primary);
+  color: #ffffff;
   border: none;
-  padding: 10px 22px;
-  border-radius: 8px;
+  padding: 11px 24px;
+  border-radius: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  box-shadow: 0 6px 16px rgba(0, 87, 224, 0.25);
+}
+
+.form-cancelar {
+  background: var(--surface-strong);
+  color: var(--text-muted);
+  border: none;
+  padding: 11px 24px;
+  border-radius: 10px;
   font-weight: 700;
   cursor: pointer;
   font-family: inherit;
 }
 
-.form-cancelar {
-  background: #e2e8f0;
-  border: none;
-  padding: 10px 22px;
-  border-radius: 8px;
-  font-weight: 700;
-  cursor: pointer;
-  font-family: inherit;
+.form-cancelar:hover {
+  color: var(--text-primary);
 }
 
 .gerenciar-tabela {
   width: 100%;
   border-collapse: collapse;
-  background: #fff;
-  border: 1px solid #e2e8f0;
-  border-radius: 14px;
+  background: var(--surface);
+  border: 1px solid var(--border-soft);
+  border-radius: 18px;
   overflow: hidden;
+  box-shadow: 0 20px 45px -30px rgba(11, 23, 51, 0.4);
 }
 
 .gerenciar-tabela th,
 .gerenciar-tabela td {
   text-align: left;
-  padding: 12px 16px;
+  padding: 14px 18px;
   font-size: 14px;
-  border-bottom: 1px solid #f1f5f9;
+  border-bottom: 1px solid var(--border-soft);
+  color: var(--text-primary);
+}
+
+.gerenciar-tabela tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.gerenciar-tabela tbody tr:hover {
+  background: var(--surface-strong);
 }
 
 .gerenciar-tabela th {
-  background: #f8fafc;
-  color: #64748b;
+  background: var(--surface-strong);
+  color: var(--text-faint);
   font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
 .gerenciar-acoes {
@@ -160,15 +200,20 @@
 }
 
 .gerenciar-acoes button {
-  padding: 6px 12px;
-  border-radius: 6px;
+  padding: 7px 14px;
+  border-radius: 8px;
   border: none;
   cursor: pointer;
   font-weight: 600;
   font-size: 13px;
-  background: #e0e7ff;
-  color: #3730a3;
+  background: rgba(0, 87, 224, 0.1);
+  color: var(--accent-blue);
   font-family: inherit;
+  transition: background-color 0.15s ease;
+}
+
+.gerenciar-acoes button:hover {
+  background: rgba(0, 87, 224, 0.18);
 }
 
 .btn-excluir {
@@ -176,14 +221,26 @@
   color: #b91c1c !important;
 }
 
+.btn-excluir:hover {
+  background: #fecaca !important;
+}
+
 .gerenciar-filtro {
   width: 100%;
-  padding: 11px 14px;
-  border: 1px solid #cbd5e1;
-  border-radius: 8px;
+  padding: 12px 16px;
+  border: 1px solid var(--border-soft);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--text-primary);
   font-size: 14px;
   font-family: inherit;
   margin-bottom: 16px;
+  transition: border-color 0.15s ease;
+}
+
+.gerenciar-filtro:focus {
+  outline: none;
+  border-color: var(--accent-blue-light);
 }
 
 .paginacao {
@@ -197,9 +254,9 @@
 
 .paginacao-botao {
   padding: 9px 18px;
-  background-color: #ffffff;
-  color: #2563eb;
-  border: 1px solid #e2e8f0;
+  background: var(--surface);
+  color: var(--accent-blue);
+  border: 1px solid var(--border-soft);
   border-radius: 10px;
   font-size: 13px;
   font-weight: 700;
@@ -209,17 +266,17 @@
 }
 
 .paginacao-botao:hover:not(:disabled) {
-  background-color: #eff6ff;
-  border-color: #dbeafe;
+  background: var(--surface-strong);
+  border-color: var(--border-strong);
 }
 
 .paginacao-botao:disabled {
-  color: #cbd5e1;
+  color: var(--text-faint);
   cursor: default;
 }
 
 .paginacao-info {
   font-size: 13px;
-  color: #64748b;
+  color: var(--text-muted);
   font-weight: 600;
 }
