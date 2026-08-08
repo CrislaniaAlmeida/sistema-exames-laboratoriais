@@ -97,6 +97,9 @@
   min-height: 92vh;
   display: flex;
   align-items: center;
+  padding-top: 110px;
+  padding-bottom: 40px;
+  box-sizing: border-box;
   background-size: cover;
   background-position: center 30%;
   background-repeat: no-repeat;
@@ -466,6 +469,15 @@
   }
   .landing-hero {
     min-height: 100vh;
+    padding-top: 130px;
+  }
+
+  .landing-header {
+    gap: 12px;
+  }
+
+  .landing-badge {
+    display: none;
   }
   .landing-hero-conteudo h1 {
     font-size: 38px;
