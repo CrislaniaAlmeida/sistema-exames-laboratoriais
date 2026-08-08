@@ -9,47 +9,49 @@ function LandingPage() {
         <div className="landing-logo">
           <span className="landing-logo-icon">🧪</span>
           <span className="landing-logo-text">NexLab</span>
-          <span className="landing-badge">Uso Interno</span>
+          <span className="landing-badge">Laboratorial</span>
         </div>
+
         <nav className="landing-nav">
-          <a href="#inicio">Início</a>
-          <a href="#exames">Exames</a>
-          <a href="#suporte">Suporte</a>
+          <a href="#recursos">Recursos</a>
+          <a href="#sobre">Sobre</a>
+          <a href="#contato">Contato</a>
         </nav>
+
+        <Link to="/login" className="btn btn-secondary">
+          Entrar
+        </Link>
       </header>
 
-      <main className="landing-hero">
+      <section className="landing-hero">
         <div className="landing-hero-text">
-          <span className="landing-eyebrow">Portal da equipe NexLab</span>
-          <h1>
-            Instruções de coleta na palma da mão
-          </h1>
+          <span className="landing-eyebrow">Gestão Laboratorial</span>
+          <h1>Exames, materiais e tubos, tudo em um só lugar.</h1>
           <p>
-            Ferramenta interna para os funcionários do laboratório
-            consultarem rapidamente material, preparo e recipiente
-            corretos de cada exame — garantindo coletas seguras e
-            padronizadas.
+            Consulte rapidamente informações de preparo, material coletado e tubo indicado
+            para cada exame do laboratório, com dados sempre atualizados.
           </p>
+
           <div className="landing-actions">
             <Link to="/login" className="btn btn-primary">
               Consultar exames
             </Link>
-            <a href="mailto:suporte@nexlab.com" className="btn btn-secondary">
+            <a href="#contato" className="btn btn-secondary">
               Falar com o suporte
             </a>
           </div>
         </div>
 
         <div className="landing-hero-image">
-          <img src={heroImg} alt="Profissional de laboratório realizando análise" />
+          <img src={heroImg} alt="Laboratório NexLab" />
         </div>
-      </main>
+      </section>
 
-      <section className="landing-guide">
-        <h2>Guia de coleta por exame</h2>
+      <section className="landing-guide" id="sobre">
+        <h2>Feito para o dia a dia do laboratório</h2>
         <p>
-          Pesquise um exame para ver o material, o preparo do paciente e o
-          tubo ou recipiente indicado.
+          Uma central única para sua equipe consultar exames, acompanhar preparo do paciente
+          e organizar materiais e tubos com agilidade.
         </p>
       </section>
     </div>
