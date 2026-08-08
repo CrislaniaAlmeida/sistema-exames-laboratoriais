@@ -33,6 +33,7 @@ function TubosGerenciar() {
 
   const [carregando, setCarregando] = useState(true);
   const [salvando, setSalvando] = useState(false);
+  const [enviandoFoto, setEnviandoFoto] = useState(false);
   const [erro, setErro] = useState('');
   const [mensagem, setMensagem] = useState('');
 
@@ -82,6 +83,29 @@ function TubosGerenciar() {
 
   function handleChange(campo, valor) {
     setForm((atual) => ({ ...atual, [campo]: valor }));
+  }
+
+  async function handleEscolherFoto(evento) {
+    const arquivo = evento.target.files?.[0];
+    evento.target.value = '';
+    if (!arquivo) return;
+
+    setErro('');
+    setEnviandoFoto(true);
+    try {
+      const dadosFormulario = new FormData();
+      dadosFormulario.append('arquivo', arquivo);
+      const resposta = await api.post('/tubos/upload-foto', dadosFormulario);
+      handleChange('foto_url', resposta.data.foto_url);
+      setMensagem('Foto enviada. A imagem pode levar 1-2 minutos para aparecer no site.');
+    } catch (erroRequisicao) {
+      setErro(
+        erroRequisicao.response?.data?.detail ||
+        'Nao foi possivel enviar a foto. Tente novamente.'
+      );
+    } finally {
+      setEnviandoFoto(false);
+    }
   }
 
   function montarPayload() {
@@ -168,13 +192,22 @@ function TubosGerenciar() {
               </label>
 
               <label>
-                URL da foto
-                <input
-                  type="text"
-                  value={form.foto_url}
-                  onChange={(e) => handleChange('foto_url', e.target.value)}
-                  placeholder="/tubos/roxo-edta.jpeg"
-                />
+                Foto do tubo
+                <div className="foto-upload-grupo">
+                  {form.foto_url && (
+                    <img src={form.foto_url} alt="Previa da foto" className="foto-upload-previa" />
+                  )}
+                  <label className="foto-upload-botao">
+                    {enviandoFoto ? 'Enviando...' : 'Escolher foto do computador'}
+                    <input
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp"
+                      onChange={handleEscolherFoto}
+                      disabled={enviandoFoto}
+                      hidden
+                    />
+                  </label>
+                </div>
               </label>
             </div>
 

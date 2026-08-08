@@ -100,6 +100,41 @@
   gap: 4px;
 }
 
+.foto-upload-grupo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.foto-upload-previa {
+  width: 44px;
+  height: 44px;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid var(--border-soft);
+  flex-shrink: 0;
+}
+
+.foto-upload-botao {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 16px;
+  border-radius: 10px;
+  border: 1px solid var(--border-soft);
+  background: var(--surface);
+  color: var(--accent-blue);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.foto-upload-botao:hover {
+  background: var(--surface-strong);
+  border-color: var(--border-strong);
+}
+
 .gerenciar-form input,
 .gerenciar-form select,
 .gerenciar-form textarea {

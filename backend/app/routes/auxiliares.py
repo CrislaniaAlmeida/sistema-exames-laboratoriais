@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 from sqlalchemy.orm import Session
 from typing import List
 
@@ -110,6 +110,15 @@ def criar_tubo(
     usuario_atual: Usuario = Depends(exigir_admin),
 ):
     return auxiliares_service.criar_tubo(db, dados)
+
+
+@router.post("/tubos/upload-foto")
+async def upload_foto_tubo(
+    arquivo: UploadFile = File(...),
+    usuario_atual: Usuario = Depends(exigir_admin),
+):
+    foto_url = await auxiliares_service.enviar_foto_tubo_para_github(arquivo)
+    return {"foto_url": foto_url}
 
 
 @router.put("/tubos/{tubo_id}", response_model=TuboResposta)
