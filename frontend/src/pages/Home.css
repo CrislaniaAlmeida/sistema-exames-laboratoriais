@@ -316,32 +316,37 @@
 .stat-card-foto {
   position: relative;
   height: 92px;
-  background: var(--grad-primary);
+  background-color: var(--accent-blue);
   background-image:
-    radial-gradient(circle at 15% 20%, rgba(255, 255, 255, 0.28), transparent 45%),
-    radial-gradient(circle at 85% 85%, rgba(0, 0, 0, 0.12), transparent 55%),
-    var(--grad-primary);
+    linear-gradient(135deg, rgba(0, 87, 224, 0.35), rgba(61, 130, 255, 0.1)),
+    url('/stats-lab.jpg');
+  background-blend-mode: multiply, normal;
+  background-size: cover, 200% 200%;
+  background-position: center, 0% 0%;
 }
 
 .stat-card-violeta .stat-card-foto {
+  background-color: var(--accent-violet);
   background-image:
-    radial-gradient(circle at 15% 20%, rgba(255, 255, 255, 0.28), transparent 45%),
-    radial-gradient(circle at 85% 85%, rgba(0, 0, 0, 0.12), transparent 55%),
-    var(--grad-violet);
+    linear-gradient(135deg, rgba(123, 79, 255, 0.35), rgba(123, 79, 255, 0.1)),
+    url('/stats-lab.jpg');
+  background-position: center, 100% 0%;
 }
 
 .stat-card-teal .stat-card-foto {
+  background-color: var(--accent-cyan);
   background-image:
-    radial-gradient(circle at 15% 20%, rgba(255, 255, 255, 0.28), transparent 45%),
-    radial-gradient(circle at 85% 85%, rgba(0, 0, 0, 0.12), transparent 55%),
-    linear-gradient(135deg, #00bfa8 0%, #4fd8c7 100%);
+    linear-gradient(135deg, rgba(0, 191, 168, 0.35), rgba(0, 191, 168, 0.1)),
+    url('/stats-lab.jpg');
+  background-position: center, 0% 100%;
 }
 
 .stat-card-amber .stat-card-foto {
+  background-color: var(--accent-amber);
   background-image:
-    radial-gradient(circle at 15% 20%, rgba(255, 255, 255, 0.28), transparent 45%),
-    radial-gradient(circle at 85% 85%, rgba(0, 0, 0, 0.12), transparent 55%),
-    linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
+    linear-gradient(135deg, rgba(245, 158, 11, 0.3), rgba(245, 158, 11, 0.05)),
+    url('/stats-lab.jpg');
+  background-position: center, 100% 100%;
 }
 
 .stat-card-icone {
