@@ -5,9 +5,6 @@ import './LandingPage.css';
 function LandingPage() {
   return (
     <div className="landing">
-      <div className="landing-blob landing-blob-1" />
-      <div className="landing-blob landing-blob-2" />
-
       <header className="landing-header">
         <div className="landing-logo">
           <span className="landing-logo-icon">🧪</span>
@@ -24,17 +21,18 @@ function LandingPage() {
         </Link>
       </header>
 
-      <main className="landing-hero" id="inicio">
-        <div className="landing-hero-text">
+      <main className="landing-hero" id="inicio" style={{ backgroundImage: `url(${heroImg})` }}>
+        <div className="landing-hero-overlay" />
+        <div className="landing-hero-conteudo">
           <span className="landing-eyebrow">Portal da equipe NexLab</span>
           <h1>
-            Instruções de coleta<br />na palma da mão
+            Precisão e excelência<br />em cada coleta
           </h1>
           <p>
             Ferramenta interna para os funcionários do laboratório
-            consultarem rapidamente material, preparo e recipiente
-            corretos de cada exame — garantindo coletas seguras e
-            padronizadas.
+            consultarem, com padrão de excelência, o material, o preparo
+            e o recipiente corretos de cada exame — coletas seguras,
+            consistentes e impecáveis.
           </p>
           <div className="landing-actions">
             <Link to="/login" className="btn btn-primary">
@@ -46,22 +44,31 @@ function LandingPage() {
           </div>
         </div>
 
-        <div className="landing-hero-image">
-          <img src={heroImg} alt="Profissional de laboratório realizando análise" />
-          <div className="landing-hero-tag">
-            <span className="landing-hero-tag-icone">✓</span>
-            <div>
-              <strong>Coleta padronizada</strong>
-              <span>Material, tubo e preparo sempre corretos</span>
-            </div>
-          </div>
-        </div>
+        <div className="landing-hero-linha" />
       </main>
+
+      <section className="landing-faixa">
+        <div className="faixa-item">
+          <span className="faixa-icone">✓</span>
+          <span>Padronização de coleta</span>
+        </div>
+        <div className="faixa-divisor" />
+        <div className="faixa-item">
+          <span className="faixa-icone">⏱</span>
+          <span>Consulta em segundos</span>
+        </div>
+        <div className="faixa-divisor" />
+        <div className="faixa-item">
+          <span className="faixa-icone">◈</span>
+          <span>Cobertura completa de exames</span>
+        </div>
+      </section>
 
       <section className="landing-recursos" id="recursos">
         <div className="landing-recursos-topo">
-          <span className="landing-eyebrow landing-eyebrow-centro">Como o NexLab ajuda</span>
+          <span className="landing-eyebrow">Como o NexLab ajuda</span>
           <h2>Tudo que a equipe precisa antes de cada coleta</h2>
+          <div className="landing-recursos-linha" />
         </div>
 
         <div className="landing-recursos-grid">
@@ -105,6 +112,15 @@ function LandingPage() {
         </div>
       </section>
 
+      <section className="landing-manifesto">
+        <div className="landing-manifesto-linha" />
+        <p>
+          Um padrão de excelência que acompanha cada etapa da coleta —
+          <em> da preparação do paciente ao recipiente final.</em>
+        </p>
+        <div className="landing-manifesto-linha" />
+      </section>
+
       <section className="landing-guide" id="suporte">
         <div className="landing-guide-conteudo">
           <span className="landing-eyebrow landing-eyebrow-claro">Pronto para começar</span>
@@ -113,7 +129,7 @@ function LandingPage() {
             Pesquise um exame para ver o material, o preparo do paciente e o
             tubo ou recipiente indicado.
           </p>
-          <Link to="/login" className="btn btn-primary btn-grande">
+          <Link to="/login" className="btn btn-dourado">
             Acessar o portal
           </Link>
         </div>
