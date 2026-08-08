@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import './Login.css';
@@ -38,9 +38,18 @@ function Login() {
 
   return (
     <div className="login-fundo" style={{ backgroundImage: `url(${fundoLogin})` }}>
+      <div className="login-overlay" />
+
+      <Link to="/" className="login-voltar">← Voltar ao início</Link>
+
       <div className="login-card">
-        <h1 className="login-titulo">NexLab</h1>
-        <p className="login-subtitulo">Faca login para continuar</p>
+        <div className="login-marca">
+          <span className="login-marca-icone">🧪</span>
+          <span className="login-marca-texto">NexLab</span>
+        </div>
+        <div className="login-linha" />
+        <h1 className="login-titulo">Bem-vinda de volta</h1>
+        <p className="login-subtitulo">Entre para acessar o portal de exames</p>
 
         <form onSubmit={handleSubmit} className="login-form">
           <div className="login-input-grupo">
