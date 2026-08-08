@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&display=swap');
+
 .login-fundo {
   position: relative;
   display: flex;
@@ -8,6 +10,7 @@
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
+  font-family: 'Inter', system-ui, sans-serif;
 }
 
 .login-card {
@@ -22,15 +25,16 @@
 
 .login-titulo {
   margin: 0;
-  font-size: 30px;
-  font-weight: 800;
-  color: #0f172a;
+  font-family: 'Instrument Serif', Georgia, serif;
+  font-size: 32px;
+  font-weight: 700;
+  color: #0b1733;
 }
 
 .login-subtitulo {
   margin: 6px 0 28px 0;
   font-size: 15px;
-  color: #64748b;
+  color: #4a5880;
 }
 
 .login-form {
@@ -43,14 +47,20 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  background-color: #eef1f5;
+  background-color: #eef4ff;
+  border: 1px solid #e0e9f8;
   border-radius: 14px;
   padding: 14px 18px;
+  transition: border-color 0.15s ease;
+}
+
+.login-input-grupo:focus-within {
+  border-color: #3d82ff;
 }
 
 .login-icone {
   display: flex;
-  color: #94a3b8;
+  color: #8a97ba;
   flex-shrink: 0;
 }
 
@@ -59,12 +69,30 @@
   background: transparent;
   outline: none;
   font-size: 15px;
-  color: #0f172a;
+  color: #0b1733;
   width: 100%;
+  font-family: inherit;
 }
 
 .login-input-grupo input::placeholder {
-  color: #94a3b8;
+  color: #8a97ba;
+}
+
+.login-toggle-senha {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: #8a97ba;
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+  transition: color 0.15s ease;
+}
+
+.login-toggle-senha:hover {
+  color: #4a5880;
 }
 
 .login-erro {
@@ -78,16 +106,18 @@
   padding: 14px;
   font-size: 16px;
   font-weight: 700;
-  background-color: #2563eb;
+  background: linear-gradient(135deg, #0057e0 0%, #3d82ff 100%);
   color: #fff;
   border: none;
   border-radius: 14px;
   cursor: pointer;
-  transition: background-color 0.15s ease;
+  transition: box-shadow 0.15s ease;
+  box-shadow: 0 8px 20px rgba(0, 87, 224, 0.28);
+  font-family: 'Inter', system-ui, sans-serif;
 }
 
 .login-botao:hover:not(:disabled) {
-  background-color: #1d4ed8;
+  box-shadow: 0 10px 26px rgba(0, 87, 224, 0.4);
 }
 
 .login-botao:disabled {

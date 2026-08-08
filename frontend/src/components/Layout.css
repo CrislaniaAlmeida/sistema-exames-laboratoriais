@@ -1,23 +1,25 @@
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700;800&family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&display=swap');
 
 :root {
-  --bg-deep: #05070d;
-  --bg-mid: #0a0f1c;
-  --surface: rgba(255, 255, 255, 0.045);
-  --surface-strong: rgba(255, 255, 255, 0.075);
-  --border-soft: rgba(255, 255, 255, 0.09);
-  --border-strong: rgba(255, 255, 255, 0.16);
-  --text-primary: #eaf1ff;
-  --text-muted: #8b96ab;
-  --text-faint: #586074;
-  --accent-blue: #2563eb;
-  --accent-blue-light: #60a5fa;
-  --accent-cyan: #22d3ee;
-  --accent-violet: #8b5cf6;
-  --accent-emerald: #34d399;
-  --grad-primary: linear-gradient(135deg, #2563eb 0%, #22d3ee 100%);
-  --grad-violet: linear-gradient(135deg, #8b5cf6 0%, #2563eb 100%);
-  --font-display: 'Space Grotesk', system-ui, sans-serif;
+  --bg-deep: #f4f8ff;
+  --bg-mid: #eaf1ff;
+  --surface: #ffffff;
+  --surface-strong: #ebf2ff;
+  --border-soft: #e0e9f8;
+  --border-strong: #c7d5f0;
+  --text-primary: #0b1733;
+  --text-muted: #4a5880;
+  --text-faint: #8a97ba;
+  --accent-blue: #0057e0;
+  --accent-blue-light: #3d82ff;
+  --accent-cyan: #00bfa8;
+  --accent-violet: #7b4fff;
+  --accent-emerald: #00bfa8;
+  --accent-amber: #f59e0b;
+  --grad-primary: linear-gradient(135deg, #0057e0 0%, #3d82ff 100%);
+  --grad-violet: linear-gradient(135deg, #7b4fff 0%, #0057e0 100%);
+  --grad-hero: linear-gradient(125deg, #0041c2 0%, #1b2e9e 40%, #6b3fee 100%);
+  --font-display: 'Instrument Serif', Georgia, serif;
   --font-body: 'Inter', system-ui, sans-serif;
 }
 
@@ -27,9 +29,9 @@
   min-height: 100vh;
   background-color: var(--bg-deep);
   background-image:
-    radial-gradient(circle at -5% -10%, rgba(37, 99, 235, 0.35), transparent 40%),
-    radial-gradient(circle at 105% 110%, rgba(139, 92, 246, 0.28), transparent 40%),
-    radial-gradient(circle at 85% 25%, rgba(34, 211, 238, 0.16), transparent 35%);
+    radial-gradient(circle at -5% -10%, rgba(0, 87, 224, 0.1), transparent 40%),
+    radial-gradient(circle at 105% 110%, rgba(123, 79, 255, 0.08), transparent 40%),
+    radial-gradient(circle at 85% 25%, rgba(0, 191, 168, 0.06), transparent 35%);
   background-attachment: fixed;
   color: var(--text-primary);
   font-family: var(--font-body);
@@ -76,7 +78,7 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.35);
+  box-shadow: 0 8px 20px rgba(0, 87, 224, 0.3);
 }
 
 .layout-logo h1 {
@@ -119,14 +121,14 @@
 
 .layout-nav-item-ativo {
   background: var(--grad-primary);
-  color: #04070d;
+  color: #ffffff;
   font-weight: 700;
-  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
+  box-shadow: 0 8px 20px rgba(0, 87, 224, 0.28);
 }
 
 .layout-nav-item-ativo:hover {
   background: var(--grad-primary);
-  color: #04070d;
+  color: #ffffff;
 }
 
 .layout-nav-icone {
@@ -276,7 +278,7 @@
   font-size: 13px;
   font-weight: 700;
   flex-shrink: 0;
-  box-shadow: 0 6px 16px rgba(139, 92, 246, 0.35);
+  box-shadow: 0 6px 16px rgba(123, 79, 255, 0.3);
 }
 
 .layout-conteudo {

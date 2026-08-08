@@ -1,14 +1,12 @@
-.landing {
-  min-height: 100vh;
-  background: linear-gradient(180deg, #eef2ff 0%, #ffffff 40%, #f8fafc 100%);
-  color: #0f172a;
-}
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&display=swap');
+
 .landing {
   min-height: 100vh;
   width: 100%;
   overflow-x: hidden;
-  background: linear-gradient(180deg, #eef2ff 0%, #ffffff 40%, #f8fafc 100%);
-  color: #0f172a;
+  background: linear-gradient(180deg, #eef4ff 0%, #ffffff 45%, #f4f8ff 100%);
+  color: #0b1733;
+  font-family: 'Inter', system-ui, sans-serif;
 }
 
 .landing-header {
@@ -25,20 +23,21 @@
 }
 
 .landing-logo-icon {
-  background: #dbeafe;
+  background: rgba(0, 87, 224, 0.1);
   border-radius: 10px;
   padding: 6px 8px;
   font-size: 20px;
 }
 
 .landing-logo-text {
-  font-size: 20px;
+  font-family: 'Instrument Serif', Georgia, serif;
+  font-size: 22px;
   font-weight: 700;
 }
 
 .landing-badge {
-  background: #e0e7ff;
-  color: #4338ca;
+  background: rgba(123, 79, 255, 0.12);
+  color: #6c3ce0;
   font-size: 12px;
   font-weight: 600;
   padding: 4px 10px;
@@ -52,13 +51,13 @@
 }
 
 .landing-nav a {
-  color: #334155;
+  color: #4a5880;
   text-decoration: none;
   font-weight: 500;
 }
 
 .landing-nav a:hover {
-  color: #2563eb;
+  color: #0057e0;
 }
 
 .landing-hero {
@@ -77,8 +76,8 @@
 
 .landing-eyebrow {
   display: inline-block;
-  background: #dbeafe;
-  color: #1d4ed8;
+  background: rgba(0, 87, 224, 0.1);
+  color: #0057e0;
   font-size: 13px;
   font-weight: 600;
   padding: 6px 14px;
@@ -87,17 +86,18 @@
 }
 
 .landing-hero-text h1 {
-  font-size: 44px;
+  font-family: 'Instrument Serif', Georgia, serif;
+  font-size: 48px;
   line-height: 1.15;
-  font-weight: 800;
+  font-weight: 700;
   margin: 0 0 20px;
-  color: #0f172a;
+  color: #0b1733;
 }
 
 .landing-hero-text p {
   font-size: 16px;
   line-height: 1.6;
-  color: #475569;
+  color: #4a5880;
   margin-bottom: 32px;
 }
 
@@ -122,15 +122,15 @@
 }
 
 .btn-primary {
-  background: #2563eb;
+  background: linear-gradient(135deg, #0057e0 0%, #3d82ff 100%);
   color: #ffffff;
-  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.25);
+  box-shadow: 0 8px 20px rgba(0, 87, 224, 0.28);
 }
 
 .btn-secondary {
   background: #ffffff;
-  color: #1d4ed8;
-  border: 1px solid #dbeafe;
+  color: #0057e0;
+  border: 1px solid #dbe6fb;
 }
 
 .landing-hero-image {
@@ -151,17 +151,19 @@
 .landing-guide {
   text-align: center;
   padding: 64px 24px 96px;
-  background: #f1f5f9;
+  background: #ebf2ff;
 }
 
 .landing-guide h2 {
-  font-size: 28px;
-  font-weight: 800;
+  font-family: 'Instrument Serif', Georgia, serif;
+  font-size: 30px;
+  font-weight: 700;
   margin-bottom: 12px;
+  color: #0b1733;
 }
 
 .landing-guide p {
-  color: #64748b;
+  color: #4a5880;
   font-size: 16px;
   max-width: 480px;
   margin: 0 auto;
