@@ -34,6 +34,7 @@ function Home() {
   const [exames, setExames] = useState([]);
   const [materiais, setMateriais] = useState({});
   const [tubos, setTubos] = useState({});
+  const [tubosLista, setTubosLista] = useState([]);
   const [totais, setTotais] = useState({ exames: 0, ativos: 0, laboratorios: 0, materiais: 0, tubos: 0 });
   const [categoriaAtiva, setCategoriaAtiva] = useState('Todos');
   const [pagina, setPagina] = useState(1);
@@ -59,6 +60,7 @@ function Home() {
 
         setMateriais(mapaMateriais);
         setTubos(mapaTubos);
+        setTubosLista(respTubos.data);
         setExames(respExames.data);
         setTotais({
           exames: respExames.data.length,
@@ -296,14 +298,22 @@ function Home() {
         )}
 
         {!mostrarResultados ? (
-          <div className="dashboard-resultados-vazio">
-            <span className="dashboard-resultados-vazio-icone">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <circle cx="11" cy="11" r="7" />
-                <path d="m21 21-4.3-4.3" />
-              </svg>
-            </span>
-            <p>Pesquise um exame ou escolha uma categoria para ver os resultados aqui.</p>
+          <div className="guia-tubos">
+            <div className="dashboard-secao-titulo">Guia rápido de tubos</div>
+            <div className="guia-tubos-grid">
+              {tubosLista.map((tubo) => (
+                <div key={tubo.id} className="guia-tubo-card">
+                  <span
+                    className="guia-tubo-cor"
+                    style={{ backgroundColor: corHexDoTubo(tubo.cor) }}
+                  />
+                  <div className="guia-tubo-texto">
+                    <strong>{tubo.cor}</strong>
+                    <span>{tubo.descricao || 'Sem descricao cadastrada'}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         ) : (
         <div className="dashboard-resultados">
