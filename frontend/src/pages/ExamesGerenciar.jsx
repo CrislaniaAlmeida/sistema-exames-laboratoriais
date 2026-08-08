@@ -89,6 +89,7 @@ function ExamesGerenciar() {
     setFormAberto(true);
     setMensagem('');
     setErro('');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   function abrirEdicao(exame) {
@@ -118,6 +119,7 @@ function ExamesGerenciar() {
     setFormAberto(true);
     setMensagem('');
     setErro('');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   function fecharForm() {

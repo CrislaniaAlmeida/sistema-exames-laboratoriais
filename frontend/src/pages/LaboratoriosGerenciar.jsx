@@ -39,6 +39,7 @@ function LaboratoriosGerenciar() {
     setFormAberto(true);
     setMensagem('');
     setErro('');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   function abrirEdicao(laboratorio) {
@@ -54,6 +55,7 @@ function LaboratoriosGerenciar() {
     setFormAberto(true);
     setMensagem('');
     setErro('');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   function fecharForm() {

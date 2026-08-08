@@ -58,6 +58,7 @@ function TubosGerenciar() {
     setFormAberto(true);
     setMensagem('');
     setErro('');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   function abrirEdicao(tubo) {
@@ -70,6 +71,7 @@ function TubosGerenciar() {
     setFormAberto(true);
     setMensagem('');
     setErro('');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   function fecharForm() {
