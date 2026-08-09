@@ -26,9 +26,14 @@ function PacientesGerenciar() {
   const [medicamentosPopupAberto, setMedicamentosPopupAberto] = useState(false);
   const [medicamentosTemp, setMedicamentosTemp] = useState(['']);
 
+  const [examesDisponiveis, setExamesDisponiveis] = useState([]);
+  const [termoExame, setTermoExame] = useState('');
+  const [examesSelecionados, setExamesSelecionados] = useState([]);
+
   const [buscandoCep, setBuscandoCep] = useState(false);
   const [carregando, setCarregando] = useState(true);
   const [salvando, setSalvando] = useState(false);
+  const [concluindo, setConcluindo] = useState(false);
   const [erro, setErro] = useState('');
   const [mensagem, setMensagem] = useState('');
 
@@ -44,9 +49,39 @@ function PacientesGerenciar() {
     }
   }
 
+  async function carregarExames() {
+    try {
+      const resposta = await api.get('/exames/');
+      setExamesDisponiveis(resposta.data);
+    } catch {
+      // a secao de exames so fica indisponivel; o resto do cadastro continua funcionando
+    }
+  }
+
   useEffect(() => {
     carregarPacientes();
+    carregarExames();
   }, []);
+
+  const sugestoesExame = termoExame.trim().length < 2 ? [] : examesDisponiveis
+    .filter((exame) => !examesSelecionados.some((selecionado) => selecionado.id === exame.id))
+    .filter((exame) => {
+      const termo = termoExame.trim().toLowerCase();
+      return (
+        exame.nome.toLowerCase().includes(termo) ||
+        (exame.sigla && exame.sigla.toLowerCase().includes(termo))
+      );
+    })
+    .slice(0, 8);
+
+  function adicionarExame(exame) {
+    setExamesSelecionados((atual) => [...atual, exame]);
+    setTermoExame('');
+  }
+
+  function removerExame(exameId) {
+    setExamesSelecionados((atual) => atual.filter((e) => e.id !== exameId));
+  }
 
   const pacientesFiltrados = pacientes.filter((p) => {
     if (!termoFiltro.trim()) return true;
@@ -61,6 +96,8 @@ function PacientesGerenciar() {
   function abrirNovo() {
     setForm(PACIENTE_VAZIO);
     setEditandoId(null);
+    setExamesSelecionados([]);
+    setTermoExame('');
     setFormAberto(true);
     setMensagem('');
     setErro('');
@@ -74,6 +111,8 @@ function PacientesGerenciar() {
       data_nascimento: paciente.data_nascimento || '',
     });
     setEditandoId(paciente.id);
+    setExamesSelecionados([]);
+    setTermoExame('');
     setFormAberto(true);
     setMensagem('');
     setErro('');
@@ -84,6 +123,8 @@ function PacientesGerenciar() {
     setFormAberto(false);
     setEditandoId(null);
     setForm(PACIENTE_VAZIO);
+    setExamesSelecionados([]);
+    setTermoExame('');
   }
 
   function handleChange(campo, valor) {
@@ -189,6 +230,62 @@ function PacientesGerenciar() {
       );
     } finally {
       setSalvando(false);
+    }
+  }
+
+  async function handleConcluir() {
+    setErro('');
+    setMensagem('');
+
+    if (!form.nome || !form.cpf || !form.data_nascimento) {
+      setErro('Preencha nome, CPF e data de nascimento antes de concluir.');
+      return;
+    }
+    if (examesSelecionados.length === 0) {
+      setErro('Adicione ao menos um exame antes de concluir o cadastro.');
+      return;
+    }
+
+    const confirmar = window.confirm(
+      `Confirma os dados cadastrados para "${form.nome}"? ` +
+      `Isso vai gerar o comprovante em PDF com ${examesSelecionados.length} exame(s) solicitado(s).`
+    );
+    if (!confirmar) return;
+
+    setConcluindo(true);
+    try {
+      const payload = montarPayload();
+      let pacienteId = editandoId;
+
+      if (pacienteId) {
+        await api.put(`/pacientes/${pacienteId}`, payload);
+      } else {
+        const resposta = await api.post('/pacientes/', payload);
+        pacienteId = resposta.data.id;
+      }
+
+      const respostaPaciente = await api.get(`/pacientes/${pacienteId}`);
+      const respostaSolicitacao = await api.post(`/pacientes/${pacienteId}/solicitacoes`, {
+        exame_ids: examesSelecionados.map((exame) => exame.id),
+      });
+
+      const { gerarPdfSolicitacao } = await import('../services/pdfSolicitacao');
+      gerarPdfSolicitacao({
+        paciente: respostaPaciente.data,
+        exames: respostaSolicitacao.data.exames,
+        dataSolicitacao: new Date(respostaSolicitacao.data.data_solicitacao),
+      });
+
+      setMensagem('Cadastro concluido. O comprovante em PDF foi baixado.');
+      fecharForm();
+      carregarPacientes();
+    } catch (erroRequisicao) {
+      setErro(
+        erroRequisicao.response?.data?.detail ||
+        'Nao foi possivel concluir o cadastro. Verifique os campos.'
+      );
+    } finally {
+      setConcluindo(false);
     }
   }
 
@@ -378,9 +475,51 @@ function PacientesGerenciar() {
               />
             </label>
 
+            <h3 className="paciente-secao-titulo">Exames solicitados</h3>
+            <div className="paciente-exames-busca">
+              <input
+                type="text"
+                autoComplete="off"
+                value={termoExame}
+                onChange={(e) => setTermoExame(e.target.value)}
+                placeholder="Digite a sigla ou o nome do exame..."
+              />
+              {sugestoesExame.length > 0 && (
+                <div className="paciente-exames-sugestoes">
+                  {sugestoesExame.map((exame) => (
+                    <button
+                      type="button"
+                      key={exame.id}
+                      className="paciente-exames-sugestao"
+                      onClick={() => adicionarExame(exame)}
+                    >
+                      <strong>{exame.sigla || exame.nome}</strong>
+                      {exame.sigla && <span> — {exame.nome}</span>}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {examesSelecionados.length > 0 ? (
+              <ul className="paciente-exames-lista">
+                {examesSelecionados.map((exame) => (
+                  <li key={exame.id}>
+                    <span>{exame.nome} {exame.sigla && <span className="tag-sigla-mini">{exame.sigla}</span>}</span>
+                    <button type="button" onClick={() => removerExame(exame.id)}>×</button>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="paciente-exames-vazio">Nenhum exame adicionado ainda.</p>
+            )}
+
             <div className="form-acoes">
               <button type="submit" disabled={salvando}>
-                {salvando ? 'Salvando...' : 'Salvar'}
+                {salvando ? 'Salvando...' : 'Salvar dados'}
+              </button>
+              <button type="button" className="paciente-concluir" onClick={handleConcluir} disabled={concluindo}>
+                {concluindo ? 'Gerando...' : 'Concluir e gerar PDF'}
               </button>
               <button type="button" className="form-cancelar" onClick={fecharForm}>
                 Cancelar

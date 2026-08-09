@@ -69,6 +69,39 @@ class Paciente(Base):
     criado_em = Column(TIMESTAMP(timezone=True), server_default=func.now())
     atualizado_em = Column(TIMESTAMP(timezone=True), server_default=func.now())
 
+    solicitacoes = relationship(
+        "Solicitacao", back_populates="paciente", cascade="all, delete-orphan")
+
+
+class Solicitacao(Base):
+    """Um pedido de exames feito para um paciente numa determinada data."""
+    __tablename__ = "solicitacoes_exames"
+
+    id = Column(Integer, primary_key=True, index=True)
+    paciente_id = Column(Integer, ForeignKey("pacientes.id", ondelete="CASCADE"), nullable=False)
+    data_solicitacao = Column(TIMESTAMP(timezone=True), server_default=func.now())
+
+    paciente = relationship("Paciente", back_populates="solicitacoes")
+    itens = relationship(
+        "SolicitacaoExame", back_populates="solicitacao", cascade="all, delete-orphan")
+
+    @property
+    def exames(self):
+        return [item.exame for item in self.itens if item.exame]
+
+
+class SolicitacaoExame(Base):
+    """Um exame especifico dentro de uma solicitacao (tabela de ligacao)."""
+    __tablename__ = "solicitacao_exames"
+
+    id = Column(Integer, primary_key=True, index=True)
+    solicitacao_id = Column(Integer, ForeignKey(
+        "solicitacoes_exames.id", ondelete="CASCADE"), nullable=False)
+    exame_id = Column(Integer, ForeignKey("exames.id", ondelete="SET NULL"))
+
+    solicitacao = relationship("Solicitacao", back_populates="itens")
+    exame = relationship("Exame")
+
 
 class Laboratorio(Base):
     __tablename__ = "laboratorios"

@@ -4,7 +4,10 @@ from typing import List
 
 from app.database.connection import get_db
 from app.database.models import Usuario
-from app.schemas.paciente import PacienteCriar, PacienteAtualizar, PacienteResposta
+from app.schemas.paciente import (
+    PacienteCriar, PacienteAtualizar, PacienteResposta,
+    SolicitacaoCriar, SolicitacaoResposta,
+)
 from app.services import paciente_service
 from app.auth.dependencies import exigir_permissao
 
@@ -63,3 +66,25 @@ def excluir(
     if not paciente:
         raise HTTPException(status_code=404, detail="Paciente nao encontrado.")
     return {"mensagem": f"Paciente '{paciente.nome}' excluido com sucesso."}
+
+
+@router.get("/{paciente_id}/solicitacoes", response_model=List[SolicitacaoResposta])
+def listar_solicitacoes(
+    paciente_id: int,
+    db: Session = Depends(get_db),
+    usuario_atual: Usuario = Depends(exigir_permissao("pacientes_gerenciar")),
+):
+    return paciente_service.listar_solicitacoes(db, paciente_id)
+
+
+@router.post("/{paciente_id}/solicitacoes", response_model=SolicitacaoResposta, status_code=201)
+def criar_solicitacao(
+    paciente_id: int,
+    dados: SolicitacaoCriar,
+    db: Session = Depends(get_db),
+    usuario_atual: Usuario = Depends(exigir_permissao("pacientes_gerenciar")),
+):
+    solicitacao = paciente_service.criar_solicitacao(db, paciente_id, dados.exame_ids)
+    if not solicitacao:
+        raise HTTPException(status_code=404, detail="Paciente nao encontrado.")
+    return solicitacao

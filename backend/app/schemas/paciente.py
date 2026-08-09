@@ -80,3 +80,29 @@ class PacienteResposta(PacienteBase):
 
     class Config:
         from_attributes = True
+
+
+class ExameResumoResposta(BaseModel):
+    id: int
+    nome: str
+    sigla: Optional[str] = None
+    codigo: Optional[str] = None
+    setor_responsavel: Optional[str] = None
+    prazo_liberacao_resultado: Optional[str] = None
+
+    class Config:
+        from_attributes = True
+
+
+class SolicitacaoCriar(BaseModel):
+    exame_ids: List[int]
+
+
+class SolicitacaoResposta(BaseModel):
+    id: int
+    paciente_id: int
+    data_solicitacao: datetime
+    exames: List[ExameResumoResposta]
+
+    class Config:
+        from_attributes = True

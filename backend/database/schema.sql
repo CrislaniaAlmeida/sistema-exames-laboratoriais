@@ -144,6 +144,24 @@ CREATE TABLE exames (
 COMMENT ON TABLE exames IS 'Tabela principal com todas as informações de cada exame laboratorial';
 
 -- =========================================================
+-- TABELA: solicitacoes_exames (pedido de exames de um paciente)
+-- =========================================================
+CREATE TABLE solicitacoes_exames (
+    id                  INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    paciente_id         INTEGER NOT NULL REFERENCES pacientes(id) ON DELETE CASCADE,
+    data_solicitacao    TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE solicitacao_exames (
+    id                  INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    solicitacao_id      INTEGER NOT NULL REFERENCES solicitacoes_exames(id) ON DELETE CASCADE,
+    exame_id            INTEGER REFERENCES exames(id) ON DELETE SET NULL
+);
+
+CREATE INDEX idx_solicitacoes_paciente ON solicitacoes_exames (paciente_id);
+CREATE INDEX idx_solicitacao_exames_solicitacao ON solicitacao_exames (solicitacao_id);
+
+-- =========================================================
 -- TABELA: exames_relacionados (relação N:N entre exames)
 -- =========================================================
 CREATE TABLE exames_relacionados (

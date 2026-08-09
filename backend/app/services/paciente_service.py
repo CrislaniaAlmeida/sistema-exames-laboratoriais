@@ -1,7 +1,7 @@
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy import func
-from app.database.models import Paciente
+from app.database.models import Paciente, Solicitacao, SolicitacaoExame, Exame
 from app.schemas.paciente import PacienteCriar, PacienteAtualizar
 
 MAXIMO_MEDICAMENTOS = 6
@@ -90,3 +90,41 @@ def excluir_paciente(db: Session, paciente_id: int):
     db.delete(paciente)
     db.commit()
     return paciente
+
+
+def listar_solicitacoes(db: Session, paciente_id: int):
+    return (
+        db.query(Solicitacao)
+        .filter(Solicitacao.paciente_id == paciente_id)
+        .order_by(Solicitacao.data_solicitacao.desc())
+        .all()
+    )
+
+
+def criar_solicitacao(db: Session, paciente_id: int, exame_ids: list):
+    paciente = buscar_paciente_por_id(db, paciente_id)
+    if not paciente:
+        return None
+
+    if not exame_ids:
+        raise HTTPException(status_code=400, detail="Selecione ao menos um exame.")
+
+    exames_existentes = db.query(Exame.id).filter(Exame.id.in_(exame_ids)).all()
+    ids_validos = {e.id for e in exames_existentes}
+    ids_invalidos = set(exame_ids) - ids_validos
+    if ids_invalidos:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Exame(s) nao encontrado(s): {', '.join(str(i) for i in ids_invalidos)}",
+        )
+
+    nova_solicitacao = Solicitacao(paciente_id=paciente_id)
+    db.add(nova_solicitacao)
+    db.flush()
+
+    for exame_id in exame_ids:
+        db.add(SolicitacaoExame(solicitacao_id=nova_solicitacao.id, exame_id=exame_id))
+
+    db.commit()
+    db.refresh(nova_solicitacao)
+    return nova_solicitacao
