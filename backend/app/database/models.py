@@ -175,3 +175,11 @@ class Exame(Base):
     laboratorio = relationship("Laboratorio", back_populates="exames")
     material = relationship("Material", back_populates="exames")
     tubo = relationship("Tubo", back_populates="exames")
+
+    @property
+    def tubo_cor(self):
+        return self.tubo.cor if self.tubo else None
+
+    @property
+    def material_nome(self):
+        return self.material.nome if self.material else None

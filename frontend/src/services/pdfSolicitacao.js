@@ -108,3 +108,69 @@ export function gerarPdfSolicitacao({ paciente, exames, dataSolicitacao }) {
 
   doc.save(`solicitacao-${paciente.codigo}.pdf`);
 }
+
+/**
+ * Agrupa os exames por tubo de coleta. Quando o exame ja tem um tubo
+ * cadastrado (tela "Gerenciar Exames"), usa a cor dele -- essa e a
+ * fonte confiavel. Quando nao tem, agrupa pelo setor responsavel e
+ * marca a cor como "A confirmar" em vez de arriscar um palpite errado.
+ */
+function agruparExamesPorTubo(exames) {
+  const grupos = new Map();
+
+  exames.forEach((exame) => {
+    const chave = exame.tubo_cor
+      ? `tubo:${exame.tubo_cor.toLowerCase()}`
+      : `setor:${(exame.setor_responsavel || 'geral').toLowerCase()}`;
+
+    if (!grupos.has(chave)) {
+      grupos.set(chave, {
+        corTampa: exame.tubo_cor || null,
+        setor: exame.setor_responsavel || null,
+        amostra: exame.material_nome || null,
+        exames: [],
+      });
+    }
+
+    const grupo = grupos.get(chave);
+    grupo.exames.push(exame);
+    if (!grupo.amostra && exame.material_nome) grupo.amostra = exame.material_nome;
+  });
+
+  return Array.from(grupos.values());
+}
+
+export function gerarEtiquetasTubos({ paciente, exames }) {
+  const grupos = agruparExamesPorTubo(exames);
+  const doc = new jsPDF({ unit: 'mm', format: [50, 25] });
+  const largura = 46;
+
+  grupos.forEach((grupo, indice) => {
+    if (indice > 0) doc.addPage([50, 25]);
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(7);
+    const linhasNome = doc.splitTextToSize(paciente.nome, largura).slice(0, 2);
+
+    let y = 3.6;
+    linhasNome.forEach((linha) => {
+      doc.text(linha, 2, y);
+      y += 3;
+    });
+
+    y += 0.8;
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(6.2);
+    doc.text(`Nasc: ${formatarData(paciente.data_nascimento)}`, 2, y); y += 3.1;
+    doc.text(`Codigo: ${paciente.codigo}`, 2, y); y += 3.1;
+    doc.text(`Amostra: ${grupo.amostra || grupo.setor || '-'}`, 2, y); y += 3.4;
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(6.8);
+    doc.text(`Tubo: ${grupo.corTampa || 'A confirmar'}`, 2, y);
+  });
+
+  doc.save(`etiquetas-${paciente.codigo}.pdf`);
+
+  return grupos;
+}

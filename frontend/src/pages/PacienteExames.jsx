@@ -90,14 +90,26 @@ function PacienteExames() {
         exame_ids: examesSelecionados.map((exame) => exame.id),
       });
 
-      const { gerarPdfSolicitacao } = await import('../services/pdfSolicitacao');
+      const { gerarPdfSolicitacao, gerarEtiquetasTubos } = await import('../services/pdfSolicitacao');
       gerarPdfSolicitacao({
         paciente,
         exames: respostaSolicitacao.data.exames,
         dataSolicitacao: new Date(respostaSolicitacao.data.data_solicitacao),
       });
 
-      setMensagem('Solicitacao concluida. O comprovante em PDF foi baixado.');
+      const grupos = gerarEtiquetasTubos({
+        paciente,
+        exames: respostaSolicitacao.data.exames,
+      });
+
+      const semTuboDefinido = grupos.filter((grupo) => !grupo.corTampa).length;
+      const avisoTubo = semTuboDefinido
+        ? ` Atencao: ${semTuboDefinido} etiqueta(s) ficaram marcadas "A confirmar" porque esses exames ainda nao tem tubo cadastrado em Gerenciar Exames.`
+        : '';
+
+      setMensagem(
+        `Solicitacao concluida. O comprovante e as etiquetas de tubo (${grupos.length}) foram baixados.${avisoTubo}`
+      );
       setExamesSelecionados([]);
       carregarTudo();
     } catch (erroRequisicao) {

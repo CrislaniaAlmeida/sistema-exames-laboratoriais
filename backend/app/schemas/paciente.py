@@ -91,6 +91,8 @@ class ExameResumoResposta(BaseModel):
     codigo: Optional[str] = None
     setor_responsavel: Optional[str] = None
     prazo_liberacao_resultado: Optional[str] = None
+    tubo_cor: Optional[str] = None
+    material_nome: Optional[str] = None
 
     class Config:
         from_attributes = True
