@@ -9,16 +9,16 @@ import './Home.css';
 const ITENS_POR_PAGINA = 20;
 
 const CORES_TUBO = {
-  roxo: '#7c3aed',
-  vermelho: '#dc2626',
-  amarelo: '#eab308',
+  rox: '#7c3aed',
+  vermelh: '#dc2626',
+  amarel: '#eab308',
   azul: '#0057e0',
   verde: '#16a34a',
   cinza: '#6b7280',
   rosa: '#ec4899',
-  preto: '#111827',
+  pret: '#111827',
   laranja: '#ea580c',
-  branco: '#e5e7eb',
+  branc: '#e5e7eb',
   bege: '#d6c7a8',
 };
 

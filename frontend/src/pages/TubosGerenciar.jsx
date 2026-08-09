@@ -7,11 +7,11 @@ import './TubosGerenciar.css';
 const TUBO_VAZIO = { cor: '', descricao: '', foto_url: '' };
 
 const coresConhecidas = {
-  amarelo: '#f5c518',
-  roxo: '#7c3aed',
+  amarel: '#f5c518',
+  rox: '#7c3aed',
   azul: '#2563eb',
   cinza: '#94a3b8',
-  vermelho: '#dc2626',
+  vermelh: '#dc2626',
   verde: '#16a34a',
   rosa: '#ec4899',
   laranja: '#f97316',
