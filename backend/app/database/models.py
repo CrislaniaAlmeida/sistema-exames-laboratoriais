@@ -1,9 +1,11 @@
 from sqlalchemy import (
-    Column, Integer, String, Text, Boolean, ForeignKey, TIMESTAMP, CheckConstraint
+    Column, Integer, String, Text, Boolean, ForeignKey, TIMESTAMP, CheckConstraint, JSON
 )
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from app.database.connection import Base
+
+PERFIS_VALIDOS = ("admin", "recepcao", "bioquimico", "usuario")
 
 
 class Usuario(Base):
@@ -14,13 +16,15 @@ class Usuario(Base):
     email = Column(String(150), nullable=False, unique=True, index=True)
     senha_hash = Column(String(255), nullable=False)
     perfil = Column(String(20), nullable=False, default="usuario")
+    permissoes = Column(JSON, nullable=False, default=list)
     ativo = Column(Boolean, nullable=False, default=True)
     criado_em = Column(TIMESTAMP(timezone=True), server_default=func.now())
     atualizado_em = Column(TIMESTAMP(timezone=True), server_default=func.now())
 
     __table_args__ = (
-        CheckConstraint("perfil IN ('admin', 'usuario')",
-                        name="check_perfil_valido"),
+        CheckConstraint(
+            "perfil IN ('admin', 'recepcao', 'bioquimico', 'usuario')",
+            name="check_perfil_valido"),
     )
 
 

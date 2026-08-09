@@ -4,10 +4,11 @@ import './Layout.css';
 
 const navItems = [
   { label: 'Dashboard', path: '/exames', icon: 'dashboard', disponivel: true },
-  { label: 'Gerenciar Exames', path: '/exames/gerenciar', icon: 'exames', disponivel: true, adminOnly: true },
-  { label: 'Laboratorios', path: '/laboratorios', icon: 'laboratorio', disponivel: true, adminOnly: true },
+  { label: 'Gerenciar Exames', path: '/exames/gerenciar', icon: 'exames', disponivel: true, permissao: 'exames_gerenciar' },
+  { label: 'Laboratorios', path: '/laboratorios', icon: 'laboratorio', disponivel: true, permissao: 'laboratorios_gerenciar' },
   { label: 'Materiais', path: '/materiais', icon: 'materiais', disponivel: false, adminOnly: true },
-  { label: 'Tubos', path: '/tubos', icon: 'tubos', disponivel: true, adminOnly: true },
+  { label: 'Tubos', path: '/tubos', icon: 'tubos', disponivel: true, permissao: 'tubos_gerenciar' },
+  { label: 'Usuarios', path: '/usuarios', icon: 'usuarios', disponivel: true, adminOnly: true },
 ];
 
 const titulosPagina = {
@@ -15,6 +16,14 @@ const titulosPagina = {
   '/exames/gerenciar': { titulo: 'Gerenciar Exames', subtitulo: 'Cadastre, edite ou remova exames do sistema' },
   '/tubos': { titulo: 'Gerenciar Tubos', subtitulo: 'Cadastre, edite ou remova tubos de coleta' },
   '/laboratorios': { titulo: 'Laboratorios de Apoio', subtitulo: 'Cadastre laboratorios externos' },
+  '/usuarios': { titulo: 'Gerenciar Usuarios', subtitulo: 'Cadastre usuarios e defina o que cada um pode acessar' },
+};
+
+const PERFIS_LABEL = {
+  admin: 'Administrador',
+  recepcao: 'Recepcao / Coletador',
+  bioquimico: 'Bioquimico',
+  usuario: 'Outro',
 };
 
 const icons = {
@@ -43,6 +52,14 @@ const icons = {
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
       <rect x="7" y="2" width="10" height="20" rx="4" />
       <path d="M7 13h10" />
+    </svg>
+  ),
+  usuarios: (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+      <circle cx="9" cy="7" r="4" />
+      <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
     </svg>
   ),
 };
@@ -75,7 +92,9 @@ function Layout({ children }) {
 
         <nav className="layout-nav">
           {navItems.map((item) => {
-            if (item.adminOnly && usuario?.perfil !== 'admin') return null;
+            const ehAdmin = usuario?.perfil === 'admin';
+            if (item.adminOnly && !ehAdmin) return null;
+            if (item.permissao && !ehAdmin && !usuario?.permissoes?.includes(item.permissao)) return null;
 
             const ativo = location.pathname === item.path;
 
@@ -105,7 +124,7 @@ function Layout({ children }) {
         <div className="layout-usuario">
           <div className="layout-usuario-info">
             <span className="layout-usuario-nome">{usuario?.nome}</span>
-            <span className="layout-usuario-perfil">{usuario?.perfil === 'admin' ? 'Administrador' : 'Usuario'}</span>
+            <span className="layout-usuario-perfil">{PERFIS_LABEL[usuario?.perfil] || 'Usuario'}</span>
           </div>
           <button onClick={logout} className="layout-sair">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><polyline points="16 17 21 12 16 7" /><line x1="21" y1="12" x2="9" y2="12" /></svg>

@@ -50,3 +50,21 @@ def exigir_admin(usuario_atual: Usuario = Depends(obter_usuario_atual)) -> Usuar
             detail="Apenas administradores podem realizar esta acao.",
         )
     return usuario_atual
+
+
+def exigir_permissao(chave_permissao: str):
+    """
+    Gera uma dependencia que libera o acesso para administradores
+    (que tem acesso total) ou para usuarios que tenham a permissao
+    especifica cadastrada.
+    """
+    def verificar(usuario_atual: Usuario = Depends(obter_usuario_atual)) -> Usuario:
+        if usuario_atual.perfil == "admin":
+            return usuario_atual
+        if chave_permissao in (usuario_atual.permissoes or []):
+            return usuario_atual
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Voce nao tem permissao para realizar esta acao.",
+        )
+    return verificar

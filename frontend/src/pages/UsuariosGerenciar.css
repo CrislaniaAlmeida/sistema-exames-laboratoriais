@@ -1,0 +1,311 @@
+.gerenciar {
+  max-width: 1100px;
+}
+
+.gerenciar-voltar-topo {
+  display: inline-block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent-blue);
+  text-decoration: none;
+  margin-bottom: 16px;
+}
+
+.gerenciar-voltar-topo:hover {
+  text-decoration: underline;
+}
+
+.gerenciar-cabecalho {
+  margin-bottom: 24px;
+}
+
+.gerenciar-cabecalho h1 {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 30px;
+  font-weight: 400;
+  color: var(--text-primary);
+  margin: 0 0 4px;
+}
+
+.gerenciar-cabecalho p {
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.gerenciar-erro {
+  background: #fee2e2;
+  color: #b91c1c;
+  padding: 10px 16px;
+  border-radius: 10px;
+  margin-bottom: 16px;
+}
+
+.gerenciar-mensagem {
+  background: rgba(0, 191, 168, 0.14);
+  color: #048a78;
+  padding: 10px 16px;
+  border-radius: 10px;
+  margin-bottom: 16px;
+}
+
+.gerenciar-novo {
+  background: var(--grad-primary);
+  color: #ffffff;
+  border: none;
+  padding: 12px 22px;
+  border-radius: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-bottom: 24px;
+  font-family: inherit;
+  box-shadow: 0 8px 20px rgba(0, 87, 224, 0.25);
+  transition: box-shadow 0.15s ease, transform 0.12s ease;
+}
+
+.gerenciar-novo:hover {
+  box-shadow: 0 10px 24px rgba(0, 87, 224, 0.35);
+}
+
+.gerenciar-form {
+  background: var(--surface);
+  border: 1px solid var(--border-soft);
+  border-radius: 18px;
+  padding: 28px;
+  margin-bottom: 28px;
+}
+
+.gerenciar-form h2 {
+  margin: 0 0 16px;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 22px;
+  font-weight: 400;
+  color: var(--text-primary);
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.gerenciar-form label {
+  display: flex;
+  flex-direction: column;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+  gap: 4px;
+}
+
+.gerenciar-form input,
+.gerenciar-form select,
+.gerenciar-form textarea {
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border-soft);
+  background: var(--surface);
+  color: var(--text-primary);
+  font-size: 14px;
+  font-weight: 400;
+  font-family: inherit;
+  transition: border-color 0.15s ease;
+}
+
+.gerenciar-form input:focus,
+.gerenciar-form select:focus,
+.gerenciar-form textarea:focus {
+  outline: none;
+  border-color: var(--accent-blue-light);
+}
+
+.usuarios-permissoes-aviso {
+  background: rgba(0, 87, 224, 0.08);
+  color: var(--accent-blue);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 10px 14px;
+  border-radius: 10px;
+  margin: 0 0 14px;
+}
+
+.usuarios-permissoes {
+  margin-bottom: 14px;
+}
+
+.usuarios-permissoes-titulo {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.usuarios-permissoes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 10px;
+}
+
+.usuarios-permissao-item {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+  background: var(--surface-strong);
+  border: 1px solid var(--border-soft);
+  border-radius: 10px;
+  padding: 10px 12px;
+  cursor: pointer;
+}
+
+.usuarios-permissao-item input {
+  width: auto;
+  accent-color: var(--accent-blue);
+}
+
+.usuarios-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.usuarios-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  background: rgba(123, 79, 255, 0.12);
+  color: var(--accent-violet);
+}
+
+.usuarios-badge-vazio {
+  background: var(--surface-strong);
+  color: var(--text-faint);
+}
+
+.form-acoes {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.form-acoes button[type="submit"] {
+  background: var(--grad-primary);
+  color: #ffffff;
+  border: none;
+  padding: 11px 24px;
+  border-radius: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  box-shadow: 0 6px 16px rgba(0, 87, 224, 0.25);
+}
+
+.form-cancelar {
+  background: var(--surface-strong);
+  color: var(--text-muted);
+  border: none;
+  padding: 11px 24px;
+  border-radius: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.form-cancelar:hover {
+  color: var(--text-primary);
+}
+
+.gerenciar-tabela {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--surface);
+  border: 1px solid var(--border-soft);
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 20px 45px -30px rgba(11, 23, 51, 0.4);
+}
+
+.gerenciar-tabela th,
+.gerenciar-tabela td {
+  text-align: left;
+  padding: 14px 18px;
+  font-size: 14px;
+  border-bottom: 1px solid var(--border-soft);
+  color: var(--text-primary);
+}
+
+.gerenciar-tabela tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.gerenciar-tabela tbody tr:hover {
+  background: var(--surface-strong);
+}
+
+.gerenciar-tabela th {
+  background: var(--surface-strong);
+  color: var(--text-faint);
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.gerenciar-acoes {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.gerenciar-acoes button {
+  padding: 7px 14px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 13px;
+  background: rgba(0, 87, 224, 0.1);
+  color: var(--accent-blue);
+  font-family: inherit;
+  transition: background-color 0.15s ease;
+}
+
+.gerenciar-acoes button:hover {
+  background: rgba(0, 87, 224, 0.18);
+}
+
+.btn-excluir {
+  background: #fee2e2 !important;
+  color: #b91c1c !important;
+}
+
+.btn-excluir:hover {
+  background: #fecaca !important;
+}
+
+.tag {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.tag-ativo {
+  background: rgba(0, 191, 168, 0.14);
+  color: #048a78;
+}
+
+.tag-inativo {
+  background: var(--surface-strong);
+  color: var(--text-faint);
+}

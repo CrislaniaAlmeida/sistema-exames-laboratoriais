@@ -1,6 +1,19 @@
 from pydantic import BaseModel, EmailStr
-from typing import Optional
+from typing import Optional, List
 from datetime import datetime
+
+PERMISSOES_DISPONIVEIS = {
+    "exames_gerenciar": "Cadastrar e editar exames",
+    "tubos_gerenciar": "Cadastrar e editar tubos",
+    "laboratorios_gerenciar": "Cadastrar e editar laboratorios",
+}
+
+PERFIS_DISPONIVEIS = {
+    "admin": "Administrador",
+    "recepcao": "Recepcao / Coletador",
+    "bioquimico": "Bioquimico",
+    "usuario": "Outro",
+}
 
 
 class UsuarioCriar(BaseModel):
@@ -8,6 +21,15 @@ class UsuarioCriar(BaseModel):
     email: EmailStr
     senha: str
     perfil: str = "usuario"
+    permissoes: List[str] = []
+
+
+class UsuarioAtualizar(BaseModel):
+    nome: Optional[str] = None
+    senha: Optional[str] = None
+    perfil: Optional[str] = None
+    permissoes: Optional[List[str]] = None
+    ativo: Optional[bool] = None
 
 
 class UsuarioResposta(BaseModel):
@@ -15,6 +37,7 @@ class UsuarioResposta(BaseModel):
     nome: str
     email: EmailStr
     perfil: str
+    permissoes: List[str] = []
     ativo: bool
     criado_em: datetime
 

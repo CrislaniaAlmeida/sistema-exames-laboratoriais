@@ -25,13 +25,14 @@ CREATE TABLE usuarios (
     email           VARCHAR(150) NOT NULL UNIQUE,
     senha_hash      VARCHAR(255) NOT NULL,
     perfil          VARCHAR(20)  NOT NULL DEFAULT 'usuario'
-                        CHECK (perfil IN ('admin', 'usuario')),
+                        CHECK (perfil IN ('admin', 'recepcao', 'bioquimico', 'usuario')),
+    permissoes      JSONB        NOT NULL DEFAULT '[]'::jsonb,
     ativo           BOOLEAN      NOT NULL DEFAULT TRUE,
     criado_em       TIMESTAMPTZ  NOT NULL DEFAULT now(),
     atualizado_em   TIMESTAMPTZ  NOT NULL DEFAULT now()
 );
 
-COMMENT ON TABLE usuarios IS 'Usuários do sistema, com dois perfis: admin e usuario';
+COMMENT ON TABLE usuarios IS 'Usuários do sistema. Perfil "admin" tem acesso total; os demais tem acesso definido pela coluna permissoes (ex: exames_gerenciar, tubos_gerenciar, laboratorios_gerenciar)';
 
 -- =========================================================
 -- TABELA: laboratorios (laboratório de apoio)

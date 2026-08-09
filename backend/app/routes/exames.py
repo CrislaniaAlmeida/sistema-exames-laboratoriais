@@ -6,7 +6,7 @@ from app.database.connection import get_db
 from app.database.models import Usuario
 from app.schemas.exame import ExameCriar, ExameAtualizar, ExameResposta
 from app.services import exame_service
-from app.auth.dependencies import obter_usuario_atual, exigir_admin
+from app.auth.dependencies import obter_usuario_atual, exigir_permissao
 
 router = APIRouter(prefix="/exames", tags=["Exames"])
 
@@ -53,9 +53,9 @@ def buscar_por_id(
 def criar(
     dados: ExameCriar,
     db: Session = Depends(get_db),
-    usuario_atual: Usuario = Depends(exigir_admin),
+    usuario_atual: Usuario = Depends(exigir_permissao("exames_gerenciar")),
 ):
-    """Cadastra um novo exame. Requer perfil admin."""
+    """Cadastra um novo exame. Requer permissao de gerenciamento de exames."""
     return exame_service.criar_exame(db, dados)
 
 
@@ -64,9 +64,9 @@ def atualizar(
     exame_id: int,
     dados: ExameAtualizar,
     db: Session = Depends(get_db),
-    usuario_atual: Usuario = Depends(exigir_admin),
+    usuario_atual: Usuario = Depends(exigir_permissao("exames_gerenciar")),
 ):
-    """Edita um exame existente. Requer perfil admin."""
+    """Edita um exame existente. Requer permissao de gerenciamento de exames."""
     exame = exame_service.atualizar_exame(db, exame_id, dados)
     if not exame:
         raise HTTPException(status_code=404, detail="Exame nao encontrado.")
@@ -77,9 +77,9 @@ def atualizar(
 def excluir(
     exame_id: int,
     db: Session = Depends(get_db),
-    usuario_atual: Usuario = Depends(exigir_admin),
+    usuario_atual: Usuario = Depends(exigir_permissao("exames_gerenciar")),
 ):
-    """Exclui (inativa) um exame. Requer perfil admin."""
+    """Exclui (inativa) um exame. Requer permissao de gerenciamento de exames."""
     exame = exame_service.excluir_exame(db, exame_id)
     if not exame:
         raise HTTPException(status_code=404, detail="Exame nao encontrado.")

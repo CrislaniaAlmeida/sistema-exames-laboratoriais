@@ -10,7 +10,7 @@ from app.schemas.auxiliares import (
     TuboCriar, TuboAtualizar, TuboResposta,
 )
 from app.services import auxiliares_service
-from app.auth.dependencies import obter_usuario_atual, exigir_admin
+from app.auth.dependencies import obter_usuario_atual, exigir_admin, exigir_permissao
 
 router = APIRouter(tags=["Dados Auxiliares"])
 
@@ -29,7 +29,7 @@ def listar_laboratorios(
 def criar_laboratorio(
     dados: LaboratorioCriar,
     db: Session = Depends(get_db),
-    usuario_atual: Usuario = Depends(exigir_admin),
+    usuario_atual: Usuario = Depends(exigir_permissao("laboratorios_gerenciar")),
 ):
     return auxiliares_service.criar_laboratorio(db, dados)
 
@@ -39,7 +39,7 @@ def atualizar_laboratorio(
     laboratorio_id: int,
     dados: LaboratorioAtualizar,
     db: Session = Depends(get_db),
-    usuario_atual: Usuario = Depends(exigir_admin),
+    usuario_atual: Usuario = Depends(exigir_permissao("laboratorios_gerenciar")),
 ):
     laboratorio = auxiliares_service.atualizar_laboratorio(
         db, laboratorio_id, dados)
@@ -53,7 +53,7 @@ def atualizar_laboratorio(
 def excluir_laboratorio(
     laboratorio_id: int,
     db: Session = Depends(get_db),
-    usuario_atual: Usuario = Depends(exigir_admin),
+    usuario_atual: Usuario = Depends(exigir_permissao("laboratorios_gerenciar")),
 ):
     laboratorio = auxiliares_service.excluir_laboratorio(db, laboratorio_id)
     if not laboratorio:
@@ -107,7 +107,7 @@ def listar_tubos(
 def criar_tubo(
     dados: TuboCriar,
     db: Session = Depends(get_db),
-    usuario_atual: Usuario = Depends(exigir_admin),
+    usuario_atual: Usuario = Depends(exigir_permissao("tubos_gerenciar")),
 ):
     return auxiliares_service.criar_tubo(db, dados)
 
@@ -115,7 +115,7 @@ def criar_tubo(
 @router.post("/tubos/upload-foto")
 async def upload_foto_tubo(
     arquivo: UploadFile = File(...),
-    usuario_atual: Usuario = Depends(exigir_admin),
+    usuario_atual: Usuario = Depends(exigir_permissao("tubos_gerenciar")),
 ):
     foto_url = await auxiliares_service.enviar_foto_tubo_para_github(arquivo)
     return {"foto_url": foto_url}
@@ -126,7 +126,7 @@ def atualizar_tubo(
     tubo_id: int,
     dados: TuboAtualizar,
     db: Session = Depends(get_db),
-    usuario_atual: Usuario = Depends(exigir_admin),
+    usuario_atual: Usuario = Depends(exigir_permissao("tubos_gerenciar")),
 ):
     tubo = auxiliares_service.atualizar_tubo(db, tubo_id, dados)
     if not tubo:
@@ -138,7 +138,7 @@ def atualizar_tubo(
 def excluir_tubo(
     tubo_id: int,
     db: Session = Depends(get_db),
-    usuario_atual: Usuario = Depends(exigir_admin),
+    usuario_atual: Usuario = Depends(exigir_permissao("tubos_gerenciar")),
 ):
     tubo = auxiliares_service.excluir_tubo(db, tubo_id)
     if not tubo:

@@ -6,8 +6,10 @@ import ExameDetalhe from './pages/ExameDetalhe';
 import ExamesGerenciar from './pages/ExamesGerenciar';
 import TubosGerenciar from './pages/TubosGerenciar';
 import LaboratoriosGerenciar from './pages/LaboratoriosGerenciar';
+import UsuariosGerenciar from './pages/UsuariosGerenciar';
 import RotaProtegida from './components/RotaProtegida';
 import RotaAdmin from './components/RotaAdmin';
+import RotaComPermissao from './components/RotaComPermissao';
 
 function App() {
   return (
@@ -33,24 +35,32 @@ function App() {
       <Route
         path="/exames/gerenciar"
         element={
-          <RotaAdmin>
+          <RotaComPermissao permissao="exames_gerenciar">
             <ExamesGerenciar />
-          </RotaAdmin>
+          </RotaComPermissao>
         }
       />
       <Route
         path="/tubos"
         element={
-          <RotaAdmin>
+          <RotaComPermissao permissao="tubos_gerenciar">
             <TubosGerenciar />
-          </RotaAdmin>
+          </RotaComPermissao>
         }
       />
       <Route
         path="/laboratorios"
         element={
-          <RotaAdmin>
+          <RotaComPermissao permissao="laboratorios_gerenciar">
             <LaboratoriosGerenciar />
+          </RotaComPermissao>
+        }
+      />
+      <Route
+        path="/usuarios"
+        element={
+          <RotaAdmin>
+            <UsuariosGerenciar />
           </RotaAdmin>
         }
       />
