@@ -1,5 +1,5 @@
 from sqlalchemy import (
-    Column, Integer, String, Text, Boolean, ForeignKey, TIMESTAMP, CheckConstraint, JSON
+    Column, Integer, String, Text, Boolean, Date, ForeignKey, TIMESTAMP, CheckConstraint, JSON
 )
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
@@ -27,6 +27,47 @@ class Usuario(Base):
             "perfil IN ('admin', 'recepcao', 'bioquimico', 'usuario')",
             name="check_perfil_valido"),
     )
+
+
+class Paciente(Base):
+    __tablename__ = "pacientes"
+
+    id = Column(Integer, primary_key=True, index=True)
+    codigo = Column(String(20), nullable=False, unique=True, index=True)
+
+    nome = Column(String(150), nullable=False, index=True)
+    nome_social = Column(String(150))
+    cpf = Column(String(14), nullable=False, unique=True, index=True)
+    rg = Column(String(20))
+    data_nascimento = Column(Date, nullable=False)
+    sexo = Column(String(20))
+    nacionalidade = Column(String(100))
+    naturalidade = Column(String(100))
+    nome_mae = Column(String(150))
+
+    celular = Column(String(20))
+    telefone = Column(String(20))
+    email = Column(String(150))
+
+    cep = Column(String(10))
+    logradouro = Column(String(200))
+    numero = Column(String(20))
+    bairro = Column(String(100))
+    cidade = Column(String(100))
+    estado = Column(String(2))
+
+    cartao_sus = Column(String(20))
+    convenio = Column(String(100))
+    carteira_convenio = Column(String(50))
+    crm_medico_solicitante = Column(String(50))
+
+    toma_medicacao = Column(Boolean, nullable=False, default=False)
+    medicamentos = Column(JSON, nullable=False, default=list)
+    observacoes_clinicas = Column(Text)
+
+    ativo = Column(Boolean, nullable=False, default=True)
+    criado_em = Column(TIMESTAMP(timezone=True), server_default=func.now())
+    atualizado_em = Column(TIMESTAMP(timezone=True), server_default=func.now())
 
 
 class Laboratorio(Base):

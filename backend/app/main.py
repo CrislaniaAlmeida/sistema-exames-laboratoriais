@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 from app.database.connection import engine
-from app.routes import exames, auxiliares, auth, usuarios
+from app.routes import exames, auxiliares, auth, usuarios, pacientes
 
 app = FastAPI(
     title="Sistema de Consulta de Exames Laboratoriais",
@@ -25,6 +25,7 @@ app.include_router(auth.router)
 app.include_router(exames.router)
 app.include_router(auxiliares.router)
 app.include_router(usuarios.router)
+app.include_router(pacientes.router)
 
 
 @app.get("/")

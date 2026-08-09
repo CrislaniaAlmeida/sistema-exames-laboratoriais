@@ -6,6 +6,7 @@ PERMISSOES_DISPONIVEIS = {
     "exames_gerenciar": "Cadastrar e editar exames",
     "tubos_gerenciar": "Cadastrar e editar tubos",
     "laboratorios_gerenciar": "Cadastrar e editar laboratorios",
+    "pacientes_gerenciar": "Cadastrar e editar pacientes",
 }
 
 PERFIS_DISPONIVEIS = {

@@ -17,12 +17,18 @@ const PERFIS_OPCOES = [
 const PERFIS_LABEL = Object.fromEntries(PERFIS_OPCOES.map((p) => [p.valor, p.label]));
 
 const PERMISSOES_OPCOES = [
+  { chave: 'pacientes_gerenciar', label: 'Cadastrar Pacientes' },
   { chave: 'exames_gerenciar', label: 'Gerenciar Exames' },
   { chave: 'tubos_gerenciar', label: 'Gerenciar Tubos' },
   { chave: 'laboratorios_gerenciar', label: 'Gerenciar Laboratorios' },
 ];
 
 const PERMISSOES_LABEL = Object.fromEntries(PERMISSOES_OPCOES.map((p) => [p.chave, p.label]));
+
+const PERMISSOES_PADRAO_POR_CARGO = {
+  recepcao: ['pacientes_gerenciar'],
+  bioquimico: ['exames_gerenciar', 'tubos_gerenciar'],
+};
 
 function UsuariosGerenciar() {
   const { usuario: usuarioLogado } = useAuth();
@@ -85,6 +91,16 @@ function UsuariosGerenciar() {
 
   function handleChange(campo, valor) {
     setForm((atual) => ({ ...atual, [campo]: valor }));
+  }
+
+  function handleMudarCargo(novoPerfil) {
+    setForm((atual) => {
+      if (atual.permissoes.length > 0) {
+        return { ...atual, perfil: novoPerfil };
+      }
+      const permissoesPadrao = PERMISSOES_PADRAO_POR_CARGO[novoPerfil] || [];
+      return { ...atual, perfil: novoPerfil, permissoes: permissoesPadrao };
+    });
   }
 
   function alternarPermissao(chave) {
@@ -224,7 +240,7 @@ function UsuariosGerenciar() {
 
               <label>
                 Cargo *
-                <select value={form.perfil} onChange={(e) => handleChange('perfil', e.target.value)}>
+                <select value={form.perfil} onChange={(e) => handleMudarCargo(e.target.value)}>
                   {PERFIS_OPCOES.map((opcao) => (
                     <option key={opcao.valor} value={opcao.valor}>{opcao.label}</option>
                   ))}

@@ -1,0 +1,420 @@
+.gerenciar {
+  max-width: 1100px;
+}
+
+.gerenciar-voltar-topo {
+  display: inline-block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent-blue);
+  text-decoration: none;
+  margin-bottom: 16px;
+}
+
+.gerenciar-voltar-topo:hover {
+  text-decoration: underline;
+}
+
+.gerenciar-cabecalho {
+  margin-bottom: 24px;
+}
+
+.gerenciar-cabecalho h1 {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 30px;
+  font-weight: 400;
+  color: var(--text-primary);
+  margin: 0 0 4px;
+}
+
+.gerenciar-cabecalho p {
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.gerenciar-erro {
+  background: #fee2e2;
+  color: #b91c1c;
+  padding: 10px 16px;
+  border-radius: 10px;
+  margin-bottom: 16px;
+}
+
+.gerenciar-mensagem {
+  background: rgba(0, 191, 168, 0.14);
+  color: #048a78;
+  padding: 10px 16px;
+  border-radius: 10px;
+  margin-bottom: 16px;
+}
+
+.gerenciar-novo {
+  background: var(--grad-primary);
+  color: #ffffff;
+  border: none;
+  padding: 12px 22px;
+  border-radius: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-bottom: 24px;
+  font-family: inherit;
+  box-shadow: 0 8px 20px rgba(0, 87, 224, 0.25);
+  transition: box-shadow 0.15s ease, transform 0.12s ease;
+}
+
+.gerenciar-novo:hover {
+  box-shadow: 0 10px 24px rgba(0, 87, 224, 0.35);
+}
+
+.gerenciar-form {
+  background: var(--surface);
+  border: 1px solid var(--border-soft);
+  border-radius: 18px;
+  padding: 28px;
+  margin-bottom: 28px;
+}
+
+.gerenciar-form h2 {
+  margin: 0 0 16px;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 22px;
+  font-weight: 400;
+  color: var(--text-primary);
+}
+
+.paciente-secao-titulo {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin: 22px 0 12px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border-soft);
+}
+
+.gerenciar-form h3.paciente-secao-titulo:first-of-type {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: none;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.gerenciar-form label {
+  display: flex;
+  flex-direction: column;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+  gap: 4px;
+}
+
+.gerenciar-form input,
+.gerenciar-form select,
+.gerenciar-form textarea {
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border-soft);
+  background: var(--surface);
+  color: var(--text-primary);
+  font-size: 14px;
+  font-weight: 400;
+  font-family: inherit;
+  transition: border-color 0.15s ease;
+}
+
+.gerenciar-form input:focus,
+.gerenciar-form select:focus,
+.gerenciar-form textarea:focus {
+  outline: none;
+  border-color: var(--accent-blue-light);
+}
+
+.form-full {
+  margin-bottom: 14px;
+}
+
+.paciente-buscando-cep {
+  color: var(--accent-blue);
+  font-weight: 500;
+  text-transform: none;
+  margin-left: 6px;
+}
+
+.paciente-medicacao {
+  background: var(--surface-strong);
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin-bottom: 14px;
+}
+
+.paciente-medicacao-titulo {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.paciente-medicacao-opcoes {
+  display: flex;
+  gap: 20px;
+}
+
+.paciente-radio {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.paciente-radio input {
+  width: auto;
+  accent-color: var(--accent-blue);
+}
+
+.paciente-medicamentos-resumo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border-soft);
+  font-size: 13px;
+  color: var(--text-primary);
+}
+
+.paciente-medicamentos-vazio {
+  color: var(--text-faint);
+  font-style: italic;
+}
+
+.paciente-medicamentos-resumo button {
+  background: none;
+  border: none;
+  color: var(--accent-blue);
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.form-acoes {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.form-acoes button[type="submit"],
+.paciente-modal .form-acoes button:first-child {
+  background: var(--grad-primary);
+  color: #ffffff;
+  border: none;
+  padding: 11px 24px;
+  border-radius: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  box-shadow: 0 6px 16px rgba(0, 87, 224, 0.25);
+}
+
+.form-cancelar {
+  background: var(--surface-strong);
+  color: var(--text-muted);
+  border: none;
+  padding: 11px 24px;
+  border-radius: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.form-cancelar:hover {
+  color: var(--text-primary);
+}
+
+.paciente-busca {
+  width: 100%;
+  max-width: 360px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--border-soft);
+  background: var(--surface);
+  color: var(--text-primary);
+  font-size: 14px;
+  font-family: inherit;
+  margin-bottom: 16px;
+}
+
+.paciente-busca:focus {
+  outline: none;
+  border-color: var(--accent-blue-light);
+}
+
+.gerenciar-tabela {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--surface);
+  border: 1px solid var(--border-soft);
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 20px 45px -30px rgba(11, 23, 51, 0.4);
+}
+
+.gerenciar-tabela th,
+.gerenciar-tabela td {
+  text-align: left;
+  padding: 14px 18px;
+  font-size: 14px;
+  border-bottom: 1px solid var(--border-soft);
+  color: var(--text-primary);
+}
+
+.gerenciar-tabela tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.gerenciar-tabela tbody tr:hover {
+  background: var(--surface-strong);
+}
+
+.gerenciar-tabela th {
+  background: var(--surface-strong);
+  color: var(--text-faint);
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.paciente-codigo {
+  font-family: var(--font-mono, monospace);
+  font-size: 12px;
+  color: var(--text-faint);
+}
+
+.gerenciar-acoes {
+  display: flex;
+  gap: 8px;
+}
+
+.gerenciar-acoes button {
+  padding: 7px 14px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 13px;
+  background: rgba(0, 87, 224, 0.1);
+  color: var(--accent-blue);
+  font-family: inherit;
+  transition: background-color 0.15s ease;
+}
+
+.gerenciar-acoes button:hover {
+  background: rgba(0, 87, 224, 0.18);
+}
+
+.btn-excluir {
+  background: #fee2e2 !important;
+  color: #b91c1c !important;
+}
+
+.btn-excluir:hover {
+  background: #fecaca !important;
+}
+
+.paciente-modal-fundo {
+  position: fixed;
+  inset: 0;
+  background: rgba(8, 12, 28, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  padding: 20px;
+}
+
+.paciente-modal {
+  background: var(--surface);
+  border-radius: 18px;
+  padding: 28px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 30px 60px -20px rgba(11, 23, 51, 0.5);
+}
+
+.paciente-modal h3 {
+  margin: 0 0 4px;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 20px;
+  font-weight: 400;
+  color: var(--text-primary);
+}
+
+.paciente-modal-ajuda {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin: 0 0 16px;
+}
+
+.paciente-modal-linha {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.paciente-modal-linha input {
+  flex: 1;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border-soft);
+  background: var(--surface);
+  color: var(--text-primary);
+  font-size: 14px;
+  font-family: inherit;
+}
+
+.paciente-modal-linha input:focus {
+  outline: none;
+  border-color: var(--accent-blue-light);
+}
+
+.paciente-modal-remover {
+  background: var(--surface-strong);
+  border: none;
+  border-radius: 8px;
+  width: 36px;
+  color: var(--text-muted);
+  font-size: 18px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.paciente-modal-remover:hover {
+  color: #b91c1c;
+}
+
+.paciente-modal-adicionar {
+  background: none;
+  border: none;
+  color: var(--accent-blue);
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  padding: 4px 0 12px;
+}
