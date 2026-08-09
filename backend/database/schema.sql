@@ -153,14 +153,27 @@ CREATE TABLE solicitacoes_exames (
     data_solicitacao    TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
+CREATE TABLE amostras (
+    id                  INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    codigo              VARCHAR(20)  NOT NULL UNIQUE,
+    solicitacao_id      INTEGER NOT NULL REFERENCES solicitacoes_exames(id) ON DELETE CASCADE,
+    tubo_cor            VARCHAR(50),
+    material            VARCHAR(100),
+    setor               VARCHAR(100),
+    criado_em           TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
 CREATE TABLE solicitacao_exames (
     id                  INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     solicitacao_id      INTEGER NOT NULL REFERENCES solicitacoes_exames(id) ON DELETE CASCADE,
-    exame_id            INTEGER REFERENCES exames(id) ON DELETE SET NULL
+    exame_id            INTEGER REFERENCES exames(id) ON DELETE SET NULL,
+    amostra_id          INTEGER REFERENCES amostras(id) ON DELETE SET NULL
 );
 
 CREATE INDEX idx_solicitacoes_paciente ON solicitacoes_exames (paciente_id);
 CREATE INDEX idx_solicitacao_exames_solicitacao ON solicitacao_exames (solicitacao_id);
+CREATE INDEX idx_amostras_codigo ON amostras (codigo);
+CREATE INDEX idx_amostras_solicitacao ON amostras (solicitacao_id);
 
 -- =========================================================
 -- TABELA: exames_relacionados (relação N:N entre exames)

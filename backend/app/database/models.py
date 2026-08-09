@@ -85,6 +85,40 @@ class Solicitacao(Base):
     paciente = relationship("Paciente", back_populates="solicitacoes")
     itens = relationship(
         "SolicitacaoExame", back_populates="solicitacao", cascade="all, delete-orphan")
+    amostras = relationship(
+        "Amostra", back_populates="solicitacao", cascade="all, delete-orphan")
+
+    @property
+    def exames(self):
+        return [item.exame for item in self.itens if item.exame]
+
+
+class Amostra(Base):
+    """
+    Um tubo/frasco a ser coletado dentro de uma solicitacao -- os exames
+    da solicitacao sao agrupados em amostras pelo tubo que usam (ou pelo
+    setor, quando o exame ainda nao tem tubo cadastrado). Tem um codigo
+    unico e permanente, pensado para virar o codigo de barras lido por
+    um aparelho do setor no futuro (hoje nao ha aparelho integrado).
+    """
+    __tablename__ = "amostras"
+
+    id = Column(Integer, primary_key=True, index=True)
+    codigo = Column(String(20), nullable=False, unique=True, index=True)
+    solicitacao_id = Column(Integer, ForeignKey(
+        "solicitacoes_exames.id", ondelete="CASCADE"), nullable=False)
+
+    tubo_cor = Column(String(50))
+    material = Column(String(100))
+    setor = Column(String(100))
+    criado_em = Column(TIMESTAMP(timezone=True), server_default=func.now())
+
+    solicitacao = relationship("Solicitacao", back_populates="amostras")
+    itens = relationship("SolicitacaoExame", back_populates="amostra")
+
+    @property
+    def paciente(self):
+        return self.solicitacao.paciente if self.solicitacao else None
 
     @property
     def exames(self):
@@ -99,9 +133,11 @@ class SolicitacaoExame(Base):
     solicitacao_id = Column(Integer, ForeignKey(
         "solicitacoes_exames.id", ondelete="CASCADE"), nullable=False)
     exame_id = Column(Integer, ForeignKey("exames.id", ondelete="SET NULL"))
+    amostra_id = Column(Integer, ForeignKey("amostras.id", ondelete="SET NULL"))
 
     solicitacao = relationship("Solicitacao", back_populates="itens")
     exame = relationship("Exame")
+    amostra = relationship("Amostra", back_populates="itens")
 
 
 class Laboratorio(Base):

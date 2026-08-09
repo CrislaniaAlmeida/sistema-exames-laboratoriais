@@ -111,44 +111,6 @@ export function gerarPdfSolicitacao({ paciente, exames, dataSolicitacao }) {
 }
 
 /**
- * Agrupa os exames por tubo de coleta. Quando o exame ja tem um tubo
- * cadastrado (tela "Gerenciar Exames"), usa a cor dele -- essa e a
- * fonte confiavel. Quando nao tem, agrupa pelo setor responsavel e
- * marca a cor como "A confirmar" em vez de arriscar um palpite errado.
- */
-function agruparExamesPorTubo(exames) {
-  const grupos = new Map();
-
-  exames.forEach((exame) => {
-    const chave = exame.tubo_cor
-      ? `tubo:${exame.tubo_cor.toLowerCase()}`
-      : `setor:${(exame.setor_responsavel || 'geral').toLowerCase()}`;
-
-    if (!grupos.has(chave)) {
-      grupos.set(chave, {
-        corTampa: exame.tubo_cor || null,
-        setor: exame.setor_responsavel || null,
-        amostra: exame.material_nome || null,
-        exames: [],
-      });
-    }
-
-    const grupo = grupos.get(chave);
-    grupo.exames.push(exame);
-    if (!grupo.amostra && exame.material_nome) grupo.amostra = exame.material_nome;
-  });
-
-  return Array.from(grupos.values());
-}
-
-function abreviarAmostra(texto) {
-  if (!texto) return 'AMOSTRA';
-  const semAcento = texto.normalize('NFD').replace(/[̀-ͯ]/g, '');
-  const somenteLetrasNumeros = semAcento.toUpperCase().replace(/[^A-Z0-9]/g, '');
-  return somenteLetrasNumeros.slice(0, 12) || 'AMOSTRA';
-}
-
-/**
  * Gera a imagem (PNG em base64) de um codigo de barras Code128 com o
  * texto informado, para o aparelho do setor ler o codigo do paciente
  * e a amostra direto do tubo.
@@ -176,12 +138,34 @@ function ajustarTamanhoImagem(larguraNativa, alturaNativa, larguraMax, alturaMax
   return { largura: larguraNativa * escala, altura: alturaNativa * escala };
 }
 
-export function gerarEtiquetasTubos({ paciente, exames }) {
-  const grupos = agruparExamesPorTubo(exames);
+function truncarParaLargura(doc, texto, larguraMax) {
+  if (doc.getTextWidth(texto) <= larguraMax) return texto;
+  let cortado = texto;
+  while (cortado.length > 0 && doc.getTextWidth(`${cortado}...`) > larguraMax) {
+    cortado = cortado.slice(0, -1);
+  }
+  return `${cortado}...`;
+}
+
+function listarSiglasExames(exames) {
+  return exames
+    .map((exame) => exame.sigla || exame.nome)
+    .join(', ');
+}
+
+/**
+ * Gera as etiquetas a partir das amostras ja calculadas e persistidas
+ * pelo backend (uma amostra por tubo necessario, com codigo unico
+ * proprio). O codigo de barras usa exatamente esse codigo -- a mesma
+ * amostra pode ser consultada depois via GET /amostras/{codigo}, o
+ * que deixa pronta a base para uma futura integracao com aparelho de
+ * setor (hoje nenhum aparelho esta conectado).
+ */
+export function gerarEtiquetasTubos({ paciente, amostras }) {
   const doc = new jsPDF({ unit: 'mm', format: [50, 25] });
   const largura = 46;
 
-  grupos.forEach((grupo, indice) => {
+  amostras.forEach((amostra, indice) => {
     if (indice > 0) doc.addPage([50, 25]);
 
     doc.setFont('helvetica', 'bold');
@@ -201,16 +185,22 @@ export function gerarEtiquetasTubos({ paciente, exames }) {
 
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(6.3);
-    doc.text(`Tubo: ${grupo.corTampa || 'A confirmar'}`, 2, y); y += 1.4;
+    doc.text(`Tubo: ${amostra.tubo_cor || 'A confirmar'}`, 2, y); y += 1.2;
 
-    const valorBarcode = `${paciente.codigo}-${abreviarAmostra(grupo.amostra || grupo.setor)}`;
+    const valorBarcode = `${paciente.codigo}-${amostra.codigo}`;
     const barcode = gerarImagemBarcode(valorBarcode);
-    const alturaDisponivel = 24.5 - y;
-    const tamanho = ajustarTamanhoImagem(barcode.largura, barcode.altura, largura, alturaDisponivel);
+    const alturaBarcode = Math.min(7.5, 24.5 - y - 3);
+    const tamanho = ajustarTamanhoImagem(barcode.largura, barcode.altura, largura, alturaBarcode);
     doc.addImage(barcode.dataUrl, 'PNG', 2, y, tamanho.largura, tamanho.altura);
+    y += tamanho.altura + 2.2;
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(5.4);
+    const linhaExames = truncarParaLargura(doc, listarSiglasExames(amostra.exames), largura);
+    doc.text(linhaExames, 2, Math.min(y, 24.3));
   });
 
   doc.save(`etiquetas-${paciente.codigo}.pdf`);
 
-  return grupos;
+  return amostras;
 }

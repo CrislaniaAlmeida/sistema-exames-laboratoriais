@@ -1,7 +1,7 @@
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy import func
-from app.database.models import Paciente, Solicitacao, SolicitacaoExame, Exame
+from app.database.models import Paciente, Solicitacao, SolicitacaoExame, Amostra, Exame
 from app.schemas.paciente import PacienteCriar, PacienteAtualizar
 
 MAXIMO_MEDICAMENTOS = 6
@@ -101,6 +101,24 @@ def listar_solicitacoes(db: Session, paciente_id: int):
     )
 
 
+def gerar_codigo_amostra(db: Session) -> str:
+    """Gera um codigo unico e sequencial para a amostra (ex: AMO-000001)."""
+    ultimo_codigo = db.query(func.max(Amostra.codigo)).scalar()
+    ultimo_numero = 0
+    if ultimo_codigo:
+        try:
+            ultimo_numero = int(ultimo_codigo.split("-")[-1])
+        except ValueError:
+            ultimo_numero = 0
+    return f"AMO-{ultimo_numero + 1:06d}"
+
+
+def _chave_grupo_amostra(exame: Exame) -> str:
+    if exame.tubo_cor:
+        return f"tubo:{exame.tubo_cor.lower()}"
+    return f"setor:{(exame.setor_responsavel or 'geral').lower()}"
+
+
 def criar_solicitacao(db: Session, paciente_id: int, exame_ids: list):
     paciente = buscar_paciente_por_id(db, paciente_id)
     if not paciente:
@@ -109,8 +127,8 @@ def criar_solicitacao(db: Session, paciente_id: int, exame_ids: list):
     if not exame_ids:
         raise HTTPException(status_code=400, detail="Selecione ao menos um exame.")
 
-    exames_existentes = db.query(Exame.id).filter(Exame.id.in_(exame_ids)).all()
-    ids_validos = {e.id for e in exames_existentes}
+    exames = db.query(Exame).filter(Exame.id.in_(exame_ids)).all()
+    ids_validos = {e.id for e in exames}
     ids_invalidos = set(exame_ids) - ids_validos
     if ids_invalidos:
         raise HTTPException(
@@ -122,9 +140,43 @@ def criar_solicitacao(db: Session, paciente_id: int, exame_ids: list):
     db.add(nova_solicitacao)
     db.flush()
 
-    for exame_id in exame_ids:
-        db.add(SolicitacaoExame(solicitacao_id=nova_solicitacao.id, exame_id=exame_id))
+    # Agrupa os exames por tubo (ou por setor, quando o exame ainda nao
+    # tem tubo cadastrado) -- cada grupo vira uma "amostra" com codigo
+    # proprio, pronta para virar codigo de barras no futuro.
+    grupos = {}
+    for exame in exames:
+        grupo = grupos.setdefault(_chave_grupo_amostra(exame), {
+            "tubo_cor": exame.tubo_cor,
+            "material": exame.material_nome,
+            "setor": exame.setor_responsavel,
+            "exame_ids": [],
+        })
+        grupo["exame_ids"].append(exame.id)
+        if not grupo["material"] and exame.material_nome:
+            grupo["material"] = exame.material_nome
+
+    for grupo in grupos.values():
+        amostra = Amostra(
+            codigo=gerar_codigo_amostra(db),
+            solicitacao_id=nova_solicitacao.id,
+            tubo_cor=grupo["tubo_cor"],
+            material=grupo["material"],
+            setor=grupo["setor"],
+        )
+        db.add(amostra)
+        db.flush()
+
+        for exame_id in grupo["exame_ids"]:
+            db.add(SolicitacaoExame(
+                solicitacao_id=nova_solicitacao.id,
+                exame_id=exame_id,
+                amostra_id=amostra.id,
+            ))
 
     db.commit()
     db.refresh(nova_solicitacao)
     return nova_solicitacao
+
+
+def buscar_amostra_por_codigo(db: Session, codigo: str):
+    return db.query(Amostra).filter(Amostra.codigo == codigo).first()

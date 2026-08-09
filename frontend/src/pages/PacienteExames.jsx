@@ -49,15 +49,21 @@ function PacienteExames() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
-  const sugestoesExame = termoExame.trim().length < 2 ? [] : examesDisponiveis
+  const termoBusca = termoExame.trim().toLowerCase();
+
+  function prioridadeSigla(sigla) {
+    if (sigla === termoBusca) return 0;
+    if (sigla.startsWith(termoBusca)) return 1;
+    return 2;
+  }
+
+  const sugestoesExame = termoBusca.length < 1 ? [] : examesDisponiveis
     .filter((exame) => !examesSelecionados.some((selecionado) => selecionado.id === exame.id))
     .filter((exame) => {
-      const termo = termoExame.trim().toLowerCase();
-      return (
-        exame.nome.toLowerCase().includes(termo) ||
-        (exame.sigla && exame.sigla.toLowerCase().includes(termo))
-      );
+      const sigla = (exame.sigla || '').toLowerCase();
+      return sigla.includes(termoBusca) || exame.nome.toLowerCase().includes(termoBusca);
     })
+    .sort((a, b) => prioridadeSigla((a.sigla || '').toLowerCase()) - prioridadeSigla((b.sigla || '').toLowerCase()))
     .slice(0, 8);
 
   function adicionarExame(exame) {
@@ -97,18 +103,18 @@ function PacienteExames() {
         dataSolicitacao: new Date(respostaSolicitacao.data.data_solicitacao),
       });
 
-      const grupos = gerarEtiquetasTubos({
+      const amostras = gerarEtiquetasTubos({
         paciente,
-        exames: respostaSolicitacao.data.exames,
+        amostras: respostaSolicitacao.data.amostras,
       });
 
-      const semTuboDefinido = grupos.filter((grupo) => !grupo.corTampa).length;
+      const semTuboDefinido = amostras.filter((amostra) => !amostra.tubo_cor).length;
       const avisoTubo = semTuboDefinido
         ? ` Atencao: ${semTuboDefinido} etiqueta(s) ficaram marcadas "A confirmar" porque esses exames ainda nao tem tubo cadastrado em Gerenciar Exames.`
         : '';
 
       setMensagem(
-        `Solicitacao concluida. O comprovante e as etiquetas de tubo (${grupos.length}) foram baixados.${avisoTubo}`
+        `Solicitacao concluida. O comprovante e as etiquetas de tubo (${amostras.length}) foram baixados.${avisoTubo}`
       );
       setExamesSelecionados([]);
       carregarTudo();

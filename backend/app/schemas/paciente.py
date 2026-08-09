@@ -102,11 +102,52 @@ class SolicitacaoCriar(BaseModel):
     exame_ids: List[int]
 
 
+class AmostraResposta(BaseModel):
+    id: int
+    codigo: str
+    tubo_cor: Optional[str] = None
+    material: Optional[str] = None
+    setor: Optional[str] = None
+    exames: List[ExameResumoResposta]
+
+    class Config:
+        from_attributes = True
+
+
 class SolicitacaoResposta(BaseModel):
     id: int
     paciente_id: int
     data_solicitacao: datetime
     exames: List[ExameResumoResposta]
+    amostras: List[AmostraResposta]
+
+    class Config:
+        from_attributes = True
+
+
+class PacienteResumoResposta(BaseModel):
+    codigo: str
+    nome: str
+    nome_social: Optional[str] = None
+    cpf: str
+    data_nascimento: date
+
+    class Config:
+        from_attributes = True
+
+
+class AmostraConsultaResposta(BaseModel):
+    """
+    Resposta pensada para uma futura integracao com aparelho de setor:
+    ao ler o codigo de barras da amostra, devolve os dados do paciente
+    e os exames daquele tubo especifico.
+    """
+    codigo: str
+    tubo_cor: Optional[str] = None
+    material: Optional[str] = None
+    setor: Optional[str] = None
+    exames: List[ExameResumoResposta]
+    paciente: PacienteResumoResposta
 
     class Config:
         from_attributes = True
