@@ -49,9 +49,10 @@ function PacientesGerenciar() {
     carregarPacientes();
   }, []);
 
-  const pacientesFiltrados = pacientes.filter((p) => {
-    if (!termoFiltro.trim()) return true;
-    const termo = termoFiltro.toLowerCase();
+  const buscaAtiva = termoFiltro.trim().length > 0;
+
+  const pacientesFiltrados = !buscaAtiva ? [] : pacientes.filter((p) => {
+    const termo = termoFiltro.trim().toLowerCase();
     return (
       p.nome.toLowerCase().includes(termo) ||
       p.cpf.includes(termo) ||
@@ -408,48 +409,54 @@ function PacientesGerenciar() {
         )}
 
         {!formAberto && (
-          <input
-            type="text"
-            className="paciente-busca"
-            placeholder="Buscar por nome, CPF ou codigo..."
-            value={termoFiltro}
-            onChange={(e) => setTermoFiltro(e.target.value)}
-          />
-        )}
+          <>
+            <input
+              type="text"
+              className="paciente-busca"
+              placeholder="Buscar paciente por nome, CPF ou codigo..."
+              value={termoFiltro}
+              onChange={(e) => setTermoFiltro(e.target.value)}
+            />
 
-        {carregando ? (
-          <p>Carregando pacientes...</p>
-        ) : (
-          <table className="gerenciar-tabela">
-            <thead>
-              <tr>
-                <th>Codigo</th>
-                <th>Nome</th>
-                <th>CPF</th>
-                <th>Nascimento</th>
-                <th>Celular</th>
-                <th>Convenio</th>
-                <th>Acoes</th>
-              </tr>
-            </thead>
-            <tbody>
-              {pacientesFiltrados.map((paciente) => (
-                <tr key={paciente.id}>
-                  <td className="paciente-codigo">{paciente.codigo}</td>
-                  <td>{paciente.nome}</td>
-                  <td>{paciente.cpf}</td>
-                  <td>{paciente.data_nascimento?.split('-').reverse().join('/')}</td>
-                  <td>{paciente.celular || '-'}</td>
-                  <td>{paciente.convenio || '-'}</td>
-                  <td className="gerenciar-acoes">
-                    <button onClick={() => abrirEdicao(paciente)}>Editar</button>
-                    <button onClick={() => navigate(`/pacientes/${paciente.id}/exames`)}>Exames</button>
-                    <button className="btn-excluir" onClick={() => handleExcluir(paciente)}>Excluir</button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+            {!buscaAtiva ? (
+              <p className="paciente-exames-vazio">Digite o nome, CPF ou codigo para localizar um paciente ja cadastrado.</p>
+            ) : carregando ? (
+              <p>Carregando pacientes...</p>
+            ) : pacientesFiltrados.length === 0 ? (
+              <p className="paciente-exames-vazio">Nenhum paciente encontrado para essa busca.</p>
+            ) : (
+              <table className="gerenciar-tabela">
+                <thead>
+                  <tr>
+                    <th>Codigo</th>
+                    <th>Nome</th>
+                    <th>CPF</th>
+                    <th>Nascimento</th>
+                    <th>Celular</th>
+                    <th>Convenio</th>
+                    <th>Acoes</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {pacientesFiltrados.map((paciente) => (
+                    <tr key={paciente.id}>
+                      <td className="paciente-codigo">{paciente.codigo}</td>
+                      <td>{paciente.nome}</td>
+                      <td>{paciente.cpf}</td>
+                      <td>{paciente.data_nascimento?.split('-').reverse().join('/')}</td>
+                      <td>{paciente.celular || '-'}</td>
+                      <td>{paciente.convenio || '-'}</td>
+                      <td className="gerenciar-acoes">
+                        <button onClick={() => abrirEdicao(paciente)}>Editar</button>
+                        <button onClick={() => navigate(`/pacientes/${paciente.id}/exames`)}>Exames</button>
+                        <button className="btn-excluir" onClick={() => handleExcluir(paciente)}>Excluir</button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </>
         )}
 
         {medicamentosPopupAberto && (
