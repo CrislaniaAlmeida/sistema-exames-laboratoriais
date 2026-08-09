@@ -1,5 +1,6 @@
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import JsBarcode from 'jsbarcode';
 
 function formatarData(data) {
   if (!data) return '-';
@@ -140,6 +141,41 @@ function agruparExamesPorTubo(exames) {
   return Array.from(grupos.values());
 }
 
+function abreviarAmostra(texto) {
+  if (!texto) return 'AMOSTRA';
+  const semAcento = texto.normalize('NFD').replace(/[̀-ͯ]/g, '');
+  const somenteLetrasNumeros = semAcento.toUpperCase().replace(/[^A-Z0-9]/g, '');
+  return somenteLetrasNumeros.slice(0, 12) || 'AMOSTRA';
+}
+
+/**
+ * Gera a imagem (PNG em base64) de um codigo de barras Code128 com o
+ * texto informado, para o aparelho do setor ler o codigo do paciente
+ * e a amostra direto do tubo.
+ */
+function gerarImagemBarcode(valor) {
+  const canvas = document.createElement('canvas');
+  JsBarcode(canvas, valor, {
+    format: 'CODE128',
+    displayValue: true,
+    fontSize: 16,
+    textMargin: 2,
+    height: 36,
+    width: 1.6,
+    margin: 4,
+  });
+  return {
+    dataUrl: canvas.toDataURL('image/png'),
+    largura: canvas.width,
+    altura: canvas.height,
+  };
+}
+
+function ajustarTamanhoImagem(larguraNativa, alturaNativa, larguraMax, alturaMax) {
+  const escala = Math.min(larguraMax / larguraNativa, alturaMax / alturaNativa);
+  return { largura: larguraNativa * escala, altura: alturaNativa * escala };
+}
+
 export function gerarEtiquetasTubos({ paciente, exames }) {
   const grupos = agruparExamesPorTubo(exames);
   const doc = new jsPDF({ unit: 'mm', format: [50, 25] });
@@ -149,25 +185,29 @@ export function gerarEtiquetasTubos({ paciente, exames }) {
     if (indice > 0) doc.addPage([50, 25]);
 
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(7);
+    doc.setFontSize(6.5);
     const linhasNome = doc.splitTextToSize(paciente.nome, largura).slice(0, 2);
 
-    let y = 3.6;
+    let y = 3.2;
     linhasNome.forEach((linha) => {
       doc.text(linha, 2, y);
-      y += 3;
+      y += 2.8;
     });
 
-    y += 0.8;
+    y += 0.6;
     doc.setFont('helvetica', 'normal');
-    doc.setFontSize(6.2);
-    doc.text(`Nasc: ${formatarData(paciente.data_nascimento)}`, 2, y); y += 3.1;
-    doc.text(`Codigo: ${paciente.codigo}`, 2, y); y += 3.1;
-    doc.text(`Amostra: ${grupo.amostra || grupo.setor || '-'}`, 2, y); y += 3.4;
+    doc.setFontSize(6);
+    doc.text(`Nasc: ${formatarData(paciente.data_nascimento)}`, 2, y); y += 3;
 
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(6.8);
-    doc.text(`Tubo: ${grupo.corTampa || 'A confirmar'}`, 2, y);
+    doc.setFontSize(6.3);
+    doc.text(`Tubo: ${grupo.corTampa || 'A confirmar'}`, 2, y); y += 1.4;
+
+    const valorBarcode = `${paciente.codigo}-${abreviarAmostra(grupo.amostra || grupo.setor)}`;
+    const barcode = gerarImagemBarcode(valorBarcode);
+    const alturaDisponivel = 24.5 - y;
+    const tamanho = ajustarTamanhoImagem(barcode.largura, barcode.altura, largura, alturaDisponivel);
+    doc.addImage(barcode.dataUrl, 'PNG', 2, y, tamanho.largura, tamanho.altura);
   });
 
   doc.save(`etiquetas-${paciente.codigo}.pdf`);
