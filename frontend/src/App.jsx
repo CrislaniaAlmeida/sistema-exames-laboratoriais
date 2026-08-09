@@ -9,6 +9,7 @@ import TubosGerenciar from './pages/TubosGerenciar';
 import LaboratoriosGerenciar from './pages/LaboratoriosGerenciar';
 import UsuariosGerenciar from './pages/UsuariosGerenciar';
 import PacientesGerenciar from './pages/PacientesGerenciar';
+import PacienteExames from './pages/PacienteExames';
 import RotaProtegida from './components/RotaProtegida';
 import RotaAdmin from './components/RotaAdmin';
 import RotaComPermissao from './components/RotaComPermissao';
@@ -47,6 +48,14 @@ function App() {
         element={
           <RotaComPermissao permissao="pacientes_gerenciar">
             <PacientesGerenciar />
+          </RotaComPermissao>
+        }
+      />
+      <Route
+        path="/pacientes/:id/exames"
+        element={
+          <RotaComPermissao permissao="pacientes_gerenciar">
+            <PacienteExames />
           </RotaComPermissao>
         }
       />

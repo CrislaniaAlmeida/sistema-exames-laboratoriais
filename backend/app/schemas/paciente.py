@@ -21,6 +21,7 @@ class PacienteBase(BaseModel):
     cep: Optional[str] = None
     logradouro: Optional[str] = None
     numero: Optional[str] = None
+    complemento: Optional[str] = None
     bairro: Optional[str] = None
     cidade: Optional[str] = None
     estado: Optional[str] = None
@@ -57,6 +58,7 @@ class PacienteAtualizar(BaseModel):
     cep: Optional[str] = None
     logradouro: Optional[str] = None
     numero: Optional[str] = None
+    complemento: Optional[str] = None
     bairro: Optional[str] = None
     cidade: Optional[str] = None
     estado: Optional[str] = None

@@ -52,6 +52,7 @@ class Paciente(Base):
     cep = Column(String(10))
     logradouro = Column(String(200))
     numero = Column(String(20))
+    complemento = Column(String(100))
     bairro = Column(String(100))
     cidade = Column(String(100))
     estado = Column(String(2))

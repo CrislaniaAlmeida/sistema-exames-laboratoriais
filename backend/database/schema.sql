@@ -59,6 +59,7 @@ CREATE TABLE pacientes (
     cep                     VARCHAR(10),
     logradouro              VARCHAR(200),
     numero                  VARCHAR(20),
+    complemento             VARCHAR(100),
     bairro                  VARCHAR(100),
     cidade                  VARCHAR(100),
     estado                  CHAR(2),
