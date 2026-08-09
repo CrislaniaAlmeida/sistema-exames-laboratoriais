@@ -38,6 +38,7 @@ class UsuarioResposta(BaseModel):
     email: EmailStr
     perfil: str
     permissoes: List[str] = []
+    deve_trocar_senha: bool
     ativo: bool
     criado_em: datetime
 
@@ -48,6 +49,10 @@ class UsuarioResposta(BaseModel):
 class LoginDados(BaseModel):
     email: EmailStr
     senha: str
+
+
+class TrocarSenhaDados(BaseModel):
+    senha_nova: str
 
 
 class TokenResposta(BaseModel):

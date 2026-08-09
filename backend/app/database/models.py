@@ -17,6 +17,7 @@ class Usuario(Base):
     senha_hash = Column(String(255), nullable=False)
     perfil = Column(String(20), nullable=False, default="usuario")
     permissoes = Column(JSON, nullable=False, default=list)
+    deve_trocar_senha = Column(Boolean, nullable=False, default=False)
     ativo = Column(Boolean, nullable=False, default=True)
     criado_em = Column(TIMESTAMP(timezone=True), server_default=func.now())
     atualizado_em = Column(TIMESTAMP(timezone=True), server_default=func.now())

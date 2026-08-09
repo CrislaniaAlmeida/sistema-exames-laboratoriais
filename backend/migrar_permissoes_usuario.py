@@ -11,6 +11,8 @@ O que este script faz:
      comeca vazia para quem ja existe).
   2. Amplia a regra de "perfil" valido para aceitar tambem 'recepcao' e
      'bioquimico', alem de 'admin' e 'usuario'.
+  3. Adiciona a coluna "deve_trocar_senha" (comeca falsa para quem ja
+     existe, entao ninguem que ja usa o sistema e afetado).
 
 E seguro rodar mais de uma vez (nao duplica nem apaga nada).
 
@@ -61,7 +63,13 @@ def main():
             "CHECK (perfil IN ('admin', 'recepcao', 'bioquimico', 'usuario'))"
         ))
 
-    print("\nConcluido! O banco agora suporta cargos e permissoes por usuario.")
+        print("Adicionando coluna 'deve_trocar_senha'...")
+        conexao.execute(text(
+            "ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS deve_trocar_senha "
+            "BOOLEAN NOT NULL DEFAULT FALSE"
+        ))
+
+    print("\nConcluido! O banco agora suporta cargos, permissoes e senha temporaria por usuario.")
 
 
 if __name__ == "__main__":

@@ -1,6 +1,7 @@
 import { Routes, Route } from 'react-router-dom';
 import LandingPage from './pages/LandingPage';
 import Login from './pages/Login';
+import TrocarSenha from './pages/TrocarSenha';
 import Home from './pages/Home';
 import ExameDetalhe from './pages/ExameDetalhe';
 import ExamesGerenciar from './pages/ExamesGerenciar';
@@ -16,6 +17,14 @@ function App() {
     <Routes>
       <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={<Login />} />
+      <Route
+        path="/trocar-senha"
+        element={
+          <RotaProtegida>
+            <TrocarSenha />
+          </RotaProtegida>
+        }
+      />
       <Route
         path="/exames"
         element={

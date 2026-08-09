@@ -3,10 +3,12 @@ from sqlalchemy.orm import Session
 
 from app.database.connection import get_db
 from app.database.models import Usuario
-from app.schemas.usuario import UsuarioCriar, UsuarioResposta, LoginDados, TokenResposta
+from app.schemas.usuario import (
+    UsuarioCriar, UsuarioResposta, LoginDados, TokenResposta, TrocarSenhaDados,
+)
 from app.services import usuario_service
 from app.auth.jwt import criar_token_acesso
-from app.auth.dependencies import exigir_admin
+from app.auth.dependencies import exigir_admin, obter_usuario_atual
 
 router = APIRouter(tags=["Autenticacao"])
 
@@ -37,3 +39,13 @@ def login(dados: LoginDados, db: Session = Depends(get_db)):
         access_token=token,
         usuario=usuario,
     )
+
+
+@router.put("/trocar-senha", response_model=UsuarioResposta)
+def trocar_senha(
+    dados: TrocarSenhaDados,
+    db: Session = Depends(get_db),
+    usuario_atual: Usuario = Depends(obter_usuario_atual),
+):
+    """Permite que o proprio usuario logado defina uma nova senha."""
+    return usuario_service.trocar_senha_propria(db, usuario_atual, dados.senha_nova)

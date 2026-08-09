@@ -37,6 +37,7 @@ def criar_usuario(db: Session, dados: UsuarioCriar):
         senha_hash=senha_criptografada,
         perfil=dados.perfil,
         permissoes=permissoes,
+        deve_trocar_senha=True,
     )
     db.add(novo_usuario)
     db.commit()
@@ -56,6 +57,7 @@ def atualizar_usuario(db: Session, usuario_id: int, dados: UsuarioAtualizar):
 
     if dados_para_atualizar.get("senha"):
         usuario.senha_hash = criptografar_senha(dados_para_atualizar["senha"])
+        usuario.deve_trocar_senha = True
     dados_para_atualizar.pop("senha", None)
 
     for campo, valor in dados_para_atualizar.items():
@@ -76,6 +78,20 @@ def excluir_usuario(db: Session, usuario_id: int):
 
     db.delete(usuario)
     db.commit()
+    return usuario
+
+
+def trocar_senha_propria(db: Session, usuario: Usuario, senha_nova: str):
+    if len(senha_nova) < 6:
+        raise HTTPException(
+            status_code=400,
+            detail="A nova senha deve ter pelo menos 6 caracteres.",
+        )
+
+    usuario.senha_hash = criptografar_senha(senha_nova)
+    usuario.deve_trocar_senha = False
+    db.commit()
+    db.refresh(usuario)
     return usuario
 
 

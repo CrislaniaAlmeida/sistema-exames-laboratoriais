@@ -27,6 +27,7 @@ CREATE TABLE usuarios (
     perfil          VARCHAR(20)  NOT NULL DEFAULT 'usuario'
                         CHECK (perfil IN ('admin', 'recepcao', 'bioquimico', 'usuario')),
     permissoes      JSONB        NOT NULL DEFAULT '[]'::jsonb,
+    deve_trocar_senha BOOLEAN    NOT NULL DEFAULT FALSE,
     ativo           BOOLEAN      NOT NULL DEFAULT TRUE,
     criado_em       TIMESTAMPTZ  NOT NULL DEFAULT now(),
     atualizado_em   TIMESTAMPTZ  NOT NULL DEFAULT now()

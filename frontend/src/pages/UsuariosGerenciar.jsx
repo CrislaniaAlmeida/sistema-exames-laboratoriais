@@ -180,7 +180,7 @@ function UsuariosGerenciar() {
         )}
 
         {formAberto && (
-          <form className="gerenciar-form" onSubmit={handleSalvar}>
+          <form className="gerenciar-form" onSubmit={handleSalvar} autoComplete="off">
             <h2>{editandoId ? 'Editar usuario' : 'Novo usuario'}</h2>
 
             <div className="form-grid">
@@ -189,6 +189,7 @@ function UsuariosGerenciar() {
                 <input
                   type="text"
                   required
+                  autoComplete="off"
                   value={form.nome}
                   onChange={(e) => handleChange('nome', e.target.value)}
                   placeholder="Nome completo"
@@ -200,6 +201,8 @@ function UsuariosGerenciar() {
                 <input
                   type="email"
                   required
+                  autoComplete="off"
+                  name="novo-usuario-email"
                   value={form.email}
                   onChange={(e) => handleChange('email', e.target.value)}
                   placeholder="email@exemplo.com"
@@ -207,10 +210,12 @@ function UsuariosGerenciar() {
               </label>
 
               <label>
-                {editandoId ? 'Nova senha' : 'Senha *'}
+                {editandoId ? 'Nova senha temporaria' : 'Senha temporaria *'}
                 <input
                   type="password"
                   required={!editandoId}
+                  autoComplete="new-password"
+                  name="novo-usuario-senha"
                   value={form.senha}
                   onChange={(e) => handleChange('senha', e.target.value)}
                   placeholder={editandoId ? 'Deixe em branco para nao alterar' : 'Senha de acesso'}
@@ -299,6 +304,11 @@ function UsuariosGerenciar() {
                     <span className={`tag ${usuarioLinha.ativo ? 'tag-ativo' : 'tag-inativo'}`}>
                       {usuarioLinha.ativo ? 'Ativo' : 'Inativo'}
                     </span>
+                    {usuarioLinha.deve_trocar_senha && (
+                      <span className="tag tag-inativo" style={{ marginLeft: 6 }}>
+                        Senha temporaria
+                      </span>
+                    )}
                   </td>
                   <td className="gerenciar-acoes">
                     <button onClick={() => abrirEdicao(usuarioLinha)}>Editar</button>
