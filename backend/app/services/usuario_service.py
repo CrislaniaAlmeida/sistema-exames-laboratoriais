@@ -82,12 +82,6 @@ def excluir_usuario(db: Session, usuario_id: int):
 
 
 def trocar_senha_propria(db: Session, usuario: Usuario, senha_nova: str):
-    if len(senha_nova) < 6:
-        raise HTTPException(
-            status_code=400,
-            detail="A nova senha deve ter pelo menos 6 caracteres.",
-        )
-
     usuario.senha_hash = criptografar_senha(senha_nova)
     usuario.deve_trocar_senha = False
     db.commit()

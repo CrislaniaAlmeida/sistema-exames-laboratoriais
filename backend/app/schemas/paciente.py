@@ -1,6 +1,8 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr, field_validator
 from typing import Optional, List
 from datetime import date, datetime
+
+from app.validadores import validar_cpf
 
 
 class PacienteBase(BaseModel):
@@ -37,7 +39,12 @@ class PacienteBase(BaseModel):
 
 
 class PacienteCriar(PacienteBase):
-    pass
+    email: Optional[EmailStr] = None
+
+    @field_validator("cpf")
+    @classmethod
+    def _validar_cpf(cls, valor):
+        return validar_cpf(valor)
 
 
 class PacienteAtualizar(BaseModel):
@@ -53,7 +60,7 @@ class PacienteAtualizar(BaseModel):
 
     celular: Optional[str] = None
     telefone: Optional[str] = None
-    email: Optional[str] = None
+    email: Optional[EmailStr] = None
 
     cep: Optional[str] = None
     logradouro: Optional[str] = None

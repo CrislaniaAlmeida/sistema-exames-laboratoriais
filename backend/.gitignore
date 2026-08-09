@@ -3,3 +3,5 @@ __pycache__/
 *.pyc
 .env
 dados_importacao/
+.pytest_cache/
+*.db

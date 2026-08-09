@@ -1,7 +1,10 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from slowapi import _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
 from sqlalchemy import text
 from app.database.connection import engine
+from app.limiter import limiter
 from app.routes import exames, auxiliares, auth, usuarios, pacientes, amostras
 
 app = FastAPI(
@@ -9,6 +12,9 @@ app = FastAPI(
     description="API para consulta, cadastro e gerenciamento de exames laboratoriais",
     version="1.0.0"
 )
+
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 app.add_middleware(
     CORSMiddleware,

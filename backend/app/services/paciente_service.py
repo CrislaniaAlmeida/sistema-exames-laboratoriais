@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func
 from app.database.models import Paciente, Solicitacao, SolicitacaoExame, Amostra, Exame
 from app.schemas.paciente import PacienteCriar, PacienteAtualizar
+from app.validadores import validar_cpf
 
 MAXIMO_MEDICAMENTOS = 6
 
@@ -66,7 +67,12 @@ def atualizar_paciente(db: Session, paciente_id: int, dados: PacienteAtualizar):
 
     dados_para_atualizar = dados.model_dump(exclude_unset=True)
 
-    if "cpf" in dados_para_atualizar:
+    if "cpf" in dados_para_atualizar and dados_para_atualizar["cpf"] != paciente.cpf:
+        try:
+            dados_para_atualizar["cpf"] = validar_cpf(dados_para_atualizar["cpf"])
+        except ValueError as erro:
+            raise HTTPException(status_code=400, detail=str(erro))
+
         outro = buscar_paciente_por_cpf(db, dados_para_atualizar["cpf"])
         if outro and outro.id != paciente_id:
             raise HTTPException(status_code=400, detail="Ja existe um paciente cadastrado com esse CPF.")

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
 
 from app.database.connection import get_db
@@ -9,6 +9,7 @@ from app.schemas.usuario import (
 from app.services import usuario_service
 from app.auth.jwt import criar_token_acesso
 from app.auth.dependencies import exigir_admin, obter_usuario_atual
+from app.limiter import limiter
 
 router = APIRouter(tags=["Autenticacao"])
 
@@ -28,7 +29,8 @@ def cadastrar_usuario(
 
 
 @router.post("/login", response_model=TokenResposta)
-def login(dados: LoginDados, db: Session = Depends(get_db)):
+@limiter.limit("5/minute")
+def login(request: Request, dados: LoginDados, db: Session = Depends(get_db)):
     usuario = usuario_service.autenticar_usuario(db, dados.email, dados.senha)
     if not usuario:
         raise HTTPException(status_code=401, detail="Email ou senha invalidos.")

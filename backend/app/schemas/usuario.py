@@ -1,6 +1,8 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field
 from typing import Optional, List
 from datetime import datetime
+
+TAMANHO_MINIMO_SENHA = 6
 
 PERMISSOES_DISPONIVEIS = {
     "exames_gerenciar": "Cadastrar e editar exames",
@@ -20,14 +22,14 @@ PERFIS_DISPONIVEIS = {
 class UsuarioCriar(BaseModel):
     nome: str
     email: EmailStr
-    senha: str
+    senha: str = Field(min_length=TAMANHO_MINIMO_SENHA)
     perfil: str = "usuario"
     permissoes: List[str] = []
 
 
 class UsuarioAtualizar(BaseModel):
     nome: Optional[str] = None
-    senha: Optional[str] = None
+    senha: Optional[str] = Field(None, min_length=TAMANHO_MINIMO_SENHA)
     perfil: Optional[str] = None
     permissoes: Optional[List[str]] = None
     ativo: Optional[bool] = None
@@ -53,7 +55,7 @@ class LoginDados(BaseModel):
 
 
 class TrocarSenhaDados(BaseModel):
-    senha_nova: str
+    senha_nova: str = Field(min_length=TAMANHO_MINIMO_SENHA)
 
 
 class TokenResposta(BaseModel):
