@@ -6,14 +6,15 @@ TAMANHO_MINIMO_SENHA = 6
 
 PERMISSOES_DISPONIVEIS = {
     "exames_gerenciar": "Cadastrar e editar exames",
-    "tubos_gerenciar": "Cadastrar e editar tubos",
     "laboratorios_gerenciar": "Cadastrar e editar laboratorios",
     "pacientes_gerenciar": "Cadastrar e editar pacientes",
+    "amostras_gerenciar": "Triagem e painel de amostras",
 }
 
 PERFIS_DISPONIVEIS = {
     "admin": "Administrador",
-    "recepcao": "Recepcao / Coletador",
+    "recepcao": "Recepcao",
+    "coletador": "Coletador",
     "bioquimico": "Bioquimico",
     "usuario": "Outro",
 }

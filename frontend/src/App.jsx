@@ -73,9 +73,9 @@ function App() {
       <Route
         path="/tubos"
         element={
-          <RotaComPermissao permissao="tubos_gerenciar">
+          <RotaAdmin>
             <TubosGerenciar />
-          </RotaComPermissao>
+          </RotaAdmin>
         }
       />
       <Route

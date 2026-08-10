@@ -10,7 +10,7 @@ const navItems = [
   { label: 'Gerenciar Exames', path: '/exames/gerenciar', icon: 'exames', disponivel: true, permissao: 'exames_gerenciar' },
   { label: 'Laboratorios', path: '/laboratorios', icon: 'laboratorio', disponivel: true, permissao: 'laboratorios_gerenciar' },
   { label: 'Materiais', path: '/materiais', icon: 'materiais', disponivel: true, adminOnly: true },
-  { label: 'Tubos', path: '/tubos', icon: 'tubos', disponivel: true, permissao: 'tubos_gerenciar' },
+  { label: 'Tubos', path: '/tubos', icon: 'tubos', disponivel: true, adminOnly: true },
   { label: 'Usuarios', path: '/usuarios', icon: 'usuarios', disponivel: true, adminOnly: true },
 ];
 

@@ -21,7 +21,6 @@ const PERMISSOES_OPCOES = [
   { chave: 'pacientes_gerenciar', label: 'Cadastrar Pacientes' },
   { chave: 'amostras_gerenciar', label: 'Triagem de Amostras' },
   { chave: 'exames_gerenciar', label: 'Gerenciar Exames' },
-  { chave: 'tubos_gerenciar', label: 'Gerenciar Tubos' },
   { chave: 'laboratorios_gerenciar', label: 'Gerenciar Laboratorios' },
 ];
 
@@ -30,7 +29,7 @@ const PERMISSOES_LABEL = Object.fromEntries(PERMISSOES_OPCOES.map((p) => [p.chav
 const PERMISSOES_PADRAO_POR_CARGO = {
   recepcao: ['pacientes_gerenciar'],
   coletador: ['amostras_gerenciar'],
-  bioquimico: ['exames_gerenciar', 'tubos_gerenciar', 'amostras_gerenciar'],
+  bioquimico: ['exames_gerenciar', 'amostras_gerenciar'],
 };
 
 const iconeEditar = (

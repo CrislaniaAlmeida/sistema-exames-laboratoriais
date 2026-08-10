@@ -120,7 +120,7 @@ def listar_tubos(
 def criar_tubo(
     dados: TuboCriar,
     db: Session = Depends(get_db),
-    usuario_atual: Usuario = Depends(exigir_permissao("tubos_gerenciar")),
+    usuario_atual: Usuario = Depends(exigir_admin),
 ):
     return auxiliares_service.criar_tubo(db, dados)
 
@@ -128,7 +128,7 @@ def criar_tubo(
 @router.post("/tubos/upload-foto")
 async def upload_foto_tubo(
     arquivo: UploadFile = File(...),
-    usuario_atual: Usuario = Depends(exigir_permissao("tubos_gerenciar")),
+    usuario_atual: Usuario = Depends(exigir_admin),
 ):
     foto_url = await auxiliares_service.enviar_foto_tubo_para_github(arquivo)
     return {"foto_url": foto_url}
@@ -139,7 +139,7 @@ def atualizar_tubo(
     tubo_id: int,
     dados: TuboAtualizar,
     db: Session = Depends(get_db),
-    usuario_atual: Usuario = Depends(exigir_permissao("tubos_gerenciar")),
+    usuario_atual: Usuario = Depends(exigir_admin),
 ):
     tubo = auxiliares_service.atualizar_tubo(db, tubo_id, dados)
     if not tubo:
@@ -151,7 +151,7 @@ def atualizar_tubo(
 def excluir_tubo(
     tubo_id: int,
     db: Session = Depends(get_db),
-    usuario_atual: Usuario = Depends(exigir_permissao("tubos_gerenciar")),
+    usuario_atual: Usuario = Depends(exigir_admin),
 ):
     tubo = auxiliares_service.excluir_tubo(db, tubo_id)
     if not tubo:
