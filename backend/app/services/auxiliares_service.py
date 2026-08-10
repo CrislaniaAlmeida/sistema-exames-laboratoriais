@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 from app.database.models import Laboratorio, Material, Tubo
 from app.schemas.auxiliares import (
     LaboratorioCriar, LaboratorioAtualizar,
-    MaterialCriar,
+    MaterialCriar, MaterialAtualizar,
     TuboCriar, TuboAtualizar,
 )
 
@@ -82,8 +82,26 @@ def criar_material(db: Session, dados: MaterialCriar):
     return novo
 
 
+def buscar_material_por_id(db: Session, material_id: int):
+    return db.query(Material).filter(Material.id == material_id).first()
+
+
+def atualizar_material(db: Session, material_id: int, dados: MaterialAtualizar):
+    material = buscar_material_por_id(db, material_id)
+    if not material:
+        return None
+
+    dados_para_atualizar = dados.model_dump(exclude_unset=True)
+    for campo, valor in dados_para_atualizar.items():
+        setattr(material, campo, valor)
+
+    db.commit()
+    db.refresh(material)
+    return material
+
+
 def excluir_material(db: Session, material_id: int):
-    material = db.query(Material).filter(Material.id == material_id).first()
+    material = buscar_material_por_id(db, material_id)
     if not material:
         return None
 

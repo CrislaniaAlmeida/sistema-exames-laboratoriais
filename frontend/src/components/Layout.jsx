@@ -7,7 +7,7 @@ const navItems = [
   { label: 'Pacientes', path: '/pacientes', icon: 'pacientes', disponivel: true, permissao: 'pacientes_gerenciar' },
   { label: 'Gerenciar Exames', path: '/exames/gerenciar', icon: 'exames', disponivel: true, permissao: 'exames_gerenciar' },
   { label: 'Laboratorios', path: '/laboratorios', icon: 'laboratorio', disponivel: true, permissao: 'laboratorios_gerenciar' },
-  { label: 'Materiais', path: '/materiais', icon: 'materiais', disponivel: false, adminOnly: true },
+  { label: 'Materiais', path: '/materiais', icon: 'materiais', disponivel: true, adminOnly: true },
   { label: 'Tubos', path: '/tubos', icon: 'tubos', disponivel: true, permissao: 'tubos_gerenciar' },
   { label: 'Usuarios', path: '/usuarios', icon: 'usuarios', disponivel: true, adminOnly: true },
 ];
@@ -19,6 +19,7 @@ const titulosPagina = {
   '/tubos': { titulo: 'Gerenciar Tubos', subtitulo: 'Cadastre, edite ou remova tubos de coleta' },
   '/laboratorios': { titulo: 'Laboratorios de Apoio', subtitulo: 'Cadastre laboratorios externos' },
   '/usuarios': { titulo: 'Gerenciar Usuarios', subtitulo: 'Cadastre usuarios e defina o que cada um pode acessar' },
+  '/materiais': { titulo: 'Gerenciar Materiais', subtitulo: 'Cadastre os materiais biologicos usados nos exames' },
 };
 
 const PERFIS_LABEL = {

@@ -6,7 +6,7 @@ from app.database.connection import get_db
 from app.database.models import Usuario
 from app.schemas.auxiliares import (
     LaboratorioCriar, LaboratorioAtualizar, LaboratorioResposta,
-    MaterialCriar, MaterialResposta,
+    MaterialCriar, MaterialAtualizar, MaterialResposta,
     TuboCriar, TuboAtualizar, TuboResposta,
 )
 from app.services import auxiliares_service
@@ -79,6 +79,19 @@ def criar_material(
     usuario_atual: Usuario = Depends(exigir_admin),
 ):
     return auxiliares_service.criar_material(db, dados)
+
+
+@router.put("/materiais/{material_id}", response_model=MaterialResposta)
+def atualizar_material(
+    material_id: int,
+    dados: MaterialAtualizar,
+    db: Session = Depends(get_db),
+    usuario_atual: Usuario = Depends(exigir_admin),
+):
+    material = auxiliares_service.atualizar_material(db, material_id, dados)
+    if not material:
+        raise HTTPException(status_code=404, detail="Material nao encontrado.")
+    return material
 
 
 @router.delete("/materiais/{material_id}")

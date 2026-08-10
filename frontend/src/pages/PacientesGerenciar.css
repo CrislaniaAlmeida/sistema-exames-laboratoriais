@@ -73,9 +73,13 @@
   border-radius: 18px;
   padding: 28px;
   margin-bottom: 28px;
+  box-shadow: 0 20px 45px -30px rgba(11, 23, 51, 0.4);
 }
 
 .gerenciar-form h2 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   margin: 0 0 16px;
   font-family: var(--font-display);
   font-style: italic;
@@ -85,14 +89,79 @@
 }
 
 .paciente-secao-titulo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--text-faint);
-  margin: 22px 0 12px;
-  padding-top: 14px;
+  margin: 22px 0 14px;
+  padding-top: 16px;
   border-top: 1px solid var(--border-soft);
+}
+
+.paciente-resumo-card {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  background: var(--surface);
+  border: 1px solid var(--border-soft);
+  border-radius: 18px;
+  padding: 22px 26px;
+  margin-bottom: 24px;
+  box-shadow: 0 20px 45px -30px rgba(11, 23, 51, 0.4);
+}
+
+.paciente-resumo-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 54px;
+  height: 54px;
+  border-radius: 16px;
+  background: var(--grad-primary);
+  color: #ffffff;
+  flex-shrink: 0;
+  box-shadow: 0 8px 20px rgba(0, 87, 224, 0.28);
+}
+
+.paciente-resumo-nome {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 24px;
+  font-weight: 400;
+  color: var(--text-primary);
+  margin: 0 0 8px;
+}
+
+.paciente-resumo-tags {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.paciente-resumo-tag {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: var(--surface-strong);
+  border: 1px solid var(--border-soft);
+  padding: 5px 12px;
+  border-radius: 999px;
+}
+
+.paciente-secao-icone {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  background: var(--surface-strong);
+  color: var(--accent-blue);
+  flex-shrink: 0;
 }
 
 .gerenciar-form h3.paciente-secao-titulo:first-of-type {
@@ -345,6 +414,9 @@
 }
 
 .paciente-concluir {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   background: var(--grad-primary);
   color: #ffffff;
   border: none;
@@ -376,22 +448,69 @@
   color: var(--text-primary);
 }
 
+.paciente-busca-grupo {
+  position: relative;
+  width: 100%;
+  max-width: 380px;
+  margin-bottom: 20px;
+}
+
+.paciente-busca-icone {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-faint);
+  display: flex;
+  pointer-events: none;
+}
+
 .paciente-busca {
   width: 100%;
-  max-width: 360px;
-  padding: 10px 14px;
+  padding: 11px 14px 11px 40px;
   border-radius: 10px;
   border: 1px solid var(--border-soft);
   background: var(--surface);
   color: var(--text-primary);
   font-size: 14px;
   font-family: inherit;
-  margin-bottom: 16px;
+  box-shadow: 0 8px 20px -14px rgba(11, 23, 51, 0.5);
 }
 
 .paciente-busca:focus {
   outline: none;
   border-color: var(--accent-blue-light);
+}
+
+.paciente-estado-vazio {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 14px;
+  padding: 56px 24px;
+  background: var(--surface);
+  border: 1px solid var(--border-soft);
+  border-radius: 18px;
+  box-shadow: 0 20px 45px -30px rgba(11, 23, 51, 0.4);
+}
+
+.paciente-estado-vazio-icone {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--surface-strong);
+  color: var(--accent-blue-light);
+}
+
+.paciente-estado-vazio p {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 14px;
 }
 
 .gerenciar-tabela {
@@ -442,20 +561,25 @@
 }
 
 .gerenciar-acoes button {
-  padding: 7px 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 13px;
   border-radius: 8px;
-  border: none;
+  border: 1px solid transparent;
   cursor: pointer;
   font-weight: 600;
-  font-size: 13px;
-  background: rgba(0, 87, 224, 0.1);
+  font-size: 12.5px;
+  background: rgba(0, 87, 224, 0.08);
   color: var(--accent-blue);
   font-family: inherit;
-  transition: background-color 0.15s ease;
+  transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.12s ease;
 }
 
 .gerenciar-acoes button:hover {
-  background: rgba(0, 87, 224, 0.18);
+  background: rgba(0, 87, 224, 0.16);
+  border-color: rgba(0, 87, 224, 0.2);
+  transform: translateY(-1px);
 }
 
 .btn-excluir {
@@ -465,6 +589,7 @@
 
 .btn-excluir:hover {
   background: #fecaca !important;
+  border-color: rgba(185, 28, 28, 0.25) !important;
 }
 
 .paciente-modal-fundo {

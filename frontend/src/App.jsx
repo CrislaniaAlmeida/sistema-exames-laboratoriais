@@ -10,6 +10,7 @@ import LaboratoriosGerenciar from './pages/LaboratoriosGerenciar';
 import UsuariosGerenciar from './pages/UsuariosGerenciar';
 import PacientesGerenciar from './pages/PacientesGerenciar';
 import PacienteExames from './pages/PacienteExames';
+import MateriaisGerenciar from './pages/MateriaisGerenciar';
 import RotaProtegida from './components/RotaProtegida';
 import RotaAdmin from './components/RotaAdmin';
 import RotaComPermissao from './components/RotaComPermissao';
@@ -88,6 +89,14 @@ function App() {
         element={
           <RotaAdmin>
             <UsuariosGerenciar />
+          </RotaAdmin>
+        }
+      />
+      <Route
+        path="/materiais"
+        element={
+          <RotaAdmin>
+            <MateriaisGerenciar />
           </RotaAdmin>
         }
       />

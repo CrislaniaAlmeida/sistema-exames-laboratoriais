@@ -15,6 +15,37 @@ const PACIENTE_VAZIO = {
 
 const MAXIMO_MEDICAMENTOS = 6;
 
+const iconesSecao = {
+  pessoais: (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="8" r="4" /><path d="M4 21c0-4 4-7 8-7s8 3 8 7" /></svg>
+  ),
+  contato: (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92Z" /></svg>
+  ),
+  endereco: (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 1 1 16 0Z" /><circle cx="12" cy="10" r="3" /></svg>
+  ),
+  saude: (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78Z" /></svg>
+  ),
+};
+
+const iconeEditar = (
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 20h9" /><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" /></svg>
+);
+const iconeExcluir = (
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 6h18" /><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" /></svg>
+);
+const iconeExames = (
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 2v6.34a2 2 0 0 1-.4 1.2L4 16a2 2 0 0 0 1.6 3.2h12.8A2 2 0 0 0 20 16l-4.6-6.46a2 2 0 0 1-.4-1.2V2" /><path d="M8.5 2h7" /></svg>
+);
+const iconeBusca = (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8" /><path d="M21 21l-4.35-4.35" /></svg>
+);
+const iconePaciente = (
+  <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><circle cx="12" cy="8" r="4" /><path d="M4 21c0-4 4-7 8-7s8 3 8 7" /></svg>
+);
+
 function PacientesGerenciar() {
   const navigate = useNavigate();
   const [pacientes, setPacientes] = useState([]);
@@ -233,7 +264,7 @@ function PacientesGerenciar() {
           <form className="gerenciar-form" onSubmit={handleSalvar} autoComplete="off">
             <h2>{editandoId ? `Editar paciente ${form.codigo || ''}` : 'Novo paciente'}</h2>
 
-            <h3 className="paciente-secao-titulo">Dados pessoais</h3>
+            <h3 className="paciente-secao-titulo"><span className="paciente-secao-icone">{iconesSecao.pessoais}</span>Dados pessoais</h3>
             <div className="form-grid">
               <label>
                 Nome *
@@ -278,7 +309,7 @@ function PacientesGerenciar() {
               </label>
             </div>
 
-            <h3 className="paciente-secao-titulo">Contato</h3>
+            <h3 className="paciente-secao-titulo"><span className="paciente-secao-icone">{iconesSecao.contato}</span>Contato</h3>
             <div className="form-grid">
               <label>
                 Celular
@@ -294,7 +325,7 @@ function PacientesGerenciar() {
               </label>
             </div>
 
-            <h3 className="paciente-secao-titulo">Endereco</h3>
+            <h3 className="paciente-secao-titulo"><span className="paciente-secao-icone">{iconesSecao.endereco}</span>Endereco</h3>
             <div className="form-grid">
               <label>
                 CEP
@@ -333,7 +364,7 @@ function PacientesGerenciar() {
               </label>
             </div>
 
-            <h3 className="paciente-secao-titulo">Convenio e saude</h3>
+            <h3 className="paciente-secao-titulo"><span className="paciente-secao-icone">{iconesSecao.saude}</span>Convenio e saude</h3>
             <div className="form-grid">
               <label>
                 Cartao do SUS
@@ -410,20 +441,29 @@ function PacientesGerenciar() {
 
         {!formAberto && (
           <>
-            <input
-              type="text"
-              className="paciente-busca"
-              placeholder="Buscar paciente por nome, CPF ou codigo..."
-              value={termoFiltro}
-              onChange={(e) => setTermoFiltro(e.target.value)}
-            />
+            <div className="paciente-busca-grupo">
+              <span className="paciente-busca-icone">{iconeBusca}</span>
+              <input
+                type="text"
+                className="paciente-busca"
+                placeholder="Buscar paciente por nome, CPF ou codigo..."
+                value={termoFiltro}
+                onChange={(e) => setTermoFiltro(e.target.value)}
+              />
+            </div>
 
             {!buscaAtiva ? (
-              <p className="paciente-exames-vazio">Digite o nome, CPF ou codigo para localizar um paciente ja cadastrado.</p>
+              <div className="paciente-estado-vazio">
+                <span className="paciente-estado-vazio-icone">{iconePaciente}</span>
+                <p>Digite o nome, CPF ou codigo para localizar um paciente ja cadastrado.</p>
+              </div>
             ) : carregando ? (
               <p>Carregando pacientes...</p>
             ) : pacientesFiltrados.length === 0 ? (
-              <p className="paciente-exames-vazio">Nenhum paciente encontrado para essa busca.</p>
+              <div className="paciente-estado-vazio">
+                <span className="paciente-estado-vazio-icone">{iconePaciente}</span>
+                <p>Nenhum paciente encontrado para essa busca.</p>
+              </div>
             ) : (
               <table className="gerenciar-tabela">
                 <thead>
@@ -447,9 +487,9 @@ function PacientesGerenciar() {
                       <td>{paciente.celular || '-'}</td>
                       <td>{paciente.convenio || '-'}</td>
                       <td className="gerenciar-acoes">
-                        <button onClick={() => abrirEdicao(paciente)}>Editar</button>
-                        <button onClick={() => navigate(`/pacientes/${paciente.id}/exames`)}>Exames</button>
-                        <button className="btn-excluir" onClick={() => handleExcluir(paciente)}>Excluir</button>
+                        <button onClick={() => abrirEdicao(paciente)}>{iconeEditar}Editar</button>
+                        <button onClick={() => navigate(`/pacientes/${paciente.id}/exames`)}>{iconeExames}Exames</button>
+                        <button className="btn-excluir" onClick={() => handleExcluir(paciente)}>{iconeExcluir}Excluir</button>
                       </td>
                     </tr>
                   ))}

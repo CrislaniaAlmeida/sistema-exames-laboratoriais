@@ -10,6 +10,22 @@ function formatarDataBr(data) {
   return `${dia}/${mes}/${ano}`;
 }
 
+const iconePaciente = (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><circle cx="12" cy="8" r="4" /><path d="M4 21c0-4 4-7 8-7s8 3 8 7" /></svg>
+);
+const iconeTubo = (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 2v6.34a2 2 0 0 1-.4 1.2L4 16a2 2 0 0 0 1.6 3.2h12.8A2 2 0 0 0 20 16l-4.6-6.46a2 2 0 0 1-.4-1.2V2" /><path d="M8.5 2h7" /></svg>
+);
+const iconeHistorico = (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 3" /></svg>
+);
+const iconePdf = (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z" /><path d="M14 2v6h6" /></svg>
+);
+const iconeVazio = (
+  <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><path d="M9 2v6.34a2 2 0 0 1-.4 1.2L4 16a2 2 0 0 0 1.6 3.2h12.8A2 2 0 0 0 20 16l-4.6-6.46a2 2 0 0 1-.4-1.2V2" /><path d="M8.5 2h7" /></svg>
+);
+
 function PacienteExames() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -151,16 +167,23 @@ function PacienteExames() {
       <div className="gerenciar gerenciar-pacientes">
         <Link to="/pacientes" className="gerenciar-voltar-topo">← Voltar para pacientes</Link>
 
-        <div className="gerenciar-cabecalho">
-          <h1>Exames de {paciente.nome}</h1>
-          <p>Codigo {paciente.codigo} · CPF {paciente.cpf} · Nascimento {formatarDataBr(paciente.data_nascimento)}</p>
+        <div className="paciente-resumo-card">
+          <span className="paciente-resumo-avatar">{iconePaciente}</span>
+          <div>
+            <h1 className="paciente-resumo-nome">{paciente.nome}</h1>
+            <div className="paciente-resumo-tags">
+              <span className="paciente-resumo-tag">{paciente.codigo}</span>
+              <span className="paciente-resumo-tag">CPF {paciente.cpf}</span>
+              <span className="paciente-resumo-tag">Nascimento {formatarDataBr(paciente.data_nascimento)}</span>
+            </div>
+          </div>
         </div>
 
         {erro && <p className="gerenciar-erro">{erro}</p>}
         {mensagem && <p className="gerenciar-mensagem">{mensagem}</p>}
 
         <div className="gerenciar-form">
-          <h2>Novos exames solicitados</h2>
+          <h2><span className="paciente-secao-icone">{iconeTubo}</span>Novos exames solicitados</h2>
 
           <div className="paciente-exames-busca">
             <input
@@ -202,7 +225,7 @@ function PacienteExames() {
 
           <div className="form-acoes">
             <button type="button" className="paciente-concluir" onClick={handleConcluir} disabled={concluindo}>
-              {concluindo ? 'Gerando...' : 'Concluir e gerar PDF'}
+              {iconePdf}{concluindo ? 'Gerando...' : 'Concluir e gerar PDF'}
             </button>
             <button type="button" className="form-cancelar" onClick={() => navigate('/pacientes')}>
               Voltar para pacientes
@@ -211,11 +234,14 @@ function PacienteExames() {
         </div>
 
         <div className="gerenciar-cabecalho">
-          <h2 className="paciente-secao-titulo">Solicitacoes anteriores</h2>
+          <h2 className="paciente-secao-titulo"><span className="paciente-secao-icone">{iconeHistorico}</span>Solicitacoes anteriores</h2>
         </div>
 
         {historico.length === 0 ? (
-          <p className="paciente-exames-vazio">Nenhuma solicitacao registrada ainda para este paciente.</p>
+          <div className="paciente-estado-vazio">
+            <span className="paciente-estado-vazio-icone">{iconeVazio}</span>
+            <p>Nenhuma solicitacao registrada ainda para este paciente.</p>
+          </div>
         ) : (
           <table className="gerenciar-tabela">
             <thead>

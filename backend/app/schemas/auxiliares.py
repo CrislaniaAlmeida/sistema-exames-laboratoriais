@@ -38,6 +38,10 @@ class MaterialCriar(MaterialBase):
     pass
 
 
+class MaterialAtualizar(MaterialBase):
+    nome: Optional[str] = None
+
+
 class MaterialResposta(MaterialBase):
     id: int
 
