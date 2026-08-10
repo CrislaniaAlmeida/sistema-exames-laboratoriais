@@ -25,7 +25,8 @@ CREATE TABLE usuarios (
     email           VARCHAR(150) NOT NULL UNIQUE,
     senha_hash      VARCHAR(255) NOT NULL,
     perfil          VARCHAR(20)  NOT NULL DEFAULT 'usuario'
-                        CHECK (perfil IN ('admin', 'recepcao', 'bioquimico', 'usuario')),
+                        CONSTRAINT check_perfil_valido
+                        CHECK (perfil IN ('admin', 'recepcao', 'coletador', 'bioquimico', 'usuario')),
     permissoes      JSONB        NOT NULL DEFAULT '[]'::jsonb,
     deve_trocar_senha BOOLEAN    NOT NULL DEFAULT FALSE,
     ativo           BOOLEAN      NOT NULL DEFAULT TRUE,
