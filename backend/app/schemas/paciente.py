@@ -126,6 +126,25 @@ class PacienteResumoResposta(BaseModel):
         from_attributes = True
 
 
+class PacienteAtendimentoResposta(BaseModel):
+    codigo: str
+    nome: str
+    convenio: Optional[str] = None
+
+    class Config:
+        from_attributes = True
+
+
+class AtendimentoResposta(BaseModel):
+    id: int
+    data_solicitacao: datetime
+    paciente: PacienteAtendimentoResposta
+    exames: List[ExameResumoResposta]
+
+    class Config:
+        from_attributes = True
+
+
 class ItemExameResposta(BaseModel):
     id: int
     status_resultado: str

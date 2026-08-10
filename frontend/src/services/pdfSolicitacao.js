@@ -319,3 +319,56 @@ export function gerarLaudoPdf({ paciente, solicitacao }) {
 
   doc.save(`laudo-${paciente.codigo}.pdf`);
 }
+
+/**
+ * Gera o relatorio diario de atendimentos em PDF: um atendimento
+ * (solicitacao de exame) por linha, com horario, paciente, convenio
+ * e exames solicitados, alem de um resumo no topo.
+ */
+export function gerarRelatorioAtendimentosPdf({ data, atendimentos }) {
+  const doc = new jsPDF();
+  const [ano, mes, dia] = data.split('-');
+  const dataBr = `${dia}/${mes}/${ano}`;
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(16);
+  doc.text('NexLab', 14, 18);
+  doc.setFontSize(11);
+  doc.setFont('helvetica', 'normal');
+  doc.text(`Relatorio de atendimentos - ${dataBr}`, 14, 25);
+
+  doc.setDrawColor(200);
+  doc.line(14, 29, 196, 29);
+
+  const codigosPacientes = new Set(atendimentos.map((a) => a.paciente.codigo));
+  const totalExames = atendimentos.reduce((soma, a) => soma + a.exames.length, 0);
+
+  let y = 38;
+  doc.setFont('helvetica', 'bold');
+  doc.text('Resumo', 14, y);
+  doc.setFont('helvetica', 'normal');
+  y += 7;
+  doc.text(`Total de atendimentos: ${atendimentos.length}`, 14, y);
+  doc.text(`Pacientes distintos: ${codigosPacientes.size}`, 105, y);
+  y += 6;
+  doc.text(`Exames solicitados: ${totalExames}`, 14, y);
+  y += 8;
+
+  const linhas = atendimentos.map((atendimento) => [
+    new Date(atendimento.data_solicitacao).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+    atendimento.paciente.nome,
+    atendimento.paciente.codigo,
+    atendimento.paciente.convenio || 'Particular',
+    atendimento.exames.map((e) => e.sigla || e.nome).join(', '),
+  ]);
+
+  autoTable(doc, {
+    startY: y,
+    head: [['Horario', 'Paciente', 'Codigo', 'Convenio', 'Exames']],
+    body: linhas,
+    headStyles: { fillColor: [0, 87, 224] },
+    styles: { fontSize: 9 },
+  });
+
+  doc.save(`atendimentos-${data}.pdf`);
+}

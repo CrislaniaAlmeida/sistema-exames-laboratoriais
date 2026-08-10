@@ -1,0 +1,224 @@
+.gerenciar {
+  max-width: 1100px;
+}
+
+.gerenciar-cabecalho {
+  margin-bottom: 24px;
+}
+
+.gerenciar-cabecalho h1 {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 30px;
+  font-weight: 400;
+  color: var(--text-primary);
+  margin: 0 0 4px;
+}
+
+.gerenciar-cabecalho p {
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.gerenciar-erro {
+  background: #fee2e2;
+  color: #b91c1c;
+  padding: 10px 16px;
+  border-radius: 10px;
+  margin-bottom: 16px;
+}
+
+.relatorio-filtro {
+  display: flex;
+  align-items: flex-end;
+  gap: 14px;
+  background: var(--surface);
+  border: 1px solid var(--border-soft);
+  border-radius: 16px;
+  padding: 20px 22px;
+  margin-bottom: 24px;
+  box-shadow: 0 20px 45px -30px rgba(11, 23, 51, 0.4);
+  flex-wrap: wrap;
+}
+
+.relatorio-filtro label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.relatorio-filtro input {
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border-soft);
+  background: var(--surface);
+  color: var(--text-primary);
+  font-size: 14px;
+  font-family: inherit;
+}
+
+.relatorio-filtro input:focus {
+  outline: none;
+  border-color: var(--accent-blue-light);
+}
+
+.relatorio-gerar {
+  background: var(--grad-primary);
+  color: #ffffff;
+  border: none;
+  padding: 11px 22px;
+  border-radius: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  box-shadow: 0 6px 16px rgba(0, 87, 224, 0.25);
+}
+
+.relatorio-gerar:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.relatorio-baixar {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--surface-strong);
+  color: var(--accent-blue);
+  border: 1px solid var(--border-soft);
+  padding: 11px 20px;
+  border-radius: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.relatorio-baixar:hover {
+  border-color: var(--border-strong);
+}
+
+.relatorio-resumo {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.relatorio-resumo-card {
+  background: var(--surface);
+  border: 1px solid var(--border-soft);
+  border-radius: 14px;
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  box-shadow: 0 20px 45px -32px rgba(11, 23, 51, 0.4);
+}
+
+.relatorio-resumo-numero {
+  font-family: var(--font-display);
+  font-size: 30px;
+  font-weight: 400;
+  color: var(--text-primary);
+}
+
+.relatorio-resumo-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.relatorio-resumo-convenios {
+  grid-column: span 1;
+}
+
+.relatorio-convenios-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.relatorio-convenio-item {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.relatorio-estado-vazio {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 14px;
+  padding: 56px 24px;
+  background: var(--surface);
+  border: 1px solid var(--border-soft);
+  border-radius: 18px;
+  box-shadow: 0 20px 45px -30px rgba(11, 23, 51, 0.4);
+}
+
+.relatorio-estado-vazio-icone {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--surface-strong);
+  color: var(--accent-blue-light);
+}
+
+.relatorio-estado-vazio p {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.gerenciar-tabela {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--surface);
+  border: 1px solid var(--border-soft);
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 20px 45px -30px rgba(11, 23, 51, 0.4);
+}
+
+.gerenciar-tabela th,
+.gerenciar-tabela td {
+  text-align: left;
+  padding: 14px 18px;
+  font-size: 14px;
+  border-bottom: 1px solid var(--border-soft);
+  color: var(--text-primary);
+}
+
+.gerenciar-tabela tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.gerenciar-tabela tbody tr:hover {
+  background: var(--surface-strong);
+}
+
+.gerenciar-tabela th {
+  background: var(--surface-strong);
+  color: var(--text-faint);
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.paciente-codigo {
+  font-family: var(--font-mono, monospace);
+  font-size: 12px;
+  color: var(--text-faint);
+}

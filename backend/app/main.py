@@ -5,7 +5,7 @@ from slowapi.errors import RateLimitExceeded
 from sqlalchemy import text
 from app.database.connection import engine
 from app.limiter import limiter
-from app.routes import exames, auxiliares, auth, usuarios, pacientes, amostras
+from app.routes import exames, auxiliares, auth, usuarios, pacientes, amostras, relatorios
 
 app = FastAPI(
     title="Sistema de Consulta de Exames Laboratoriais",
@@ -33,6 +33,7 @@ app.include_router(auxiliares.router)
 app.include_router(usuarios.router)
 app.include_router(pacientes.router)
 app.include_router(amostras.router)
+app.include_router(relatorios.router)
 
 
 @app.get("/")

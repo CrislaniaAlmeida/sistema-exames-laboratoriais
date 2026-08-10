@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
@@ -8,6 +8,17 @@ from app.schemas.paciente import PacienteCriar, PacienteAtualizar
 from app.validadores import validar_cpf
 
 LIMITE_PAINEL_AMOSTRAS = 300
+
+FUSO_BRASIL = timezone(timedelta(hours=-3))
+
+
+def _data_local_brasil(momento):
+    """Converte um datetime (com ou sem timezone) para a data no horario de Brasilia."""
+    if momento is None:
+        return None
+    if momento.tzinfo is None:
+        momento = momento.replace(tzinfo=timezone.utc)
+    return momento.astimezone(FUSO_BRASIL).date()
 
 MAXIMO_MEDICAMENTOS = 6
 
@@ -100,6 +111,31 @@ def excluir_paciente(db: Session, paciente_id: int):
     db.delete(paciente)
     db.commit()
     return paciente
+
+
+def listar_solicitacoes_do_dia(db: Session, data):
+    """
+    Lista os atendimentos (solicitacoes de exame) de todos os
+    pacientes num determinado dia, no horario de Brasilia -- para o
+    relatorio diario de atendimentos.
+
+    Busca um intervalo generoso (1 dia de cada lado, em UTC) e depois
+    confere a data exata em Python -- assim funciona igual em
+    qualquer banco, sem depender de funcoes de fuso horario do SQL.
+    """
+    inicio_aproximado = datetime(data.year, data.month, data.day, tzinfo=timezone.utc) - timedelta(days=1)
+    fim_aproximado = datetime(data.year, data.month, data.day, tzinfo=timezone.utc) + timedelta(days=2)
+
+    candidatas = (
+        db.query(Solicitacao)
+        .filter(
+            Solicitacao.data_solicitacao >= inicio_aproximado,
+            Solicitacao.data_solicitacao <= fim_aproximado,
+        )
+        .order_by(Solicitacao.data_solicitacao)
+        .all()
+    )
+    return [s for s in candidatas if _data_local_brasil(s.data_solicitacao) == data]
 
 
 def listar_solicitacoes(db: Session, paciente_id: int):
