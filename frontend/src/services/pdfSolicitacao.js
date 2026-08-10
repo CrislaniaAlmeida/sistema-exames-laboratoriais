@@ -204,3 +204,118 @@ export function gerarEtiquetasTubos({ paciente, amostras }) {
 
   return amostras;
 }
+
+function formatarDataHora(iso) {
+  if (!iso) return '-';
+  return new Date(iso).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+}
+
+function textoReferenciaLaudo(exame) {
+  if (!exame) return '-';
+  if (exame.valor_referencia_min != null || exame.valor_referencia_max != null) {
+    const min = exame.valor_referencia_min ?? '-';
+    const max = exame.valor_referencia_max ?? '-';
+    return `${min} a ${max}`;
+  }
+  if (exame.valor_referencia_texto) return exame.valor_referencia_texto;
+  return '-';
+}
+
+function textoFlagLaudo(flag) {
+  if (flag === 'H') return 'ALTO';
+  if (flag === 'L') return 'BAIXO';
+  return '';
+}
+
+/**
+ * Gera o laudo em PDF de uma solicitacao: um exame por linha, com o
+ * valor lancado, unidade, faixa de referencia e situacao (alto/baixo).
+ * Exames ainda sem resultado aparecem como "Aguardando resultado" --
+ * o laudo pode ser gerado parcialmente, antes de todos os exames
+ * ficarem prontos.
+ */
+export function gerarLaudoPdf({ paciente, solicitacao }) {
+  const doc = new jsPDF();
+  const itens = solicitacao.amostras.flatMap((amostra) => amostra.itens || []);
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(16);
+  doc.text('NexLab', 14, 18);
+  doc.setFontSize(11);
+  doc.setFont('helvetica', 'normal');
+  doc.text('Laudo de resultados', 14, 25);
+
+  doc.setDrawColor(200);
+  doc.line(14, 29, 196, 29);
+
+  let y = 38;
+  doc.setFont('helvetica', 'bold');
+  doc.text('Dados do paciente', 14, y);
+  doc.setFont('helvetica', 'normal');
+  y += 7;
+
+  const linhasPaciente = [
+    [`Codigo: ${paciente.codigo}`, `Nome: ${paciente.nome}`],
+    [`CPF: ${paciente.cpf}`, `Nascimento: ${formatarData(paciente.data_nascimento)}`],
+    [`Medico solicitante (CRM): ${paciente.crm_medico_solicitante || '-'}`, `Data da solicitacao: ${formatarData(new Date(solicitacao.data_solicitacao))}`],
+  ];
+
+  linhasPaciente.forEach(([esquerda, direita]) => {
+    doc.text(esquerda, 14, y);
+    doc.text(direita, 105, y);
+    y += 6;
+  });
+  y += 4;
+
+  const linhas = itens.map((item) => {
+    const exame = item.exame;
+    if (item.status_resultado !== 'disponivel') {
+      return [exame?.sigla || exame?.nome || '-', 'Aguardando resultado', '-', textoReferenciaLaudo(exame), '-'];
+    }
+    return [
+      exame?.sigla || exame?.nome || '-',
+      item.valor_resultado || '-',
+      item.unidade_resultado || '-',
+      textoReferenciaLaudo(exame),
+      textoFlagLaudo(item.flag_resultado),
+    ];
+  });
+
+  autoTable(doc, {
+    startY: y,
+    head: [['Exame', 'Resultado', 'Unidade', 'Referencia', 'Situacao']],
+    body: linhas,
+    headStyles: { fillColor: [0, 87, 224] },
+    styles: { fontSize: 9 },
+    didParseCell: (dados) => {
+      if (dados.section === 'body' && dados.column.index === 4) {
+        if (dados.cell.raw === 'ALTO' || dados.cell.raw === 'BAIXO') {
+          dados.cell.styles.textColor = [185, 28, 28];
+          dados.cell.styles.fontStyle = 'bold';
+        }
+      }
+    },
+  });
+
+  const finalY = doc.lastAutoTable.finalY || y;
+  doc.setFontSize(9);
+  doc.setTextColor(120);
+
+  let yRodape = finalY + 10;
+  itens.filter((item) => item.status_resultado === 'disponivel').forEach((item) => {
+    doc.text(
+      `${item.exame?.sigla || item.exame?.nome}: liberado por ${item.liberado_por_nome || '-'} em ${formatarDataHora(item.resultado_disponivel_em)}`,
+      14,
+      yRodape,
+    );
+    yRodape += 5;
+  });
+
+  doc.text(
+    'Este laudo foi gerado eletronicamente pelo NexLab. Resultados fora da faixa de referencia estao marcados como ALTO ou BAIXO.',
+    14,
+    yRodape + 5,
+  );
+
+  doc.save(`laudo-${paciente.codigo}.pdf`);
+}

@@ -100,6 +100,10 @@ function ExameDetalhe() {
       dias_realizacao: campoOuVazio(exame.dias_realizacao),
       prazo_liberacao_resultado: campoOuVazio(exame.prazo_liberacao_resultado),
       observacoes: campoOuVazio(exame.observacoes),
+      unidade_resultado: campoOuVazio(exame.unidade_resultado),
+      valor_referencia_min: exame.valor_referencia_min ?? '',
+      valor_referencia_max: exame.valor_referencia_max ?? '',
+      valor_referencia_texto: campoOuVazio(exame.valor_referencia_texto),
     });
     setEditando(secao);
     setErro('');
@@ -118,7 +122,7 @@ function ExameDetalhe() {
     setErro('');
     try {
       const payload = { ...form };
-      ['material_id', 'tubo_id', 'laboratorio_id'].forEach((campo) => {
+      ['material_id', 'tubo_id', 'laboratorio_id', 'valor_referencia_min', 'valor_referencia_max'].forEach((campo) => {
         payload[campo] = payload[campo] === '' ? null : Number(payload[campo]);
       });
       Object.keys(payload).forEach((campo) => {
@@ -501,6 +505,70 @@ function ExameDetalhe() {
                   <span className="campo-valor">{exame.prazo_liberacao_resultado || 'Nao informado'}</span>
                 </div>
               </div>
+            )}
+          </div>
+
+          {/* ---------- Referencia de resultado ---------- */}
+          <div className="exame-detalhe-card">
+            <div className="exame-detalhe-card-topo">
+              <h2>Referencia de resultado</h2>
+              {podeEditar && editando !== 'referencia' && (
+                <button className="card-editar-botao" onClick={() => abrirEdicao('referencia')}>Editar</button>
+              )}
+            </div>
+
+            {editando === 'referencia' ? (
+              <div className="secao-edicao">
+                <div className="edicao-grid-dupla">
+                  <label>
+                    Unidade do resultado
+                    <input value={form.unidade_resultado} onChange={(e) => handleChange('unidade_resultado', e.target.value)} placeholder="Ex: mg/dL" />
+                  </label>
+                </div>
+                <div className="edicao-grid-dupla">
+                  <label>
+                    Valor de referencia (minimo)
+                    <input type="number" step="any" value={form.valor_referencia_min} onChange={(e) => handleChange('valor_referencia_min', e.target.value)} />
+                  </label>
+                  <label>
+                    Valor de referencia (maximo)
+                    <input type="number" step="any" value={form.valor_referencia_max} onChange={(e) => handleChange('valor_referencia_max', e.target.value)} />
+                  </label>
+                </div>
+                <label>
+                  Referencia em texto (para valores nao numericos, ex: Reagente/Nao reagente)
+                  <textarea rows={2} value={form.valor_referencia_texto} onChange={(e) => handleChange('valor_referencia_texto', e.target.value)} />
+                </label>
+                <div className="edicao-acoes">
+                  <button className="edicao-salvar" onClick={salvar} disabled={salvando}>
+                    {salvando ? 'Salvando...' : 'Salvar'}
+                  </button>
+                  <button className="edicao-cancelar" onClick={cancelarEdicao} disabled={salvando}>
+                    Cancelar
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <>
+                <div className="exame-detalhe-campo-dupla">
+                  <div>
+                    <span className="campo-label">Faixa numerica</span>
+                    <span className="campo-valor">
+                      {exame.valor_referencia_min != null || exame.valor_referencia_max != null
+                        ? `${exame.valor_referencia_min ?? '-'} a ${exame.valor_referencia_max ?? '-'} ${exame.unidade_resultado || ''}`
+                        : 'Nao informado'}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="campo-label">Unidade</span>
+                    <span className="campo-valor">{exame.unidade_resultado || 'Nao informado'}</span>
+                  </div>
+                </div>
+                <div className="exame-detalhe-campo">
+                  <span className="campo-label">Referencia em texto</span>
+                  <span className="campo-valor">{exame.valor_referencia_texto || 'Nao informado'}</span>
+                </div>
+              </>
             )}
           </div>
 

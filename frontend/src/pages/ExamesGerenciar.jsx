@@ -13,6 +13,7 @@ const EXAME_VAZIO = {
   temperatura_armazenamento: '', tempo_maximo_envio: '', dias_realizacao: '',
   prazo_liberacao_resultado: '', metodo_utilizado: '', observacoes: '',
   quantidade_contratada: '', quantidade_restante: '',
+  unidade_resultado: '', valor_referencia_min: '', valor_referencia_max: '', valor_referencia_texto: '',
 };
 
 function ExamesGerenciar() {
@@ -114,6 +115,10 @@ function ExamesGerenciar() {
       observacoes: exame.observacoes || '',
       quantidade_contratada: exame.quantidade_contratada ?? '',
       quantidade_restante: exame.quantidade_restante ?? '',
+      unidade_resultado: exame.unidade_resultado || '',
+      valor_referencia_min: exame.valor_referencia_min ?? '',
+      valor_referencia_max: exame.valor_referencia_max ?? '',
+      valor_referencia_texto: exame.valor_referencia_texto || '',
     });
     setEditandoId(exame.id);
     setFormAberto(true);
@@ -134,7 +139,7 @@ function ExamesGerenciar() {
 
   function montarPayload() {
     const payload = { ...form };
-    ['laboratorio_id', 'material_id', 'tubo_id', 'quantidade_contratada', 'quantidade_restante'].forEach((campo) => {
+    ['laboratorio_id', 'material_id', 'tubo_id', 'quantidade_contratada', 'quantidade_restante', 'valor_referencia_min', 'valor_referencia_max'].forEach((campo) => {
       payload[campo] = payload[campo] === '' ? null : Number(payload[campo]);
     });
     Object.keys(payload).forEach((campo) => {
@@ -365,6 +370,36 @@ function ExamesGerenciar() {
               </label>
 
               <label>
+                Unidade do resultado
+                <input
+                  type="text"
+                  value={form.unidade_resultado}
+                  onChange={(e) => handleChange('unidade_resultado', e.target.value)}
+                  placeholder="Ex: mg/dL, U/L, %..."
+                />
+              </label>
+
+              <label>
+                Valor de referencia (minimo)
+                <input
+                  type="number"
+                  step="any"
+                  value={form.valor_referencia_min}
+                  onChange={(e) => handleChange('valor_referencia_min', e.target.value)}
+                />
+              </label>
+
+              <label>
+                Valor de referencia (maximo)
+                <input
+                  type="number"
+                  step="any"
+                  value={form.valor_referencia_max}
+                  onChange={(e) => handleChange('valor_referencia_max', e.target.value)}
+                />
+              </label>
+
+              <label>
                 Quantidade contratada (anual)
                 <input
                   type="number"
@@ -389,6 +424,16 @@ function ExamesGerenciar() {
                 rows={2}
                 value={form.preparo_paciente}
                 onChange={(e) => handleChange('preparo_paciente', e.target.value)}
+              />
+            </label>
+
+            <label className="form-full">
+              Referencia em texto (opcional, ex: valores nao numericos)
+              <textarea
+                rows={2}
+                value={form.valor_referencia_texto}
+                onChange={(e) => handleChange('valor_referencia_texto', e.target.value)}
+                placeholder="Ex: Nao reagente / Reagente, ou faixas por idade e sexo"
               />
             </label>
 

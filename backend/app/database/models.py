@@ -1,5 +1,5 @@
 from sqlalchemy import (
-    Column, Integer, String, Text, Boolean, Date, ForeignKey, TIMESTAMP, CheckConstraint, JSON
+    Column, Integer, String, Text, Boolean, Date, ForeignKey, TIMESTAMP, CheckConstraint, JSON, Float
 )
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
@@ -161,9 +161,20 @@ class SolicitacaoExame(Base):
     status_resultado = Column(String(20), nullable=False, default="aguardando_resultado")
     resultado_disponivel_em = Column(TIMESTAMP(timezone=True))
 
+    valor_resultado = Column(String(100))
+    unidade_resultado = Column(String(30))
+    flag_resultado = Column(String(1))
+    observacoes_resultado = Column(Text)
+    liberado_por_id = Column(Integer, ForeignKey("usuarios.id", ondelete="SET NULL"))
+
     solicitacao = relationship("Solicitacao", back_populates="itens")
     exame = relationship("Exame")
     amostra = relationship("Amostra", back_populates="itens")
+    liberado_por = relationship("Usuario")
+
+    @property
+    def liberado_por_nome(self):
+        return self.liberado_por.nome if self.liberado_por else None
 
     __table_args__ = (
         CheckConstraint(
@@ -236,6 +247,11 @@ class Exame(Base):
     quantidade_contratada = Column(Integer)
     quantidade_restante = Column(Integer)
     ativo = Column(Boolean, nullable=False, default=True)
+
+    unidade_resultado = Column(String(30))
+    valor_referencia_min = Column(Float)
+    valor_referencia_max = Column(Float)
+    valor_referencia_texto = Column(Text)
 
     criado_em = Column(TIMESTAMP(timezone=True), server_default=func.now())
     atualizado_em = Column(TIMESTAMP(timezone=True), server_default=func.now())

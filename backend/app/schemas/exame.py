@@ -24,6 +24,10 @@ class ExameBase(BaseModel):
     observacoes: Optional[str] = None
     quantidade_contratada: Optional[int] = None
     quantidade_restante: Optional[int] = None
+    unidade_resultado: Optional[str] = None
+    valor_referencia_min: Optional[float] = None
+    valor_referencia_max: Optional[float] = None
+    valor_referencia_texto: Optional[str] = None
 
 
 class ExameCriar(ExameBase):

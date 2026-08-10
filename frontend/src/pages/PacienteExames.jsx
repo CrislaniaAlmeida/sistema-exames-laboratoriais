@@ -91,6 +91,11 @@ function PacienteExames() {
     setExamesSelecionados((atual) => atual.filter((e) => e.id !== exameId));
   }
 
+  async function gerarLaudo(solicitacao) {
+    const { gerarLaudoPdf } = await import('../services/pdfSolicitacao');
+    gerarLaudoPdf({ paciente, solicitacao });
+  }
+
   async function handleConcluir() {
     setErro('');
     setMensagem('');
@@ -254,6 +259,7 @@ function PacienteExames() {
                 <th>Exames</th>
                 <th>Coleta</th>
                 <th>Resultado</th>
+                <th>Laudo</th>
               </tr>
             </thead>
             <tbody>
@@ -275,6 +281,16 @@ function PacienteExames() {
                       <span className={`tag-status-mini ${disponiveis === itens.length && itens.length > 0 ? 'tag-status-feito' : 'tag-status-pendente'}`}>
                         {disponiveis}/{itens.length}
                       </span>
+                    </td>
+                    <td className="gerenciar-acoes">
+                      <button
+                        type="button"
+                        disabled={disponiveis === 0}
+                        title={disponiveis === 0 ? 'Nenhum resultado liberado ainda' : ''}
+                        onClick={() => gerarLaudo(solicitacao)}
+                      >
+                        {iconePdf}Gerar laudo
+                      </button>
                     </td>
                   </tr>
                 );

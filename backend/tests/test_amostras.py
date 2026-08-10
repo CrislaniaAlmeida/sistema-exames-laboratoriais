@@ -221,3 +221,110 @@ def test_verificar_admin_rejeita_usuario_que_nao_e_admin(cliente, token_admin, s
         headers={"Authorization": f"Bearer {token_admin}"},
     )
     assert resposta.status_code == 401
+
+
+def _criar_paciente_com_exame_com_referencia(sessao_db, cliente, token_admin):
+    paciente = Paciente(
+        codigo="PAC-000200",
+        nome="Paciente Resultado",
+        cpf="11144477735",
+        data_nascimento=date(1990, 1, 1),
+    )
+    exame = Exame(
+        nome="Glicose", sigla="GLI", setor_responsavel="Bioquimica",
+        unidade_resultado="mg/dL", valor_referencia_min=70, valor_referencia_max=99,
+    )
+    sessao_db.add_all([paciente, exame])
+    sessao_db.commit()
+
+    resposta = cliente.post(
+        f"/pacientes/{paciente.id}/solicitacoes",
+        json={"exame_ids": [exame.id]},
+        headers={"Authorization": f"Bearer {token_admin}"},
+    )
+    assert resposta.status_code == 201, resposta.text
+    return resposta.json()["amostras"][0]["itens"][0]["id"]
+
+
+def test_lancar_resultado_dentro_da_referencia_nao_gera_flag(cliente, token_admin, sessao_db):
+    item_id = _criar_paciente_com_exame_com_referencia(sessao_db, cliente, token_admin)
+
+    resposta = cliente.put(
+        f"/amostras/itens/{item_id}/resultado",
+        json={"valor_resultado": "85"},
+        headers={"Authorization": f"Bearer {token_admin}"},
+    )
+    assert resposta.status_code == 200, resposta.text
+    dados = resposta.json()
+    assert dados["valor_resultado"] == "85"
+    assert dados["unidade_resultado"] == "mg/dL"
+    assert dados["flag_resultado"] is None
+    assert dados["status_resultado"] == "disponivel"
+    assert dados["liberado_por_nome"] == "Admin de Teste"
+
+
+def test_lancar_resultado_acima_da_referencia_gera_flag_alto(cliente, token_admin, sessao_db):
+    item_id = _criar_paciente_com_exame_com_referencia(sessao_db, cliente, token_admin)
+
+    resposta = cliente.put(
+        f"/amostras/itens/{item_id}/resultado",
+        json={"valor_resultado": "126"},
+        headers={"Authorization": f"Bearer {token_admin}"},
+    )
+    assert resposta.status_code == 200, resposta.text
+    assert resposta.json()["flag_resultado"] == "H"
+
+
+def test_lancar_resultado_abaixo_da_referencia_gera_flag_baixo(cliente, token_admin, sessao_db):
+    item_id = _criar_paciente_com_exame_com_referencia(sessao_db, cliente, token_admin)
+
+    resposta = cliente.put(
+        f"/amostras/itens/{item_id}/resultado",
+        json={"valor_resultado": "55"},
+        headers={"Authorization": f"Bearer {token_admin}"},
+    )
+    assert resposta.status_code == 200, resposta.text
+    assert resposta.json()["flag_resultado"] == "L"
+
+
+def test_lancar_resultado_nao_numerico_nao_gera_flag(cliente, token_admin, sessao_db):
+    item_id = _criar_paciente_com_exame_com_referencia(sessao_db, cliente, token_admin)
+
+    resposta = cliente.put(
+        f"/amostras/itens/{item_id}/resultado",
+        json={"valor_resultado": "Nao reagente"},
+        headers={"Authorization": f"Bearer {token_admin}"},
+    )
+    assert resposta.status_code == 200, resposta.text
+    assert resposta.json()["flag_resultado"] is None
+    assert resposta.json()["valor_resultado"] == "Nao reagente"
+
+
+def test_lancar_resultado_vazio_e_rejeitado(cliente, token_admin, sessao_db):
+    item_id = _criar_paciente_com_exame_com_referencia(sessao_db, cliente, token_admin)
+
+    resposta = cliente.put(
+        f"/amostras/itens/{item_id}/resultado",
+        json={"valor_resultado": ""},
+        headers={"Authorization": f"Bearer {token_admin}"},
+    )
+    assert resposta.status_code == 422
+
+
+def test_voltar_status_para_pendente_limpa_valor_lancado(cliente, token_admin, sessao_db):
+    item_id = _criar_paciente_com_exame_com_referencia(sessao_db, cliente, token_admin)
+
+    cliente.put(
+        f"/amostras/itens/{item_id}/resultado",
+        json={"valor_resultado": "126"},
+        headers={"Authorization": f"Bearer {token_admin}"},
+    )
+    resposta = cliente.put(
+        f"/amostras/itens/{item_id}/status",
+        json={"status_resultado": "aguardando_resultado"},
+        headers={"Authorization": f"Bearer {token_admin}"},
+    )
+    assert resposta.status_code == 200, resposta.text
+    dados = resposta.json()
+    assert dados["valor_resultado"] is None
+    assert dados["flag_resultado"] is None

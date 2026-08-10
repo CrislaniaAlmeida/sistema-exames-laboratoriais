@@ -240,7 +240,53 @@ def atualizar_status_resultado_item(db: Session, item_id: int, status_resultado:
         return None
 
     item.status_resultado = status_resultado
-    item.resultado_disponivel_em = datetime.now(timezone.utc) if status_resultado == "disponivel" else None
+    if status_resultado == "disponivel":
+        item.resultado_disponivel_em = datetime.now(timezone.utc)
+    else:
+        item.resultado_disponivel_em = None
+        item.valor_resultado = None
+        item.flag_resultado = None
+        item.observacoes_resultado = None
+        item.liberado_por_id = None
+
+    db.commit()
+    db.refresh(item)
+    return item
+
+
+def calcular_flag_resultado(valor_resultado: str, exame: Exame):
+    """
+    Compara o valor lancado com a faixa de referencia numerica do
+    exame (quando configurada) e devolve 'H' (alto), 'L' (baixo) ou
+    None (dentro da faixa, ou faixa/valor nao numericos -- nesses
+    casos o bioquimico usa o texto de referencia para interpretar).
+    """
+    if exame is None:
+        return None
+    try:
+        valor_numerico = float(str(valor_resultado).replace(",", "."))
+    except ValueError:
+        return None
+
+    if exame.valor_referencia_max is not None and valor_numerico > exame.valor_referencia_max:
+        return "H"
+    if exame.valor_referencia_min is not None and valor_numerico < exame.valor_referencia_min:
+        return "L"
+    return None
+
+
+def lancar_resultado(db: Session, item_id: int, valor_resultado: str, observacoes_resultado: str, usuario_atual):
+    item = buscar_item_exame_por_id(db, item_id)
+    if not item:
+        return None
+
+    item.valor_resultado = valor_resultado
+    item.unidade_resultado = item.exame.unidade_resultado if item.exame else None
+    item.flag_resultado = calcular_flag_resultado(valor_resultado, item.exame)
+    item.observacoes_resultado = observacoes_resultado
+    item.status_resultado = "disponivel"
+    item.resultado_disponivel_em = datetime.now(timezone.utc)
+    item.liberado_por_id = usuario_atual.id
 
     db.commit()
     db.refresh(item)

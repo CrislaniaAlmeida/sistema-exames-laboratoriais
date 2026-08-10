@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr, field_validator
+from pydantic import BaseModel, EmailStr, Field, field_validator
 from typing import Optional, List, Literal
 from datetime import date, datetime
 
@@ -101,6 +101,11 @@ class ExameResumoResposta(BaseModel):
     tubo_cor: Optional[str] = None
     material_nome: Optional[str] = None
     laboratorio_nome: Optional[str] = None
+    metodo_utilizado: Optional[str] = None
+    unidade_resultado: Optional[str] = None
+    valor_referencia_min: Optional[float] = None
+    valor_referencia_max: Optional[float] = None
+    valor_referencia_texto: Optional[str] = None
 
     class Config:
         from_attributes = True
@@ -125,10 +130,20 @@ class ItemExameResposta(BaseModel):
     id: int
     status_resultado: str
     resultado_disponivel_em: Optional[datetime] = None
+    valor_resultado: Optional[str] = None
+    unidade_resultado: Optional[str] = None
+    flag_resultado: Optional[str] = None
+    observacoes_resultado: Optional[str] = None
+    liberado_por_nome: Optional[str] = None
     exame: Optional[ExameResumoResposta] = None
 
     class Config:
         from_attributes = True
+
+
+class ResultadoLancar(BaseModel):
+    valor_resultado: str = Field(min_length=1)
+    observacoes_resultado: Optional[str] = None
 
 
 class AmostraResposta(BaseModel):

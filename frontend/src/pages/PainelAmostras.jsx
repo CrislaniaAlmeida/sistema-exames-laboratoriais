@@ -18,12 +18,27 @@ function formatarDataHoraBr(iso) {
   return new Date(iso).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
 }
 
+function textoReferencia(exame) {
+  if (!exame) return null;
+  if (exame.valor_referencia_min != null || exame.valor_referencia_max != null) {
+    const min = exame.valor_referencia_min ?? '-';
+    const max = exame.valor_referencia_max ?? '-';
+    return `Referencia: ${min} a ${max} ${exame.unidade_resultado || ''}`.trim();
+  }
+  if (exame.valor_referencia_texto) {
+    return `Referencia: ${exame.valor_referencia_texto}`;
+  }
+  return null;
+}
+
 function PainelAmostras() {
   const [amostras, setAmostras] = useState([]);
   const [apenasPendentes, setApenasPendentes] = useState(true);
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState('');
   const [atualizandoId, setAtualizandoId] = useState(null);
+  const [valoresDigitados, setValoresDigitados] = useState({});
+  const [observacoesDigitadas, setObservacoesDigitadas] = useState({});
 
   async function carregar() {
     setCarregando(true);
@@ -57,15 +72,33 @@ function PainelAmostras() {
     }
   }
 
-  async function alternarStatusItem(item) {
-    const novoStatus = item.status_resultado === 'disponivel' ? 'aguardando_resultado' : 'disponivel';
+  async function lancarResultado(item) {
+    const valor = (valoresDigitados[item.id] || '').trim();
+    if (!valor) return;
+
     setAtualizandoId(`item-${item.id}`);
     setErro('');
     try {
-      await api.put(`/amostras/itens/${item.id}/status`, { status_resultado: novoStatus });
+      await api.put(`/amostras/itens/${item.id}/resultado`, {
+        valor_resultado: valor,
+        observacoes_resultado: observacoesDigitadas[item.id] || null,
+      });
+      await carregar();
+    } catch (erroRequisicao) {
+      setErro(erroRequisicao.response?.data?.detail || 'Nao foi possivel lancar o resultado.');
+    } finally {
+      setAtualizandoId(null);
+    }
+  }
+
+  async function reabrirResultado(item) {
+    setAtualizandoId(`item-${item.id}`);
+    setErro('');
+    try {
+      await api.put(`/amostras/itens/${item.id}/status`, { status_resultado: 'aguardando_resultado' });
       await carregar();
     } catch {
-      setErro('Nao foi possivel atualizar o status do resultado.');
+      setErro('Nao foi possivel reabrir o resultado.');
     } finally {
       setAtualizandoId(null);
     }
@@ -76,11 +109,11 @@ function PainelAmostras() {
       <div className="gerenciar painel-amostras">
         <div className="gerenciar-cabecalho">
           <h1>Painel de amostras</h1>
-          <p>Marque a coleta e a liberacao de resultado de cada exame, sem abrir o cadastro de cada paciente.</p>
+          <p>Marque a coleta e lance o resultado de cada exame, sem abrir o cadastro de cada paciente.</p>
         </div>
 
         <div className="painel-banner">
-          <span className="painel-banner-legenda">Coleta e liberacao de resultado, em um so lugar</span>
+          <span className="painel-banner-legenda">Coleta e lancamento de resultado, em um so lugar</span>
         </div>
 
         {erro && <p className="gerenciar-erro">{erro}</p>}
@@ -133,23 +166,67 @@ function PainelAmostras() {
                 </div>
 
                 <ul className="painel-itens">
-                  {amostra.itens.map((item) => (
-                    <li key={item.id}>
-                      <span className="painel-item-nome">
-                        {item.exame?.sigla || item.exame?.nome || 'Exame removido'}
-                      </span>
-                      <button
-                        className={`painel-status-botao painel-status-botao-mini ${item.status_resultado === 'disponivel' ? 'painel-status-feito' : 'painel-status-pendente'}`}
-                        onClick={() => alternarStatusItem(item)}
-                        disabled={atualizandoId === `item-${item.id}`}
-                      >
-                        {item.status_resultado === 'disponivel' ? iconeCheck : iconeRelogio}
-                        {item.status_resultado === 'disponivel'
-                          ? `Resultado disponivel ${formatarDataHoraBr(item.resultado_disponivel_em)}`
-                          : 'Aguardando resultado'}
-                      </button>
-                    </li>
-                  ))}
+                  {amostra.itens.map((item) => {
+                    const referencia = textoReferencia(item.exame);
+                    return (
+                      <li key={item.id} className="painel-item-linha">
+                        <div className="painel-item-cabecalho">
+                          <span className="painel-item-nome">
+                            {item.exame?.sigla || item.exame?.nome || 'Exame removido'}
+                          </span>
+                          {referencia && <span className="painel-item-referencia">{referencia}</span>}
+                        </div>
+
+                        {item.status_resultado === 'disponivel' ? (
+                          <div className="painel-item-resultado">
+                            <span className={`painel-valor-resultado ${item.flag_resultado ? 'painel-valor-flag' : ''}`}>
+                              {item.valor_resultado} {item.unidade_resultado || ''}
+                              {item.flag_resultado && (
+                                <span className={`painel-flag painel-flag-${item.flag_resultado}`}>
+                                  {item.flag_resultado === 'H' ? 'ALTO' : 'BAIXO'}
+                                </span>
+                              )}
+                            </span>
+                            <span className="painel-item-liberado-meta">
+                              Liberado por {item.liberado_por_nome || '-'} em {formatarDataHoraBr(item.resultado_disponivel_em)}
+                            </span>
+                            <button
+                              type="button"
+                              className="painel-item-reabrir"
+                              onClick={() => reabrirResultado(item)}
+                              disabled={atualizandoId === `item-${item.id}`}
+                            >
+                              Reabrir
+                            </button>
+                          </div>
+                        ) : (
+                          <div className="painel-item-lancamento">
+                            <input
+                              type="text"
+                              placeholder="Valor do resultado..."
+                              value={valoresDigitados[item.id] || ''}
+                              onChange={(e) => setValoresDigitados((atual) => ({ ...atual, [item.id]: e.target.value }))}
+                            />
+                            <input
+                              type="text"
+                              placeholder="Observacao (opcional)"
+                              className="painel-item-observacao"
+                              value={observacoesDigitadas[item.id] || ''}
+                              onChange={(e) => setObservacoesDigitadas((atual) => ({ ...atual, [item.id]: e.target.value }))}
+                            />
+                            <button
+                              type="button"
+                              className="painel-status-botao painel-status-pendente"
+                              onClick={() => lancarResultado(item)}
+                              disabled={atualizandoId === `item-${item.id}` || !(valoresDigitados[item.id] || '').trim()}
+                            >
+                              Lancar resultado
+                            </button>
+                          </div>
+                        )}
+                      </li>
+                    );
+                  })}
                 </ul>
               </div>
             ))}

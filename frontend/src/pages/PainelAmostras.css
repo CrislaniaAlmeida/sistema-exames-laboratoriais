@@ -168,11 +168,19 @@
   gap: 8px;
 }
 
-.painel-itens li {
+.painel-item-linha {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--surface-strong);
+}
+
+.painel-item-cabecalho {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
   flex-wrap: wrap;
 }
 
@@ -180,6 +188,95 @@
   font-size: 13px;
   font-weight: 600;
   color: var(--text-primary);
+}
+
+.painel-item-referencia {
+  font-size: 11.5px;
+  color: var(--text-faint);
+}
+
+.painel-item-lancamento {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.painel-item-lancamento input {
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border-soft);
+  background: var(--surface);
+  color: var(--text-primary);
+  font-size: 13px;
+  font-family: inherit;
+  flex: 1;
+  min-width: 140px;
+}
+
+.painel-item-lancamento input:focus {
+  outline: none;
+  border-color: var(--accent-blue-light);
+}
+
+.painel-item-observacao {
+  flex: 2;
+}
+
+.painel-item-resultado {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.painel-valor-resultado {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.painel-flag {
+  font-size: 10px;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 999px;
+  letter-spacing: 0.03em;
+}
+
+.painel-flag-H {
+  background: rgba(220, 38, 38, 0.14);
+  color: #b91c1c;
+}
+
+.painel-flag-L {
+  background: rgba(0, 87, 224, 0.14);
+  color: var(--accent-blue);
+}
+
+.painel-item-liberado-meta {
+  font-size: 11.5px;
+  color: var(--text-faint);
+}
+
+.painel-item-reabrir {
+  margin-left: auto;
+  background: none;
+  border: 1px solid var(--border-soft);
+  border-radius: 8px;
+  padding: 5px 12px;
+  color: var(--text-muted);
+  font-weight: 600;
+  font-size: 11.5px;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.painel-item-reabrir:hover {
+  color: var(--text-primary);
+  border-color: var(--border-strong);
 }
 
 .painel-status-botao {
@@ -199,11 +296,6 @@
 
 .painel-status-botao:hover {
   transform: translateY(-1px);
-}
-
-.painel-status-botao-mini {
-  padding: 6px 12px;
-  font-size: 12px;
 }
 
 .painel-status-pendente {

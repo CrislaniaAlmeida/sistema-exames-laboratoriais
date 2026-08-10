@@ -7,7 +7,7 @@ from app.database.connection import get_db
 from app.database.models import Usuario
 from app.schemas.paciente import (
     AmostraConsultaResposta, AmostraResposta, AmostraStatusAtualizar,
-    ItemExameResposta, ItemExameStatusAtualizar,
+    ItemExameResposta, ItemExameStatusAtualizar, ResultadoLancar,
 )
 from app.services import paciente_service
 from app.auth.dependencies import exigir_permissao
@@ -51,6 +51,26 @@ def atualizar_status_resultado_item(
     usuario_atual: Usuario = Depends(exigir_permissao("amostras_gerenciar")),
 ):
     item = paciente_service.atualizar_status_resultado_item(db, item_id, dados.status_resultado)
+    if not item:
+        raise HTTPException(status_code=404, detail="Item de exame nao encontrado.")
+    return item
+
+
+@router.put("/itens/{item_id}/resultado", response_model=ItemExameResposta)
+def lancar_resultado(
+    item_id: int,
+    dados: ResultadoLancar,
+    db: Session = Depends(get_db),
+    usuario_atual: Usuario = Depends(exigir_permissao("amostras_gerenciar")),
+):
+    """
+    Lanca o valor de um resultado, calcula automaticamente a flag
+    (Alto/Baixo) comparando com a faixa de referencia do exame, e
+    libera o resultado (status_resultado = disponivel).
+    """
+    item = paciente_service.lancar_resultado(
+        db, item_id, dados.valor_resultado, dados.observacoes_resultado, usuario_atual,
+    )
     if not item:
         raise HTTPException(status_code=404, detail="Item de exame nao encontrado.")
     return item
