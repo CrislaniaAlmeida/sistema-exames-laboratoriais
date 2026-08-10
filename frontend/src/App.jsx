@@ -11,6 +11,7 @@ import UsuariosGerenciar from './pages/UsuariosGerenciar';
 import PacientesGerenciar from './pages/PacientesGerenciar';
 import PacienteExames from './pages/PacienteExames';
 import MateriaisGerenciar from './pages/MateriaisGerenciar';
+import PainelAmostras from './pages/PainelAmostras';
 import RotaProtegida from './components/RotaProtegida';
 import RotaAdmin from './components/RotaAdmin';
 import RotaComPermissao from './components/RotaComPermissao';
@@ -98,6 +99,14 @@ function App() {
           <RotaAdmin>
             <MateriaisGerenciar />
           </RotaAdmin>
+        }
+      />
+      <Route
+        path="/painel-amostras"
+        element={
+          <RotaComPermissao permissao={['pacientes_gerenciar', 'exames_gerenciar']}>
+            <PainelAmostras />
+          </RotaComPermissao>
         }
       />
     </Routes>

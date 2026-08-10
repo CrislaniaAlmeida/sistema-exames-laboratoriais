@@ -1,9 +1,13 @@
+from datetime import datetime, timezone
+
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from app.database.models import Paciente, Solicitacao, SolicitacaoExame, Amostra, Exame
 from app.schemas.paciente import PacienteCriar, PacienteAtualizar
 from app.validadores import validar_cpf
+
+LIMITE_PAINEL_AMOSTRAS = 300
 
 MAXIMO_MEDICAMENTOS = 6
 
@@ -186,3 +190,58 @@ def criar_solicitacao(db: Session, paciente_id: int, exame_ids: list):
 
 def buscar_amostra_por_codigo(db: Session, codigo: str):
     return db.query(Amostra).filter(Amostra.codigo == codigo).first()
+
+
+def listar_amostras_painel(db: Session, apenas_pendentes: bool = True):
+    """
+    Lista amostras para o painel de coleta/resultado, mais recentes
+    primeiro. Uma amostra "pendente" e' aquela que ainda nao foi
+    coletada, ou que tem algum exame ainda aguardando resultado.
+    """
+    consulta = db.query(Amostra)
+
+    if apenas_pendentes:
+        consulta = consulta.filter(
+            (Amostra.status == "aguardando_coleta")
+            | Amostra.itens.any(SolicitacaoExame.status_resultado == "aguardando_resultado")
+        )
+
+    return (
+        consulta.order_by(Amostra.criado_em.desc())
+        .limit(LIMITE_PAINEL_AMOSTRAS)
+        .all()
+    )
+
+
+def buscar_amostra_por_id(db: Session, amostra_id: int):
+    return db.query(Amostra).filter(Amostra.id == amostra_id).first()
+
+
+def atualizar_status_amostra(db: Session, amostra_id: int, status: str):
+    amostra = buscar_amostra_por_id(db, amostra_id)
+    if not amostra:
+        return None
+
+    amostra.status = status
+    amostra.coletado_em = datetime.now(timezone.utc) if status == "coletado" else None
+
+    db.commit()
+    db.refresh(amostra)
+    return amostra
+
+
+def buscar_item_exame_por_id(db: Session, item_id: int):
+    return db.query(SolicitacaoExame).filter(SolicitacaoExame.id == item_id).first()
+
+
+def atualizar_status_resultado_item(db: Session, item_id: int, status_resultado: str):
+    item = buscar_item_exame_por_id(db, item_id)
+    if not item:
+        return None
+
+    item.status_resultado = status_resultado
+    item.resultado_disponivel_em = datetime.now(timezone.utc) if status_resultado == "disponivel" else None
+
+    db.commit()
+    db.refresh(item)
+    return item

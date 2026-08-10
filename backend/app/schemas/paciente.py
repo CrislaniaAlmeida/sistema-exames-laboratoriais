@@ -1,5 +1,5 @@
 from pydantic import BaseModel, EmailStr, field_validator
-from typing import Optional, List
+from typing import Optional, List, Literal
 from datetime import date, datetime
 
 from app.validadores import validar_cpf
@@ -109,13 +109,39 @@ class SolicitacaoCriar(BaseModel):
     exame_ids: List[int]
 
 
+class PacienteResumoResposta(BaseModel):
+    codigo: str
+    nome: str
+    nome_social: Optional[str] = None
+    cpf: str
+    data_nascimento: date
+
+    class Config:
+        from_attributes = True
+
+
+class ItemExameResposta(BaseModel):
+    id: int
+    status_resultado: str
+    resultado_disponivel_em: Optional[datetime] = None
+    exame: Optional[ExameResumoResposta] = None
+
+    class Config:
+        from_attributes = True
+
+
 class AmostraResposta(BaseModel):
     id: int
     codigo: str
     tubo_cor: Optional[str] = None
     material: Optional[str] = None
     setor: Optional[str] = None
+    status: str
+    coletado_em: Optional[datetime] = None
+    criado_em: datetime
     exames: List[ExameResumoResposta]
+    itens: List[ItemExameResposta]
+    paciente: PacienteResumoResposta
 
     class Config:
         from_attributes = True
@@ -132,15 +158,12 @@ class SolicitacaoResposta(BaseModel):
         from_attributes = True
 
 
-class PacienteResumoResposta(BaseModel):
-    codigo: str
-    nome: str
-    nome_social: Optional[str] = None
-    cpf: str
-    data_nascimento: date
+class AmostraStatusAtualizar(BaseModel):
+    status: Literal["aguardando_coleta", "coletado"]
 
-    class Config:
-        from_attributes = True
+
+class ItemExameStatusAtualizar(BaseModel):
+    status_resultado: Literal["aguardando_resultado", "disponivel"]
 
 
 class AmostraConsultaResposta(BaseModel):

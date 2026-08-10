@@ -17,7 +17,9 @@ function RotaComPermissao({ permissao, children }) {
     return <Navigate to="/trocar-senha" replace />;
   }
 
-  const temAcesso = usuario.perfil === 'admin' || usuario.permissoes?.includes(permissao);
+  const permissoesAceitas = Array.isArray(permissao) ? permissao : [permissao];
+  const temAcesso = usuario.perfil === 'admin' ||
+    permissoesAceitas.some((chave) => usuario.permissoes?.includes(chave));
   if (!temAcesso) {
     return <Navigate to="/exames" replace />;
   }

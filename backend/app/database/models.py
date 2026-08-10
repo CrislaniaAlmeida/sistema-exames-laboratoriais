@@ -111,10 +111,18 @@ class Amostra(Base):
     tubo_cor = Column(String(50))
     material = Column(String(100))
     setor = Column(String(100))
+    status = Column(String(20), nullable=False, default="aguardando_coleta")
+    coletado_em = Column(TIMESTAMP(timezone=True))
     criado_em = Column(TIMESTAMP(timezone=True), server_default=func.now())
 
     solicitacao = relationship("Solicitacao", back_populates="amostras")
     itens = relationship("SolicitacaoExame", back_populates="amostra")
+
+    __table_args__ = (
+        CheckConstraint(
+            "status IN ('aguardando_coleta', 'coletado')",
+            name="check_status_amostra_valido"),
+    )
 
     @property
     def paciente(self):
@@ -134,10 +142,18 @@ class SolicitacaoExame(Base):
         "solicitacoes_exames.id", ondelete="CASCADE"), nullable=False)
     exame_id = Column(Integer, ForeignKey("exames.id", ondelete="SET NULL"))
     amostra_id = Column(Integer, ForeignKey("amostras.id", ondelete="SET NULL"))
+    status_resultado = Column(String(20), nullable=False, default="aguardando_resultado")
+    resultado_disponivel_em = Column(TIMESTAMP(timezone=True))
 
     solicitacao = relationship("Solicitacao", back_populates="itens")
     exame = relationship("Exame")
     amostra = relationship("Amostra", back_populates="itens")
+
+    __table_args__ = (
+        CheckConstraint(
+            "status_resultado IN ('aguardando_resultado', 'disponivel')",
+            name="check_status_resultado_valido"),
+    )
 
 
 class Laboratorio(Base):

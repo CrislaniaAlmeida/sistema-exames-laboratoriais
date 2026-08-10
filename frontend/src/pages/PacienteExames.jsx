@@ -252,15 +252,33 @@ function PacienteExames() {
               <tr>
                 <th>Data</th>
                 <th>Exames</th>
+                <th>Coleta</th>
+                <th>Resultado</th>
               </tr>
             </thead>
             <tbody>
-              {historico.map((solicitacao) => (
-                <tr key={solicitacao.id}>
-                  <td>{new Date(solicitacao.data_solicitacao).toLocaleDateString('pt-BR')}</td>
-                  <td>{solicitacao.exames.map((e) => e.sigla || e.nome).join(', ')}</td>
-                </tr>
-              ))}
+              {historico.map((solicitacao) => {
+                const amostras = solicitacao.amostras || [];
+                const itens = amostras.flatMap((a) => a.itens || []);
+                const coletadas = amostras.filter((a) => a.status === 'coletado').length;
+                const disponiveis = itens.filter((i) => i.status_resultado === 'disponivel').length;
+                return (
+                  <tr key={solicitacao.id}>
+                    <td>{new Date(solicitacao.data_solicitacao).toLocaleDateString('pt-BR')}</td>
+                    <td>{solicitacao.exames.map((e) => e.sigla || e.nome).join(', ')}</td>
+                    <td>
+                      <span className={`tag-status-mini ${coletadas === amostras.length && amostras.length > 0 ? 'tag-status-feito' : 'tag-status-pendente'}`}>
+                        {coletadas}/{amostras.length}
+                      </span>
+                    </td>
+                    <td>
+                      <span className={`tag-status-mini ${disponiveis === itens.length && itens.length > 0 ? 'tag-status-feito' : 'tag-status-pendente'}`}>
+                        {disponiveis}/{itens.length}
+                      </span>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         )}

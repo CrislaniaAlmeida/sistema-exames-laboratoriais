@@ -5,6 +5,7 @@ import './Layout.css';
 const navItems = [
   { label: 'Dashboard', path: '/exames', icon: 'dashboard', disponivel: true },
   { label: 'Pacientes', path: '/pacientes', icon: 'pacientes', disponivel: true, permissao: 'pacientes_gerenciar' },
+  { label: 'Painel de Amostras', path: '/painel-amostras', icon: 'painel', disponivel: true, permissoes: ['pacientes_gerenciar', 'exames_gerenciar'] },
   { label: 'Gerenciar Exames', path: '/exames/gerenciar', icon: 'exames', disponivel: true, permissao: 'exames_gerenciar' },
   { label: 'Laboratorios', path: '/laboratorios', icon: 'laboratorio', disponivel: true, permissao: 'laboratorios_gerenciar' },
   { label: 'Materiais', path: '/materiais', icon: 'materiais', disponivel: true, adminOnly: true },
@@ -15,6 +16,7 @@ const navItems = [
 const titulosPagina = {
   '/exames': { titulo: 'Dashboard', subtitulo: 'Visao geral e consulta de exames' },
   '/pacientes': { titulo: 'Gerenciar Pacientes', subtitulo: 'Cadastre e edite os dados dos pacientes' },
+  '/painel-amostras': { titulo: 'Painel de Amostras', subtitulo: 'Coleta e liberacao de resultado por amostra' },
   '/exames/gerenciar': { titulo: 'Gerenciar Exames', subtitulo: 'Cadastre, edite ou remova exames do sistema' },
   '/tubos': { titulo: 'Gerenciar Tubos', subtitulo: 'Cadastre, edite ou remova tubos de coleta' },
   '/laboratorios': { titulo: 'Laboratorios de Apoio', subtitulo: 'Cadastre laboratorios externos' },
@@ -57,6 +59,11 @@ const icons = {
   materiais: (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
       <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
+    </svg>
+  ),
+  painel: (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M9 2v6.34a2 2 0 0 1-.4 1.2L4 16a2 2 0 0 0 1.6 3.2h12.8A2 2 0 0 0 20 16l-4.6-6.46a2 2 0 0 1-.4-1.2V2" /><path d="M8.5 2h7" /><path d="M6 20h4M14 20h4" strokeWidth="1.4" />
     </svg>
   ),
   tubos: (
@@ -106,6 +113,7 @@ function Layout({ children }) {
             const ehAdmin = usuario?.perfil === 'admin';
             if (item.adminOnly && !ehAdmin) return null;
             if (item.permissao && !ehAdmin && !usuario?.permissoes?.includes(item.permissao)) return null;
+            if (item.permissoes && !ehAdmin && !item.permissoes.some((chave) => usuario?.permissoes?.includes(chave))) return null;
 
             const ativo = location.pathname === item.path;
 

@@ -68,3 +68,23 @@ def exigir_permissao(chave_permissao: str):
             detail="Voce nao tem permissao para realizar esta acao.",
         )
     return verificar
+
+
+def exigir_qualquer_permissao(*chaves_permissao: str):
+    """
+    Como exigir_permissao, mas libera o acesso se o usuario tiver
+    QUALQUER UMA das permissoes informadas -- util para telas que
+    varios cargos diferentes precisam acessar (ex: painel de amostras,
+    usado tanto por quem coleta quanto por quem libera resultado).
+    """
+    def verificar(usuario_atual: Usuario = Depends(obter_usuario_atual)) -> Usuario:
+        if usuario_atual.perfil == "admin":
+            return usuario_atual
+        permissoes_usuario = usuario_atual.permissoes or []
+        if any(chave in permissoes_usuario for chave in chaves_permissao):
+            return usuario_atual
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Voce nao tem permissao para realizar esta acao.",
+        )
+    return verificar
