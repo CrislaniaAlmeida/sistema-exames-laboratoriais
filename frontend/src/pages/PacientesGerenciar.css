@@ -102,6 +102,39 @@
   border-top: 1px solid var(--border-soft);
 }
 
+.paciente-banner {
+  position: relative;
+  height: 150px;
+  border-radius: 18px;
+  overflow: hidden;
+  margin-bottom: 24px;
+  background-image: linear-gradient(100deg, rgba(6, 13, 33, 0.72) 10%, rgba(6, 13, 33, 0.12) 65%), url('/stats-lab.jpg');
+  background-size: 200% 200%;
+  box-shadow: 0 20px 45px -25px rgba(11, 23, 51, 0.55);
+}
+
+.paciente-banner-lista {
+  background-position: 0% 0%;
+}
+
+.paciente-banner-exames {
+  background-position: 100% 100%;
+  height: 120px;
+}
+
+.paciente-banner-legenda {
+  position: absolute;
+  left: 26px;
+  bottom: 20px;
+  max-width: 60%;
+  color: #ffffff;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 19px;
+  line-height: 1.3;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
+}
+
 .paciente-resumo-card {
   display: flex;
   align-items: center;

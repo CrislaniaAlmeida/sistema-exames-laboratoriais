@@ -179,6 +179,10 @@ function PacienteExames() {
           </div>
         </div>
 
+        <div className="paciente-banner paciente-banner-exames">
+          <span className="paciente-banner-legenda">Etiquetas com codigo de barras por amostra, prontas para o setor</span>
+        </div>
+
         {erro && <p className="gerenciar-erro">{erro}</p>}
         {mensagem && <p className="gerenciar-mensagem">{mensagem}</p>}
 

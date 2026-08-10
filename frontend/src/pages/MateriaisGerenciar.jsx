@@ -123,6 +123,10 @@ function MateriaisGerenciar() {
           <p>Cadastre, edite ou remova os materiais biologicos usados nos exames.</p>
         </div>
 
+        <div className="material-banner">
+          <span className="material-banner-legenda">Padronizacao de materiais e reagentes usados na rotina</span>
+        </div>
+
         {erro && <p className="gerenciar-erro">{erro}</p>}
         {mensagem && <p className="gerenciar-mensagem">{mensagem}</p>}
 

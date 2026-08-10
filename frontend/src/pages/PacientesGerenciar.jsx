@@ -251,6 +251,10 @@ function PacientesGerenciar() {
           <p>Cadastre os dados do paciente para atendimento e coleta.</p>
         </div>
 
+        <div className="paciente-banner paciente-banner-lista">
+          <span className="paciente-banner-legenda">Coleta e identificacao de amostras com rastreabilidade total</span>
+        </div>
+
         {erro && <p className="gerenciar-erro">{erro}</p>}
         {mensagem && <p className="gerenciar-mensagem">{mensagem}</p>}
 

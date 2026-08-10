@@ -199,6 +199,10 @@ function UsuariosGerenciar() {
           <p>Cadastre usuarios e defina o que cada cargo pode acessar no sistema.</p>
         </div>
 
+        <div className="usuario-banner">
+          <span className="usuario-banner-legenda">Acesso controlado por cargo, para cada etapa do laboratorio</span>
+        </div>
+
         {erro && <p className="gerenciar-erro">{erro}</p>}
         {mensagem && <p className="gerenciar-mensagem">{mensagem}</p>}
 
