@@ -100,6 +100,7 @@ class ExameResumoResposta(BaseModel):
     prazo_liberacao_resultado: Optional[str] = None
     tubo_cor: Optional[str] = None
     material_nome: Optional[str] = None
+    laboratorio_nome: Optional[str] = None
 
     class Config:
         from_attributes = True
@@ -136,6 +137,7 @@ class AmostraResposta(BaseModel):
     tubo_cor: Optional[str] = None
     material: Optional[str] = None
     setor: Optional[str] = None
+    destino: str
     status: str
     coletado_em: Optional[datetime] = None
     criado_em: datetime
@@ -168,14 +170,18 @@ class ItemExameStatusAtualizar(BaseModel):
 
 class AmostraConsultaResposta(BaseModel):
     """
-    Resposta pensada para uma futura integracao com aparelho de setor:
-    ao ler o codigo de barras da amostra, devolve os dados do paciente
-    e os exames daquele tubo especifico.
+    Resposta usada tanto pela triagem (bipar o codigo de barras da
+    etiqueta identifica o destino e marca a coleta) quanto por uma
+    futura integracao com aparelho de setor.
     """
+    id: int
     codigo: str
     tubo_cor: Optional[str] = None
     material: Optional[str] = None
     setor: Optional[str] = None
+    destino: str
+    status: str
+    coletado_em: Optional[datetime] = None
     exames: List[ExameResumoResposta]
     paciente: PacienteResumoResposta
 

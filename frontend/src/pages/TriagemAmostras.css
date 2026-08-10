@@ -1,0 +1,258 @@
+.gerenciar {
+  max-width: 1100px;
+}
+
+.gerenciar-cabecalho {
+  margin-bottom: 24px;
+}
+
+.gerenciar-cabecalho h1 {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 30px;
+  font-weight: 400;
+  color: var(--text-primary);
+  margin: 0 0 4px;
+}
+
+.gerenciar-cabecalho p {
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.gerenciar-erro {
+  background: #fee2e2;
+  color: #b91c1c;
+  padding: 10px 16px;
+  border-radius: 10px;
+  margin-bottom: 16px;
+}
+
+.triagem-scanner {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--surface);
+  border: 1px solid var(--border-soft);
+  border-radius: 18px;
+  padding: 20px 24px;
+  margin-bottom: 20px;
+  box-shadow: 0 20px 45px -30px rgba(11, 23, 51, 0.4);
+}
+
+.triagem-scanner-icone {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: var(--grad-primary);
+  color: #ffffff;
+  flex-shrink: 0;
+  box-shadow: 0 8px 20px rgba(0, 87, 224, 0.28);
+}
+
+.triagem-scanner input {
+  flex: 1;
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 1px solid var(--border-soft);
+  background: var(--surface-strong);
+  color: var(--text-primary);
+  font-size: 16px;
+  font-family: inherit;
+}
+
+.triagem-scanner input:focus {
+  outline: none;
+  border-color: var(--accent-blue-light);
+}
+
+.triagem-scanner button {
+  background: var(--grad-primary);
+  color: #ffffff;
+  border: none;
+  padding: 14px 26px;
+  border-radius: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+  box-shadow: 0 6px 16px rgba(0, 87, 224, 0.25);
+}
+
+.triagem-scanner button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.triagem-confirmacao {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: rgba(0, 191, 168, 0.1);
+  border: 1px solid rgba(0, 191, 168, 0.25);
+  border-radius: 16px;
+  padding: 16px 20px;
+  margin-bottom: 20px;
+}
+
+.triagem-confirmacao-icone {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(0, 191, 168, 0.18);
+  color: #048a78;
+  flex-shrink: 0;
+}
+
+.triagem-confirmacao-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.triagem-confirmacao-paciente {
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--text-primary);
+}
+
+.triagem-confirmacao-meta {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.triagem-confirmacao-aviso {
+  font-size: 12px;
+  color: #b45309;
+  font-weight: 600;
+}
+
+.triagem-resumo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  font-size: 13px;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.triagem-resumo button {
+  background: none;
+  border: 1px solid var(--border-soft);
+  border-radius: 8px;
+  padding: 7px 14px;
+  color: var(--text-muted);
+  font-weight: 600;
+  font-size: 12.5px;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.triagem-resumo button:hover {
+  color: var(--text-primary);
+  border-color: var(--border-strong);
+}
+
+.triagem-estado-vazio {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 14px;
+  padding: 56px 24px;
+  background: var(--surface);
+  border: 1px solid var(--border-soft);
+  border-radius: 18px;
+  box-shadow: 0 20px 45px -30px rgba(11, 23, 51, 0.4);
+}
+
+.triagem-estado-vazio-icone {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--surface-strong);
+  color: var(--accent-blue-light);
+}
+
+.triagem-estado-vazio p {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.triagem-grupos {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.triagem-grupo {
+  background: var(--surface);
+  border: 1px solid var(--border-soft);
+  border-radius: 16px;
+  padding: 16px 18px;
+  box-shadow: 0 20px 45px -32px rgba(11, 23, 51, 0.4);
+}
+
+.triagem-grupo-cabecalho {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--text-primary);
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border-soft);
+  margin-bottom: 10px;
+}
+
+.triagem-grupo-contagem {
+  background: var(--grad-primary);
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 9px;
+  border-radius: 999px;
+}
+
+.triagem-grupo ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.triagem-grupo li {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: var(--surface-strong);
+}
+
+.triagem-item-paciente {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.triagem-item-meta {
+  font-size: 11.5px;
+  color: var(--text-faint);
+}

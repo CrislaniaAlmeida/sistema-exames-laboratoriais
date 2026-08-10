@@ -10,7 +10,7 @@ from app.schemas.paciente import (
     ItemExameResposta, ItemExameStatusAtualizar,
 )
 from app.services import paciente_service
-from app.auth.dependencies import exigir_permissao, exigir_qualquer_permissao
+from app.auth.dependencies import exigir_permissao
 
 router = APIRouter(prefix="/amostras", tags=["Amostras"])
 
@@ -19,7 +19,7 @@ router = APIRouter(prefix="/amostras", tags=["Amostras"])
 def listar_painel_amostras(
     apenas_pendentes: bool = Query(True),
     db: Session = Depends(get_db),
-    usuario_atual: Usuario = Depends(exigir_qualquer_permissao("pacientes_gerenciar", "exames_gerenciar")),
+    usuario_atual: Usuario = Depends(exigir_permissao("amostras_gerenciar")),
 ):
     """
     Lista de trabalho com as amostras de todos os pacientes, para a
@@ -35,7 +35,7 @@ def atualizar_status_amostra(
     amostra_id: int,
     dados: AmostraStatusAtualizar,
     db: Session = Depends(get_db),
-    usuario_atual: Usuario = Depends(exigir_qualquer_permissao("pacientes_gerenciar", "exames_gerenciar")),
+    usuario_atual: Usuario = Depends(exigir_permissao("amostras_gerenciar")),
 ):
     amostra = paciente_service.atualizar_status_amostra(db, amostra_id, dados.status)
     if not amostra:
@@ -48,7 +48,7 @@ def atualizar_status_resultado_item(
     item_id: int,
     dados: ItemExameStatusAtualizar,
     db: Session = Depends(get_db),
-    usuario_atual: Usuario = Depends(exigir_qualquer_permissao("pacientes_gerenciar", "exames_gerenciar")),
+    usuario_atual: Usuario = Depends(exigir_permissao("amostras_gerenciar")),
 ):
     item = paciente_service.atualizar_status_resultado_item(db, item_id, dados.status_resultado)
     if not item:
@@ -60,15 +60,14 @@ def atualizar_status_resultado_item(
 def consultar_amostra(
     codigo: str,
     db: Session = Depends(get_db),
-    usuario_atual: Usuario = Depends(exigir_permissao("pacientes_gerenciar")),
+    usuario_atual: Usuario = Depends(exigir_permissao("amostras_gerenciar")),
 ):
     """
     Consulta os dados de uma amostra (tubo) pelo codigo gerado no
     cadastro -- o mesmo codigo impresso no codigo de barras da
-    etiqueta. Pensado para uma futura integracao com aparelho de
-    setor: hoje nao ha nenhum aparelho conectado, mas essa rota ja
-    deixa pronto o que ele precisaria consultar (dados do paciente e
-    os exames daquele tubo).
+    etiqueta. Usado pela tela de Triagem (bipar o codigo identifica o
+    destino da amostra) e pensado tambem para uma futura integracao
+    com aparelho de setor.
     """
     amostra = paciente_service.buscar_amostra_por_codigo(db, codigo)
     if not amostra:

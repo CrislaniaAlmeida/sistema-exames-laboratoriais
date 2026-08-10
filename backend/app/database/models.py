@@ -5,7 +5,7 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from app.database.connection import Base
 
-PERFIS_VALIDOS = ("admin", "recepcao", "bioquimico", "usuario")
+PERFIS_VALIDOS = ("admin", "recepcao", "coletador", "bioquimico", "usuario")
 
 
 class Usuario(Base):
@@ -24,7 +24,7 @@ class Usuario(Base):
 
     __table_args__ = (
         CheckConstraint(
-            "perfil IN ('admin', 'recepcao', 'bioquimico', 'usuario')",
+            "perfil IN ('admin', 'recepcao', 'coletador', 'bioquimico', 'usuario')",
             name="check_perfil_valido"),
     )
 
@@ -132,6 +132,22 @@ class Amostra(Base):
     def exames(self):
         return [item.exame for item in self.itens if item.exame]
 
+    @property
+    def destino(self):
+        """
+        Para onde essa amostra deve ir na triagem: o nome do(s)
+        laboratorio(s) de apoio, se algum exame dela for terceirizado,
+        ou o setor responsavel, quando e feito internamente.
+        """
+        nomes_laboratorio = sorted({
+            item.exame.laboratorio_nome
+            for item in self.itens
+            if item.exame and item.exame.laboratorio_nome
+        })
+        if nomes_laboratorio:
+            return ", ".join(nomes_laboratorio)
+        return self.setor or "Setor a definir"
+
 
 class SolicitacaoExame(Base):
     """Um exame especifico dentro de uma solicitacao (tabela de ligacao)."""
@@ -235,3 +251,7 @@ class Exame(Base):
     @property
     def material_nome(self):
         return self.material.nome if self.material else None
+
+    @property
+    def laboratorio_nome(self):
+        return self.laboratorio.nome if self.laboratorio else None

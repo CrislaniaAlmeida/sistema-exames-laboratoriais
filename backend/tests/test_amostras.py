@@ -1,6 +1,6 @@
 from datetime import date
 
-from app.database.models import Paciente, Exame, Usuario
+from app.database.models import Paciente, Exame, Usuario, Laboratorio
 from app.auth.jwt import criptografar_senha
 
 
@@ -93,23 +93,43 @@ def test_painel_pendentes_nao_mostra_amostra_totalmente_concluida(cliente, token
     assert amostra["id"] in ids_todas
 
 
-def test_bioquimico_sem_pacientes_gerenciar_acessa_painel(cliente, sessao_db):
-    bioquimico = Usuario(
-        nome="Bioquimico",
-        email="bioquimico@teste.com",
+def test_coletador_com_amostras_gerenciar_acessa_painel(cliente, sessao_db):
+    coletador = Usuario(
+        nome="Coletador",
+        email="coletador@teste.com",
         senha_hash=criptografar_senha("senha-123456"),
-        perfil="bioquimico",
-        permissoes=["exames_gerenciar"],
+        perfil="coletador",
+        permissoes=["amostras_gerenciar"],
         ativo=True,
     )
-    sessao_db.add(bioquimico)
+    sessao_db.add(coletador)
     sessao_db.commit()
 
-    login = cliente.post("/login", json={"email": "bioquimico@teste.com", "senha": "senha-123456"})
+    login = cliente.post("/login", json={"email": "coletador@teste.com", "senha": "senha-123456"})
     token = login.json()["access_token"]
 
     resposta = cliente.get("/amostras/painel", headers={"Authorization": f"Bearer {token}"})
     assert resposta.status_code == 200
+
+
+def test_recepcao_sem_amostras_gerenciar_nao_acessa_painel(cliente, sessao_db):
+    """Recepcao so cadastra pacientes -- sem a permissao amostras_gerenciar, o painel fica escondido."""
+    recepcao = Usuario(
+        nome="Recepcao",
+        email="recepcao@teste.com",
+        senha_hash=criptografar_senha("senha-123456"),
+        perfil="recepcao",
+        permissoes=["pacientes_gerenciar"],
+        ativo=True,
+    )
+    sessao_db.add(recepcao)
+    sessao_db.commit()
+
+    login = cliente.post("/login", json={"email": "recepcao@teste.com", "senha": "senha-123456"})
+    token = login.json()["access_token"]
+
+    resposta = cliente.get("/amostras/painel", headers={"Authorization": f"Bearer {token}"})
+    assert resposta.status_code == 403
 
 
 def test_usuario_sem_permissao_relevante_nao_acessa_painel(cliente, sessao_db):
@@ -129,3 +149,75 @@ def test_usuario_sem_permissao_relevante_nao_acessa_painel(cliente, sessao_db):
 
     resposta = cliente.get("/amostras/painel", headers={"Authorization": f"Bearer {token}"})
     assert resposta.status_code == 403
+
+
+def test_destino_da_amostra_e_setor_quando_exame_e_interno(cliente, token_admin, sessao_db):
+    solicitacao = _criar_paciente_com_exames(sessao_db, cliente, token_admin)
+    amostra = solicitacao["amostras"][0]
+    assert amostra["destino"] == "Hematologia"
+
+
+def test_destino_da_amostra_e_laboratorio_quando_exame_e_terceirizado(cliente, token_admin, sessao_db):
+    laboratorio = Laboratorio(nome="Laboratorio Apoio Central")
+    sessao_db.add(laboratorio)
+    sessao_db.commit()
+
+    paciente = Paciente(
+        codigo="PAC-000101",
+        nome="Paciente Terceirizado",
+        cpf="11144477735",
+        data_nascimento=date(1990, 1, 1),
+    )
+    exame = Exame(
+        nome="Exame Terceirizado", sigla="EXT",
+        setor_responsavel="Hematologia", laboratorio_id=laboratorio.id,
+    )
+    sessao_db.add_all([paciente, exame])
+    sessao_db.commit()
+
+    resposta = cliente.post(
+        f"/pacientes/{paciente.id}/solicitacoes",
+        json={"exame_ids": [exame.id]},
+        headers={"Authorization": f"Bearer {token_admin}"},
+    )
+    assert resposta.status_code == 201, resposta.text
+    assert resposta.json()["amostras"][0]["destino"] == "Laboratorio Apoio Central"
+
+
+def test_verificar_admin_com_credenciais_validas(cliente, token_admin):
+    resposta = cliente.post(
+        "/usuarios/verificar-admin",
+        json={"email": "admin@teste.com", "senha": "senha-admin-123"},
+        headers={"Authorization": f"Bearer {token_admin}"},
+    )
+    assert resposta.status_code == 200
+    assert resposta.json()["valido"] is True
+
+
+def test_verificar_admin_rejeita_senha_errada(cliente, token_admin):
+    resposta = cliente.post(
+        "/usuarios/verificar-admin",
+        json={"email": "admin@teste.com", "senha": "senha-errada"},
+        headers={"Authorization": f"Bearer {token_admin}"},
+    )
+    assert resposta.status_code == 401
+
+
+def test_verificar_admin_rejeita_usuario_que_nao_e_admin(cliente, token_admin, sessao_db):
+    recepcao = Usuario(
+        nome="Recepcao",
+        email="recepcao2@teste.com",
+        senha_hash=criptografar_senha("senha-123456"),
+        perfil="recepcao",
+        permissoes=["pacientes_gerenciar"],
+        ativo=True,
+    )
+    sessao_db.add(recepcao)
+    sessao_db.commit()
+
+    resposta = cliente.post(
+        "/usuarios/verificar-admin",
+        json={"email": "recepcao2@teste.com", "senha": "senha-123456"},
+        headers={"Authorization": f"Bearer {token_admin}"},
+    )
+    assert resposta.status_code == 401

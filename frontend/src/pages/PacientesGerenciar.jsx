@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Layout from '../components/Layout';
 import api from '../services/api';
+import { useAuth } from '../context/AuthContext';
 import './PacientesGerenciar.css';
 
 const PACIENTE_VAZIO = {
@@ -45,9 +46,13 @@ const iconeBusca = (
 const iconePaciente = (
   <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><circle cx="12" cy="8" r="4" /><path d="M4 21c0-4 4-7 8-7s8 3 8 7" /></svg>
 );
+const iconeCadeado = (
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="11" width="18" height="11" rx="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
+);
 
 function PacientesGerenciar() {
   const navigate = useNavigate();
+  const { usuario } = useAuth();
   const [pacientes, setPacientes] = useState([]);
   const [termoFiltro, setTermoFiltro] = useState('');
 
@@ -58,11 +63,20 @@ function PacientesGerenciar() {
   const [medicamentosPopupAberto, setMedicamentosPopupAberto] = useState(false);
   const [medicamentosTemp, setMedicamentosTemp] = useState(['']);
 
+  const [nomeDesbloqueado, setNomeDesbloqueado] = useState(false);
+  const [desbloqueioAberto, setDesbloqueioAberto] = useState(false);
+  const [desbloqueioEmail, setDesbloqueioEmail] = useState('');
+  const [desbloqueioSenha, setDesbloqueioSenha] = useState('');
+  const [desbloqueioErro, setDesbloqueioErro] = useState('');
+  const [verificandoDesbloqueio, setVerificandoDesbloqueio] = useState(false);
+
   const [buscandoCep, setBuscandoCep] = useState(false);
   const [carregando, setCarregando] = useState(true);
   const [salvando, setSalvando] = useState(false);
   const [erro, setErro] = useState('');
   const [mensagem, setMensagem] = useState('');
+
+  const podeEditarNomeLivre = usuario?.perfil === 'admin' || !editandoId || nomeDesbloqueado;
 
   async function carregarPacientes() {
     setCarregando(true);
@@ -95,6 +109,7 @@ function PacientesGerenciar() {
     setForm(PACIENTE_VAZIO);
     setEditandoId(null);
     setFormAberto(true);
+    setNomeDesbloqueado(false);
     setMensagem('');
     setErro('');
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -108,6 +123,7 @@ function PacientesGerenciar() {
     });
     setEditandoId(paciente.id);
     setFormAberto(true);
+    setNomeDesbloqueado(false);
     setMensagem('');
     setErro('');
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -117,6 +133,36 @@ function PacientesGerenciar() {
     setFormAberto(false);
     setEditandoId(null);
     setForm(PACIENTE_VAZIO);
+    setNomeDesbloqueado(false);
+  }
+
+  function abrirDesbloqueioNome() {
+    setDesbloqueioEmail('');
+    setDesbloqueioSenha('');
+    setDesbloqueioErro('');
+    setDesbloqueioAberto(true);
+  }
+
+  function cancelarDesbloqueioNome() {
+    setDesbloqueioAberto(false);
+  }
+
+  async function confirmarDesbloqueioNome(evento) {
+    evento.preventDefault();
+    setVerificandoDesbloqueio(true);
+    setDesbloqueioErro('');
+    try {
+      await api.post('/usuarios/verificar-admin', {
+        email: desbloqueioEmail,
+        senha: desbloqueioSenha,
+      });
+      setNomeDesbloqueado(true);
+      setDesbloqueioAberto(false);
+    } catch {
+      setDesbloqueioErro('Email ou senha de administrador invalidos.');
+    } finally {
+      setVerificandoDesbloqueio(false);
+    }
   }
 
   function handleChange(campo, valor) {
@@ -272,7 +318,19 @@ function PacientesGerenciar() {
             <div className="form-grid">
               <label>
                 Nome *
-                <input type="text" required autoComplete="off" value={form.nome} onChange={(e) => handleChange('nome', e.target.value)} />
+                <input
+                  type="text"
+                  required
+                  autoComplete="off"
+                  value={form.nome}
+                  disabled={!podeEditarNomeLivre}
+                  onChange={(e) => handleChange('nome', e.target.value)}
+                />
+                {!podeEditarNomeLivre && (
+                  <button type="button" className="paciente-desbloquear-nome" onClick={abrirDesbloqueioNome}>
+                    {iconeCadeado} Desbloquear com senha de administrador
+                  </button>
+                )}
               </label>
               <label>
                 Nome social
@@ -485,7 +543,11 @@ function PacientesGerenciar() {
                   {pacientesFiltrados.map((paciente) => (
                     <tr key={paciente.id}>
                       <td className="paciente-codigo">{paciente.codigo}</td>
-                      <td>{paciente.nome}</td>
+                      <td>
+                        <button type="button" className="paciente-nome-abrir" onClick={() => abrirEdicao(paciente)}>
+                          {paciente.nome}
+                        </button>
+                      </td>
                       <td>{paciente.cpf}</td>
                       <td>{paciente.data_nascimento?.split('-').reverse().join('/')}</td>
                       <td>{paciente.celular || '-'}</td>
@@ -537,6 +599,47 @@ function PacientesGerenciar() {
                 <button type="button" className="form-cancelar" onClick={cancelarMedicamentos}>Cancelar</button>
               </div>
             </div>
+          </div>
+        )}
+
+        {desbloqueioAberto && (
+          <div className="paciente-modal-fundo" onClick={cancelarDesbloqueioNome}>
+            <form className="paciente-modal" onClick={(e) => e.stopPropagation()} onSubmit={confirmarDesbloqueioNome}>
+              <h3>{iconeCadeado} Desbloquear nome do paciente</h3>
+              <p className="paciente-modal-ajuda">
+                Por seguranca, alterar o nome de um paciente ja cadastrado exige a senha de um administrador.
+              </p>
+
+              {desbloqueioErro && <p className="gerenciar-erro">{desbloqueioErro}</p>}
+
+              <label>
+                Email do administrador
+                <input
+                  type="email"
+                  required
+                  autoComplete="off"
+                  value={desbloqueioEmail}
+                  onChange={(e) => setDesbloqueioEmail(e.target.value)}
+                />
+              </label>
+              <label>
+                Senha
+                <input
+                  type="password"
+                  required
+                  autoComplete="off"
+                  value={desbloqueioSenha}
+                  onChange={(e) => setDesbloqueioSenha(e.target.value)}
+                />
+              </label>
+
+              <div className="form-acoes">
+                <button type="submit" disabled={verificandoDesbloqueio}>
+                  {verificandoDesbloqueio ? 'Verificando...' : 'Desbloquear'}
+                </button>
+                <button type="button" className="form-cancelar" onClick={cancelarDesbloqueioNome}>Cancelar</button>
+              </div>
+            </form>
           </div>
         )}
       </div>

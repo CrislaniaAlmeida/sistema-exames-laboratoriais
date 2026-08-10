@@ -5,7 +5,8 @@ import './Layout.css';
 const navItems = [
   { label: 'Dashboard', path: '/exames', icon: 'dashboard', disponivel: true },
   { label: 'Pacientes', path: '/pacientes', icon: 'pacientes', disponivel: true, permissao: 'pacientes_gerenciar' },
-  { label: 'Painel de Amostras', path: '/painel-amostras', icon: 'painel', disponivel: true, permissoes: ['pacientes_gerenciar', 'exames_gerenciar'] },
+  { label: 'Triagem de Amostras', path: '/triagem', icon: 'triagem', disponivel: true, permissao: 'amostras_gerenciar' },
+  { label: 'Painel de Amostras', path: '/painel-amostras', icon: 'painel', disponivel: true, permissao: 'amostras_gerenciar' },
   { label: 'Gerenciar Exames', path: '/exames/gerenciar', icon: 'exames', disponivel: true, permissao: 'exames_gerenciar' },
   { label: 'Laboratorios', path: '/laboratorios', icon: 'laboratorio', disponivel: true, permissao: 'laboratorios_gerenciar' },
   { label: 'Materiais', path: '/materiais', icon: 'materiais', disponivel: true, adminOnly: true },
@@ -17,6 +18,7 @@ const titulosPagina = {
   '/exames': { titulo: 'Dashboard', subtitulo: 'Visao geral e consulta de exames' },
   '/pacientes': { titulo: 'Gerenciar Pacientes', subtitulo: 'Cadastre e edite os dados dos pacientes' },
   '/painel-amostras': { titulo: 'Painel de Amostras', subtitulo: 'Coleta e liberacao de resultado por amostra' },
+  '/triagem': { titulo: 'Triagem de Amostras', subtitulo: 'Bipe o codigo de barras para identificar o destino da amostra' },
   '/exames/gerenciar': { titulo: 'Gerenciar Exames', subtitulo: 'Cadastre, edite ou remova exames do sistema' },
   '/tubos': { titulo: 'Gerenciar Tubos', subtitulo: 'Cadastre, edite ou remova tubos de coleta' },
   '/laboratorios': { titulo: 'Laboratorios de Apoio', subtitulo: 'Cadastre laboratorios externos' },
@@ -26,7 +28,8 @@ const titulosPagina = {
 
 const PERFIS_LABEL = {
   admin: 'Administrador',
-  recepcao: 'Recepcao / Coletador',
+  recepcao: 'Recepcao',
+  coletador: 'Coletador',
   bioquimico: 'Bioquimico',
   usuario: 'Outro',
 };
@@ -64,6 +67,11 @@ const icons = {
   painel: (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
       <path d="M9 2v6.34a2 2 0 0 1-.4 1.2L4 16a2 2 0 0 0 1.6 3.2h12.8A2 2 0 0 0 20 16l-4.6-6.46a2 2 0 0 1-.4-1.2V2" /><path d="M8.5 2h7" /><path d="M6 20h4M14 20h4" strokeWidth="1.4" />
+    </svg>
+  ),
+  triagem: (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <rect x="3" y="7" width="3" height="10" /><rect x="7.5" y="5" width="2" height="14" /><rect x="11" y="8" width="4" height="11" /><rect x="16.5" y="6" width="2" height="13" /><rect x="19.5" y="9" width="2" height="10" />
     </svg>
   ),
   tubos: (

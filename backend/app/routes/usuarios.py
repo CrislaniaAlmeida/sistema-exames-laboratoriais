@@ -1,14 +1,35 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
 from typing import List
 
 from app.database.connection import get_db
 from app.database.models import Usuario
-from app.schemas.usuario import UsuarioCriar, UsuarioAtualizar, UsuarioResposta
+from app.schemas.usuario import UsuarioCriar, UsuarioAtualizar, UsuarioResposta, LoginDados
 from app.services import usuario_service
-from app.auth.dependencies import exigir_admin
+from app.auth.dependencies import exigir_admin, obter_usuario_atual
+from app.limiter import limiter
 
 router = APIRouter(prefix="/usuarios", tags=["Usuarios"])
+
+
+@router.post("/verificar-admin")
+@limiter.limit("5/minute")
+def verificar_admin(
+    request: Request,
+    dados: LoginDados,
+    db: Session = Depends(get_db),
+    usuario_atual: Usuario = Depends(obter_usuario_atual),
+):
+    """
+    Confirma email e senha de um administrador sem trocar a sessao de
+    quem esta logado -- usado para liberar temporariamente a edicao do
+    nome do paciente por usuarios que normalmente nao podem alterar
+    esse campo (ex: recepcao).
+    """
+    admin = usuario_service.autenticar_usuario(db, dados.email, dados.senha)
+    if not admin or admin.perfil != "admin":
+        raise HTTPException(status_code=401, detail="Email ou senha de administrador invalidos.")
+    return {"valido": True}
 
 
 @router.get("/", response_model=List[UsuarioResposta])

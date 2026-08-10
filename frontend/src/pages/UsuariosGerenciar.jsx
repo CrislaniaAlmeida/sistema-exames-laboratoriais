@@ -9,7 +9,8 @@ const USUARIO_VAZIO = { nome: '', email: '', senha: '', perfil: 'recepcao', perm
 
 const PERFIS_OPCOES = [
   { valor: 'admin', label: 'Administrador' },
-  { valor: 'recepcao', label: 'Recepcao / Coletador' },
+  { valor: 'recepcao', label: 'Recepcao' },
+  { valor: 'coletador', label: 'Coletador' },
   { valor: 'bioquimico', label: 'Bioquimico' },
   { valor: 'usuario', label: 'Outro' },
 ];
@@ -18,6 +19,7 @@ const PERFIS_LABEL = Object.fromEntries(PERFIS_OPCOES.map((p) => [p.valor, p.lab
 
 const PERMISSOES_OPCOES = [
   { chave: 'pacientes_gerenciar', label: 'Cadastrar Pacientes' },
+  { chave: 'amostras_gerenciar', label: 'Triagem de Amostras' },
   { chave: 'exames_gerenciar', label: 'Gerenciar Exames' },
   { chave: 'tubos_gerenciar', label: 'Gerenciar Tubos' },
   { chave: 'laboratorios_gerenciar', label: 'Gerenciar Laboratorios' },
@@ -27,7 +29,8 @@ const PERMISSOES_LABEL = Object.fromEntries(PERMISSOES_OPCOES.map((p) => [p.chav
 
 const PERMISSOES_PADRAO_POR_CARGO = {
   recepcao: ['pacientes_gerenciar'],
-  bioquimico: ['exames_gerenciar', 'tubos_gerenciar'],
+  coletador: ['amostras_gerenciar'],
+  bioquimico: ['exames_gerenciar', 'tubos_gerenciar', 'amostras_gerenciar'],
 };
 
 const iconeEditar = (
