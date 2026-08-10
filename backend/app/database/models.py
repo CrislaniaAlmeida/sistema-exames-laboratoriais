@@ -1,3 +1,5 @@
+from datetime import datetime, timedelta, timezone
+
 from sqlalchemy import (
     Column, Integer, String, Text, Boolean, Date, ForeignKey, TIMESTAMP, CheckConstraint, JSON, Float
 )
@@ -113,6 +115,7 @@ class Amostra(Base):
     setor = Column(String(100))
     status = Column(String(20), nullable=False, default="aguardando_coleta")
     coletado_em = Column(TIMESTAMP(timezone=True))
+    recebido_em = Column(TIMESTAMP(timezone=True))
     criado_em = Column(TIMESTAMP(timezone=True), server_default=func.now())
 
     solicitacao = relationship("Solicitacao", back_populates="amostras")
@@ -131,6 +134,11 @@ class Amostra(Base):
     @property
     def exames(self):
         return [item.exame for item in self.itens if item.exame]
+
+    @property
+    def terceirizada(self):
+        """True quando algum exame desta amostra e enviado a laboratorio de apoio."""
+        return any(item.exame and item.exame.laboratorio_id for item in self.itens)
 
     @property
     def destino(self):
@@ -172,9 +180,47 @@ class SolicitacaoExame(Base):
     amostra = relationship("Amostra", back_populates="itens")
     liberado_por = relationship("Usuario")
 
+    LIMITE_PROXIMO_MINUTOS = 30
+
     @property
     def liberado_por_nome(self):
         return self.liberado_por.nome if self.liberado_por else None
+
+    @property
+    def paciente(self):
+        return self.solicitacao.paciente if self.solicitacao else None
+
+    @property
+    def prazo_limite(self):
+        """
+        Horario-limite para liberar esse resultado: recebimento da
+        amostra no setor + prazo (em horas) configurado no exame.
+        None quando falta um dos dois dados (amostra ainda nao chegou
+        ao setor, ou o exame nao tem prazo configurado).
+        """
+        if not self.amostra or self.amostra.recebido_em is None:
+            return None
+        if not self.exame or self.exame.prazo_liberacao_horas is None:
+            return None
+
+        recebido = self.amostra.recebido_em
+        if recebido.tzinfo is None:
+            recebido = recebido.replace(tzinfo=timezone.utc)
+        return recebido + timedelta(hours=self.exame.prazo_liberacao_horas)
+
+    @property
+    def prazo_status(self):
+        """'atrasado', 'proximo_do_limite', 'no_prazo' ou 'sem_prazo'."""
+        limite = self.prazo_limite
+        if limite is None:
+            return "sem_prazo"
+
+        minutos_restantes = (limite - datetime.now(timezone.utc)).total_seconds() / 60
+        if minutos_restantes < 0:
+            return "atrasado"
+        if minutos_restantes <= self.LIMITE_PROXIMO_MINUTOS:
+            return "proximo_do_limite"
+        return "no_prazo"
 
     __table_args__ = (
         CheckConstraint(
@@ -242,6 +288,8 @@ class Exame(Base):
     tempo_maximo_envio = Column(String(100))
     dias_realizacao = Column(String(200))
     prazo_liberacao_resultado = Column(String(100))
+    prazo_liberacao_horas = Column(Float)
+    equipamento = Column(String(150))
     metodo_utilizado = Column(String(150))
     observacoes = Column(Text)
     quantidade_contratada = Column(Integer)

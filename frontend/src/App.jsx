@@ -13,6 +13,7 @@ import PacienteExames from './pages/PacienteExames';
 import MateriaisGerenciar from './pages/MateriaisGerenciar';
 import PainelAmostras from './pages/PainelAmostras';
 import TriagemAmostras from './pages/TriagemAmostras';
+import LiberacaoExames from './pages/LiberacaoExames';
 import RelatorioAtendimentos from './pages/RelatorioAtendimentos';
 import RotaProtegida from './components/RotaProtegida';
 import RotaAdmin from './components/RotaAdmin';
@@ -124,6 +125,14 @@ function App() {
         element={
           <RotaComPermissao permissao="amostras_gerenciar">
             <TriagemAmostras />
+          </RotaComPermissao>
+        }
+      />
+      <Route
+        path="/liberacao"
+        element={
+          <RotaComPermissao permissao="amostras_gerenciar">
+            <LiberacaoExames />
           </RotaComPermissao>
         }
       />

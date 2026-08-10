@@ -7,7 +7,7 @@ from app.database.connection import get_db
 from app.database.models import Usuario
 from app.schemas.paciente import (
     AmostraConsultaResposta, AmostraResposta, AmostraStatusAtualizar,
-    ItemExameResposta, ItemExameStatusAtualizar, ResultadoLancar,
+    ItemExameResposta, ItemExameStatusAtualizar, ItemLiberacaoResposta, ResultadoLancar,
 )
 from app.services import paciente_service
 from app.auth.dependencies import exigir_permissao
@@ -28,6 +28,20 @@ def listar_painel_amostras(
     pendente (nao coletado ou com algum exame aguardando resultado).
     """
     return paciente_service.listar_amostras_painel(db, apenas_pendentes)
+
+
+@router.get("/liberacao", response_model=List[ItemLiberacaoResposta])
+def listar_itens_liberacao(
+    db: Session = Depends(get_db),
+    usuario_atual: Usuario = Depends(exigir_permissao("amostras_gerenciar")),
+):
+    """
+    Itens de exame aguardando resultado, apenas dos realizados
+    internamente (nao terceirizados a laboratorio de apoio), com o
+    prazo de liberacao calculado -- para a tela de Liberacao de
+    Exames, organizada por setor.
+    """
+    return paciente_service.listar_itens_liberacao(db)
 
 
 @router.put("/{amostra_id}/status", response_model=AmostraResposta)

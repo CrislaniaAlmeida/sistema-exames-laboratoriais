@@ -20,6 +20,8 @@ class ExameBase(BaseModel):
     tempo_maximo_envio: Optional[str] = None
     dias_realizacao: Optional[str] = None
     prazo_liberacao_resultado: Optional[str] = None
+    prazo_liberacao_horas: Optional[float] = None
+    equipamento: Optional[str] = None
     metodo_utilizado: Optional[str] = None
     observacoes: Optional[str] = None
     quantidade_contratada: Optional[int] = None

@@ -95,10 +95,12 @@ function ExameDetalhe() {
       preparo_paciente: campoOuVazio(exame.preparo_paciente),
       laboratorio_id: exame.laboratorio_id ?? '',
       metodo_utilizado: campoOuVazio(exame.metodo_utilizado),
+      equipamento: campoOuVazio(exame.equipamento),
       temperatura_armazenamento: campoOuVazio(exame.temperatura_armazenamento),
       tempo_maximo_envio: campoOuVazio(exame.tempo_maximo_envio),
       dias_realizacao: campoOuVazio(exame.dias_realizacao),
       prazo_liberacao_resultado: campoOuVazio(exame.prazo_liberacao_resultado),
+      prazo_liberacao_horas: exame.prazo_liberacao_horas ?? '',
       observacoes: campoOuVazio(exame.observacoes),
       unidade_resultado: campoOuVazio(exame.unidade_resultado),
       valor_referencia_min: exame.valor_referencia_min ?? '',
@@ -122,7 +124,7 @@ function ExameDetalhe() {
     setErro('');
     try {
       const payload = { ...form };
-      ['material_id', 'tubo_id', 'laboratorio_id', 'valor_referencia_min', 'valor_referencia_max'].forEach((campo) => {
+      ['material_id', 'tubo_id', 'laboratorio_id', 'valor_referencia_min', 'valor_referencia_max', 'prazo_liberacao_horas'].forEach((campo) => {
         payload[campo] = payload[campo] === '' ? null : Number(payload[campo]);
       });
       Object.keys(payload).forEach((campo) => {
@@ -415,6 +417,10 @@ function ExameDetalhe() {
                   Metodo utilizado
                   <input value={form.metodo_utilizado} onChange={(e) => handleChange('metodo_utilizado', e.target.value)} />
                 </label>
+                <label>
+                  Equipamento
+                  <input value={form.equipamento} onChange={(e) => handleChange('equipamento', e.target.value)} placeholder="Ex: Cobas 8000" />
+                </label>
                 <div className="edicao-grid-dupla">
                   <label>
                     Temperatura de armazenamento
@@ -449,6 +455,10 @@ function ExameDetalhe() {
                 <div className="exame-detalhe-campo">
                   <span className="campo-label">Metodo utilizado</span>
                   <span className="campo-valor">{exame.metodo_utilizado || 'Nao informado'}</span>
+                </div>
+                <div className="exame-detalhe-campo">
+                  <span className="campo-label">Equipamento</span>
+                  <span className="campo-valor">{exame.equipamento || 'Nao informado'}</span>
                 </div>
                 <div className="exame-detalhe-campo-dupla">
                   <div>
@@ -485,6 +495,15 @@ function ExameDetalhe() {
                     <input value={form.prazo_liberacao_resultado} onChange={(e) => handleChange('prazo_liberacao_resultado', e.target.value)} />
                   </label>
                 </div>
+                <label>
+                  Prazo de liberacao (em horas)
+                  <input
+                    type="number" step="any" min="0"
+                    value={form.prazo_liberacao_horas}
+                    onChange={(e) => handleChange('prazo_liberacao_horas', e.target.value)}
+                    placeholder="Ex: 1 (usado na tela de Liberacao de Exames)"
+                  />
+                </label>
                 <div className="edicao-acoes">
                   <button className="edicao-salvar" onClick={salvar} disabled={salvando}>
                     {salvando ? 'Salvando...' : 'Salvar'}
@@ -503,6 +522,12 @@ function ExameDetalhe() {
                 <div>
                   <span className="campo-label">Prazo de liberacao</span>
                   <span className="campo-valor">{exame.prazo_liberacao_resultado || 'Nao informado'}</span>
+                </div>
+                <div>
+                  <span className="campo-label">Prazo de liberacao (em horas)</span>
+                  <span className="campo-valor">
+                    {exame.prazo_liberacao_horas != null ? `${exame.prazo_liberacao_horas}h` : 'Nao informado'}
+                  </span>
                 </div>
               </div>
             )}

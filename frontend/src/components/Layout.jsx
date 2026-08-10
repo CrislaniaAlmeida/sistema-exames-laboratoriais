@@ -7,6 +7,7 @@ const navItems = [
   { label: 'Pacientes', path: '/pacientes', icon: 'pacientes', disponivel: true, permissao: 'pacientes_gerenciar' },
   { label: 'Triagem de Amostras', path: '/triagem', icon: 'triagem', disponivel: true, permissao: 'amostras_gerenciar' },
   { label: 'Painel de Amostras', path: '/painel-amostras', icon: 'painel', disponivel: true, permissao: 'amostras_gerenciar' },
+  { label: 'Liberacao de Exames', path: '/liberacao', icon: 'liberacao', disponivel: true, permissao: 'amostras_gerenciar' },
   { label: 'Gerenciar Exames', path: '/exames/gerenciar', icon: 'exames', disponivel: true, permissao: 'exames_gerenciar' },
   { label: 'Laboratorios', path: '/laboratorios', icon: 'laboratorio', disponivel: true, permissao: 'laboratorios_gerenciar' },
   { label: 'Materiais', path: '/materiais', icon: 'materiais', disponivel: true, adminOnly: true },
@@ -20,6 +21,7 @@ const titulosPagina = {
   '/pacientes': { titulo: 'Gerenciar Pacientes', subtitulo: 'Cadastre e edite os dados dos pacientes' },
   '/painel-amostras': { titulo: 'Painel de Amostras', subtitulo: 'Coleta e liberacao de resultado por amostra' },
   '/triagem': { titulo: 'Triagem de Amostras', subtitulo: 'Bipe o codigo de barras para identificar o destino da amostra' },
+  '/liberacao': { titulo: 'Liberacao de Exames', subtitulo: 'Exames internos aguardando liberacao, organizados por setor' },
   '/exames/gerenciar': { titulo: 'Gerenciar Exames', subtitulo: 'Cadastre, edite ou remova exames do sistema' },
   '/tubos': { titulo: 'Gerenciar Tubos', subtitulo: 'Cadastre, edite ou remova tubos de coleta' },
   '/laboratorios': { titulo: 'Laboratorios de Apoio', subtitulo: 'Cadastre laboratorios externos' },
@@ -94,6 +96,12 @@ const icons = {
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
       <path d="M4 19V5a2 2 0 0 1 2-2h9l5 5v11a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2Z" />
       <path d="M8 13h8M8 17h8M8 9h3" />
+    </svg>
+  ),
+  liberacao: (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <circle cx="12" cy="12" r="9" />
+      <path d="M8.5 12.5 11 15l4.5-5.5" />
     </svg>
   ),
 };

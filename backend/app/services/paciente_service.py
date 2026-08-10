@@ -249,6 +249,34 @@ def listar_amostras_painel(db: Session, apenas_pendentes: bool = True):
     )
 
 
+ORDEM_PRAZO_STATUS = {"atrasado": 0, "proximo_do_limite": 1, "no_prazo": 2, "sem_prazo": 3}
+
+
+def listar_itens_liberacao(db: Session):
+    """
+    Itens de exame aguardando resultado, apenas dos exames realizados
+    internamente (nao enviados a laboratorio de apoio) -- para a tela
+    de Liberacao de Exames, organizada por setor. Ordenados pela
+    urgencia do prazo (atrasados primeiro).
+    """
+    itens = (
+        db.query(SolicitacaoExame)
+        .join(Exame, SolicitacaoExame.exame_id == Exame.id)
+        .filter(SolicitacaoExame.status_resultado == "aguardando_resultado")
+        .filter(Exame.laboratorio_id.is_(None))
+        .all()
+    )
+
+    def chave_ordenacao(item):
+        limite = item.prazo_limite
+        return (
+            ORDEM_PRAZO_STATUS.get(item.prazo_status, 9),
+            limite or datetime.max.replace(tzinfo=timezone.utc),
+        )
+
+    return sorted(itens, key=chave_ordenacao)
+
+
 def buscar_amostra_por_id(db: Session, amostra_id: int):
     return db.query(Amostra).filter(Amostra.id == amostra_id).first()
 
@@ -260,6 +288,11 @@ def atualizar_status_amostra(db: Session, amostra_id: int, status: str):
 
     amostra.status = status
     amostra.coletado_em = datetime.now(timezone.utc) if status == "coletado" else None
+
+    if status == "coletado" and not amostra.terceirizada and amostra.recebido_em is None:
+        amostra.recebido_em = amostra.coletado_em
+    elif status == "aguardando_coleta":
+        amostra.recebido_em = None
 
     db.commit()
     db.refresh(amostra)

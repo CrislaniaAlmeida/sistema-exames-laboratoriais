@@ -11,7 +11,7 @@ const EXAME_VAZIO = {
   material_id: '', tubo_id: '', volume_minimo: '', volume_ideal: '',
   jejum_necessario: '', preparo_paciente: '', forma_coleta: '',
   temperatura_armazenamento: '', tempo_maximo_envio: '', dias_realizacao: '',
-  prazo_liberacao_resultado: '', metodo_utilizado: '', observacoes: '',
+  prazo_liberacao_resultado: '', prazo_liberacao_horas: '', equipamento: '', metodo_utilizado: '', observacoes: '',
   quantidade_contratada: '', quantidade_restante: '',
   unidade_resultado: '', valor_referencia_min: '', valor_referencia_max: '', valor_referencia_texto: '',
 };
@@ -111,6 +111,8 @@ function ExamesGerenciar() {
       tempo_maximo_envio: exame.tempo_maximo_envio || '',
       dias_realizacao: exame.dias_realizacao || '',
       prazo_liberacao_resultado: exame.prazo_liberacao_resultado || '',
+      prazo_liberacao_horas: exame.prazo_liberacao_horas ?? '',
+      equipamento: exame.equipamento || '',
       metodo_utilizado: exame.metodo_utilizado || '',
       observacoes: exame.observacoes || '',
       quantidade_contratada: exame.quantidade_contratada ?? '',
@@ -139,7 +141,7 @@ function ExamesGerenciar() {
 
   function montarPayload() {
     const payload = { ...form };
-    ['laboratorio_id', 'material_id', 'tubo_id', 'quantidade_contratada', 'quantidade_restante', 'valor_referencia_min', 'valor_referencia_max'].forEach((campo) => {
+    ['laboratorio_id', 'material_id', 'tubo_id', 'quantidade_contratada', 'quantidade_restante', 'valor_referencia_min', 'valor_referencia_max', 'prazo_liberacao_horas'].forEach((campo) => {
       payload[campo] = payload[campo] === '' ? null : Number(payload[campo]);
     });
     Object.keys(payload).forEach((campo) => {
@@ -357,6 +359,29 @@ function ExamesGerenciar() {
                   type="text"
                   value={form.prazo_liberacao_resultado}
                   onChange={(e) => handleChange('prazo_liberacao_resultado', e.target.value)}
+                  placeholder="Texto exibido no laudo, ex: 24 a 48 horas"
+                />
+              </label>
+
+              <label>
+                Prazo de liberacao (em horas)
+                <input
+                  type="number"
+                  step="any"
+                  min="0"
+                  value={form.prazo_liberacao_horas}
+                  onChange={(e) => handleChange('prazo_liberacao_horas', e.target.value)}
+                  placeholder="Ex: 1 (usado na tela de Liberacao de Exames)"
+                />
+              </label>
+
+              <label>
+                Equipamento
+                <input
+                  type="text"
+                  value={form.equipamento}
+                  onChange={(e) => handleChange('equipamento', e.target.value)}
+                  placeholder="Ex: Cobas 8000"
                 />
               </label>
 

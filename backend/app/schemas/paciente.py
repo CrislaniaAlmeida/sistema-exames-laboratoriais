@@ -98,6 +98,8 @@ class ExameResumoResposta(BaseModel):
     codigo: Optional[str] = None
     setor_responsavel: Optional[str] = None
     prazo_liberacao_resultado: Optional[str] = None
+    prazo_liberacao_horas: Optional[float] = None
+    equipamento: Optional[str] = None
     tubo_cor: Optional[str] = None
     material_nome: Optional[str] = None
     laboratorio_nome: Optional[str] = None
@@ -121,6 +123,7 @@ class PacienteResumoResposta(BaseModel):
     nome_social: Optional[str] = None
     cpf: str
     data_nascimento: date
+    sexo: Optional[str] = None
 
     class Config:
         from_attributes = True
@@ -189,6 +192,31 @@ class SolicitacaoResposta(BaseModel):
     data_solicitacao: datetime
     exames: List[ExameResumoResposta]
     amostras: List[AmostraResposta]
+
+    class Config:
+        from_attributes = True
+
+
+class AmostraLiberacaoResposta(BaseModel):
+    id: int
+    codigo: str
+    tubo_cor: Optional[str] = None
+    material: Optional[str] = None
+    coletado_em: Optional[datetime] = None
+    recebido_em: Optional[datetime] = None
+
+    class Config:
+        from_attributes = True
+
+
+class ItemLiberacaoResposta(BaseModel):
+    id: int
+    status_resultado: str
+    prazo_limite: Optional[datetime] = None
+    prazo_status: Literal["atrasado", "proximo_do_limite", "no_prazo", "sem_prazo"]
+    exame: Optional[ExameResumoResposta] = None
+    amostra: Optional[AmostraLiberacaoResposta] = None
+    paciente: Optional[PacienteResumoResposta] = None
 
     class Config:
         from_attributes = True

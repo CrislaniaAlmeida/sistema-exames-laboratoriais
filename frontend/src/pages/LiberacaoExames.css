@@ -1,0 +1,309 @@
+.gerenciar.liberacao {
+  max-width: 1300px;
+}
+
+.liberacao-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
+  margin-bottom: 22px;
+}
+
+.liberacao-card {
+  background: var(--surface);
+  border: 1px solid var(--border-soft);
+  border-radius: 14px;
+  padding: 18px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  box-shadow: 0 20px 45px -32px rgba(11, 23, 51, 0.4);
+}
+
+.liberacao-card > div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.liberacao-card-titulo {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.liberacao-card-numero {
+  font-family: var(--font-display);
+  font-size: 30px;
+  font-weight: 400;
+  color: var(--text-primary);
+}
+
+.liberacao-card-legenda {
+  font-size: 12px;
+  color: var(--text-faint);
+}
+
+.liberacao-card-icone {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.liberacao-card-atrasado .liberacao-card-titulo,
+.liberacao-card-atrasado .liberacao-card-numero { color: #b91c1c; }
+.liberacao-card-atrasado .liberacao-card-icone { background: #fee2e2; color: #b91c1c; }
+
+.liberacao-card-proximo .liberacao-card-titulo,
+.liberacao-card-proximo .liberacao-card-numero { color: #b45309; }
+.liberacao-card-proximo .liberacao-card-icone { background: #fef3c7; color: #b45309; }
+
+.liberacao-card-no-prazo .liberacao-card-titulo,
+.liberacao-card-no-prazo .liberacao-card-numero { color: #15803d; }
+.liberacao-card-no-prazo .liberacao-card-icone { background: #dcfce7; color: #15803d; }
+
+.liberacao-card-total .liberacao-card-icone { background: var(--surface-strong); color: var(--accent-blue-light); }
+
+.liberacao-abas {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.liberacao-abas button {
+  background: var(--surface);
+  border: 1px solid var(--border-soft);
+  color: var(--text-muted);
+  padding: 9px 16px;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  font-family: inherit;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.liberacao-abas button:hover {
+  border-color: var(--border-strong);
+}
+
+.liberacao-aba-ativa {
+  background: var(--grad-primary) !important;
+  color: #ffffff !important;
+  border-color: transparent !important;
+}
+
+.liberacao-aba-contagem {
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 999px;
+  padding: 1px 7px;
+  font-size: 11px;
+}
+
+.liberacao-abas button:not(.liberacao-aba-ativa) .liberacao-aba-contagem {
+  background: var(--surface-strong);
+  color: var(--text-faint);
+}
+
+.liberacao-filtro {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.liberacao-filtro input {
+  flex: 1;
+  padding: 11px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--border-soft);
+  background: var(--surface);
+  color: var(--text-primary);
+  font-size: 14px;
+  font-family: inherit;
+}
+
+.liberacao-filtro input:focus {
+  outline: none;
+  border-color: var(--accent-blue-light);
+}
+
+.liberacao-atualizar {
+  background: var(--surface-strong);
+  color: var(--accent-blue);
+  border: 1px solid var(--border-soft);
+  padding: 11px 20px;
+  border-radius: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+}
+
+.liberacao-atualizar:hover {
+  border-color: var(--border-strong);
+}
+
+.liberacao-tabela-wrap {
+  overflow-x: auto;
+  border-radius: 18px;
+}
+
+.liberacao-tabela th,
+.liberacao-tabela td {
+  white-space: nowrap;
+}
+
+.liberacao-status {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.liberacao-status-atrasado { background: #fee2e2; color: #b91c1c; }
+.liberacao-status-proximo_do_limite { background: #fef3c7; color: #b45309; }
+.liberacao-status-no_prazo { background: #dcfce7; color: #15803d; }
+.liberacao-status-sem_prazo { background: var(--surface-strong); color: var(--text-faint); }
+
+.liberacao-status-delta {
+  display: block;
+  font-size: 11px;
+  color: var(--text-faint);
+  margin-top: 3px;
+}
+
+.liberacao-tubo,
+.liberacao-paciente-meta {
+  color: var(--text-faint);
+  font-size: 12px;
+}
+
+.liberacao-estado-vazio {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 14px;
+  padding: 56px 24px;
+  background: var(--surface);
+  border: 1px solid var(--border-soft);
+  border-radius: 18px;
+  box-shadow: 0 20px 45px -30px rgba(11, 23, 51, 0.4);
+}
+
+.liberacao-estado-vazio-icone {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.liberacao-estado-vazio p {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.liberacao-legenda {
+  display: flex;
+  gap: 22px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+  font-size: 12px;
+  color: var(--text-faint);
+}
+
+.liberacao-legenda span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.liberacao-legenda-bola {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.liberacao-legenda-atrasado { background: #b91c1c; }
+.liberacao-legenda-proximo { background: #b45309; }
+.liberacao-legenda-no-prazo { background: #15803d; }
+
+.liberacao-modal-fundo {
+  position: fixed;
+  inset: 0;
+  background: rgba(4, 7, 13, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  padding: 20px;
+}
+
+.liberacao-modal {
+  background: var(--surface);
+  border-radius: 18px;
+  padding: 26px 28px;
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-shadow: 0 30px 60px -20px rgba(11, 23, 51, 0.5);
+}
+
+.liberacao-modal h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 400;
+  font-size: 22px;
+  color: var(--text-primary);
+}
+
+.liberacao-modal-paciente {
+  margin: -6px 0 0;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.liberacao-modal label {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.liberacao-modal input {
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border-soft);
+  background: var(--surface);
+  color: var(--text-primary);
+  font-size: 14px;
+  font-family: inherit;
+}
+
+.liberacao-modal input:focus {
+  outline: none;
+  border-color: var(--accent-blue-light);
+}
