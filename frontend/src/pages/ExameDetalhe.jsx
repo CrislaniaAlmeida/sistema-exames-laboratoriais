@@ -82,6 +82,10 @@ function ExameDetalhe() {
 
   function abrirEdicao(secao) {
     setForm({
+      nome: campoOuVazio(exame.nome),
+      sigla: campoOuVazio(exame.sigla),
+      codigo: campoOuVazio(exame.codigo),
+      setor_responsavel: campoOuVazio(exame.setor_responsavel),
       material_id: exame.material_id ?? '',
       tubo_id: exame.tubo_id ?? '',
       forma_coleta: campoOuVazio(exame.forma_coleta),
@@ -161,7 +165,7 @@ function ExameDetalhe() {
     );
   }
 
-  const ehAdmin = usuario?.perfil === 'admin';
+  const podeEditar = usuario?.perfil === 'admin' || usuario?.permissoes?.includes('exames_gerenciar');
   const processamento = laboratorio
     ? { tipo: 'Laboratorio de apoio', nome: laboratorio.nome }
     : { tipo: 'Processamento interno', nome: 'Realizado na propria unidade' };
@@ -174,18 +178,54 @@ function ExameDetalhe() {
         {erro && <p className="exame-detalhe-erro-inline">{erro}</p>}
 
         <div className="exame-detalhe-cabecalho">
-          <div>
-            <div className="exame-detalhe-titulo-linha">
-              <h1>{exame.nome}</h1>
-              {exame.sigla && <span className="tag tag-sigla">{exame.sigla}</span>}
-              <span className={`tag ${exame.ativo ? 'tag-ativo' : 'tag-inativo'}`}>
-                {exame.ativo ? 'Ativo' : 'Inativo'}
-              </span>
+          {editando === 'identidade' ? (
+            <div className="secao-edicao secao-edicao-cabecalho">
+              <div className="edicao-grid-dupla">
+                <label>
+                  Nome
+                  <input value={form.nome} onChange={(e) => handleChange('nome', e.target.value)} />
+                </label>
+                <label>
+                  Sigla
+                  <input value={form.sigla} onChange={(e) => handleChange('sigla', e.target.value)} placeholder="Ex: HC, GLI, UR..." />
+                </label>
+              </div>
+              <div className="edicao-grid-dupla">
+                <label>
+                  Codigo
+                  <input value={form.codigo} onChange={(e) => handleChange('codigo', e.target.value)} />
+                </label>
+                <label>
+                  Setor responsavel
+                  <input value={form.setor_responsavel} onChange={(e) => handleChange('setor_responsavel', e.target.value)} />
+                </label>
+              </div>
+              <div className="edicao-acoes">
+                <button className="edicao-salvar" onClick={salvar} disabled={salvando}>
+                  {salvando ? 'Salvando...' : 'Salvar'}
+                </button>
+                <button className="edicao-cancelar" onClick={cancelarEdicao} disabled={salvando}>
+                  Cancelar
+                </button>
+              </div>
             </div>
-            <p className="exame-detalhe-subtitulo">
-              Codigo: {exame.codigo || '-'} • Setor responsavel: {exame.setor_responsavel || 'Nao informado'}
-            </p>
-          </div>
+          ) : (
+            <div>
+              <div className="exame-detalhe-titulo-linha">
+                <h1>{exame.nome}</h1>
+                {exame.sigla && <span className="tag tag-sigla">{exame.sigla}</span>}
+                <span className={`tag ${exame.ativo ? 'tag-ativo' : 'tag-inativo'}`}>
+                  {exame.ativo ? 'Ativo' : 'Inativo'}
+                </span>
+                {podeEditar && (
+                  <button className="card-editar-botao" onClick={() => abrirEdicao('identidade')}>Editar</button>
+                )}
+              </div>
+              <p className="exame-detalhe-subtitulo">
+                Codigo: {exame.codigo || '-'} • Setor responsavel: {exame.setor_responsavel || 'Nao informado'}
+              </p>
+            </div>
+          )}
           <div className="exame-detalhe-cabecalho-direita">
             <div className={`processamento-badge ${laboratorio ? 'processamento-badge-externo' : 'processamento-badge-interno'}`}>
               {processamento.tipo}
@@ -198,7 +238,7 @@ function ExameDetalhe() {
           <div className="exame-detalhe-card exame-detalhe-card-tubo">
             <div className="exame-detalhe-card-topo">
               <h2>Tubo de coleta</h2>
-              {ehAdmin && editando !== 'tubo' && (
+              {podeEditar && editando !== 'tubo' && (
                 <button className="card-editar-botao" onClick={() => abrirEdicao('tubo')}>Editar</button>
               )}
             </div>
@@ -242,7 +282,7 @@ function ExameDetalhe() {
           <div className="exame-detalhe-card">
             <div className="exame-detalhe-card-topo">
               <h2>Material e coleta</h2>
-              {ehAdmin && editando !== 'material' && (
+              {podeEditar && editando !== 'material' && (
                 <button className="card-editar-botao" onClick={() => abrirEdicao('material')}>Editar</button>
               )}
             </div>
@@ -309,7 +349,7 @@ function ExameDetalhe() {
           <div className="exame-detalhe-card">
             <div className="exame-detalhe-card-topo">
               <h2>Preparo do paciente</h2>
-              {ehAdmin && editando !== 'preparo' && (
+              {podeEditar && editando !== 'preparo' && (
                 <button className="card-editar-botao" onClick={() => abrirEdicao('preparo')}>Editar</button>
               )}
             </div>
@@ -351,7 +391,7 @@ function ExameDetalhe() {
           <div className="exame-detalhe-card">
             <div className="exame-detalhe-card-topo">
               <h2>Processamento</h2>
-              {ehAdmin && editando !== 'processamento' && (
+              {podeEditar && editando !== 'processamento' && (
                 <button className="card-editar-botao" onClick={() => abrirEdicao('processamento')}>Editar</button>
               )}
             </div>
@@ -424,7 +464,7 @@ function ExameDetalhe() {
           <div className="exame-detalhe-card">
             <div className="exame-detalhe-card-topo">
               <h2>Prazos</h2>
-              {ehAdmin && editando !== 'prazos' && (
+              {podeEditar && editando !== 'prazos' && (
                 <button className="card-editar-botao" onClick={() => abrirEdicao('prazos')}>Editar</button>
               )}
             </div>
@@ -468,7 +508,7 @@ function ExameDetalhe() {
           <div className="exame-detalhe-card exame-detalhe-card-observacoes">
             <div className="exame-detalhe-card-topo">
               <h2>Observacoes</h2>
-              {ehAdmin && editando !== 'observacoes' && (
+              {podeEditar && editando !== 'observacoes' && (
                 <button className="card-editar-botao" onClick={() => abrirEdicao('observacoes')}>Editar</button>
               )}
             </div>
