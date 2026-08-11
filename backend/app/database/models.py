@@ -327,3 +327,24 @@ class Exame(Base):
     @property
     def laboratorio_nome(self):
         return self.laboratorio.nome if self.laboratorio else None
+
+
+class LogAuditoria(Base):
+    """
+    Trilha de auditoria (LGPD): registra quem acessou ou alterou dados
+    sensiveis (pacientes, amostras/resultados, usuarios), quando, e o
+    que foi feito. Alimentada por um middleware que observa as
+    requisicoes, nao precisa ser chamada manualmente em cada rota.
+    """
+    __tablename__ = "log_auditoria"
+
+    id = Column(Integer, primary_key=True, index=True)
+    usuario_id = Column(Integer, ForeignKey("usuarios.id", ondelete="SET NULL"))
+    usuario_nome = Column(String(150))
+    metodo = Column(String(10), nullable=False)
+    caminho = Column(String(300), nullable=False)
+    status_code = Column(Integer, nullable=False)
+    ip = Column(String(50))
+    criado_em = Column(TIMESTAMP(timezone=True), server_default=func.now())
+
+    usuario = relationship("Usuario")
