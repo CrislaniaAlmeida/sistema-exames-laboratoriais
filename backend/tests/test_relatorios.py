@@ -2,6 +2,16 @@ from datetime import date, datetime, timedelta, timezone
 
 from app.database.models import Paciente, Exame, Solicitacao, Usuario
 from app.auth.jwt import criptografar_senha
+from app.services.paciente_service import FUSO_BRASIL
+
+
+def _hoje_brasil():
+    """
+    O relatorio agrupa por dia no horario de Brasilia (FUSO_BRASIL), nao
+    UTC -- entao "hoje" no teste tem que usar o mesmo fuso, senao o teste
+    fica flakey na janela em que UTC ja virou o dia mas Brasilia nao.
+    """
+    return datetime.now(FUSO_BRASIL).date().isoformat()
 
 
 def _criar_paciente_com_exame(sessao_db, cliente, token_admin, codigo="PAC-000300"):
@@ -27,7 +37,7 @@ def _criar_paciente_com_exame(sessao_db, cliente, token_admin, codigo="PAC-00030
 
 def test_relatorio_lista_atendimento_de_hoje(cliente, token_admin, sessao_db):
     paciente = _criar_paciente_com_exame(sessao_db, cliente, token_admin)
-    hoje = date.today().isoformat()
+    hoje = _hoje_brasil()
 
     resposta = cliente.get(
         "/relatorios/atendimentos",
@@ -57,7 +67,7 @@ def test_relatorio_nao_lista_atendimento_de_outro_dia(cliente, token_admin, sess
     sessao_db.add(solicitacao_antiga)
     sessao_db.commit()
 
-    hoje = date.today().isoformat()
+    hoje = _hoje_brasil()
     resposta_hoje = cliente.get(
         "/relatorios/atendimentos",
         params={"data": hoje},
@@ -67,7 +77,7 @@ def test_relatorio_nao_lista_atendimento_de_outro_dia(cliente, token_admin, sess
 
     resposta_dia_certo = cliente.get(
         "/relatorios/atendimentos",
-        params={"data": ha_dez_dias.date().isoformat()},
+        params={"data": ha_dez_dias.astimezone(FUSO_BRASIL).date().isoformat()},
         headers={"Authorization": f"Bearer {token_admin}"},
     )
     assert len(resposta_dia_certo.json()) == 1
@@ -90,7 +100,7 @@ def test_relatorio_requer_admin(cliente, sessao_db):
 
     resposta = cliente.get(
         "/relatorios/atendimentos",
-        params={"data": date.today().isoformat()},
+        params={"data": _hoje_brasil()},
         headers={"Authorization": f"Bearer {token}"},
     )
     assert resposta.status_code == 403

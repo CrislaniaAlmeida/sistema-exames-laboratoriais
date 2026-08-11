@@ -83,6 +83,7 @@ class Solicitacao(Base):
     id = Column(Integer, primary_key=True, index=True)
     paciente_id = Column(Integer, ForeignKey("pacientes.id", ondelete="CASCADE"), nullable=False)
     data_solicitacao = Column(TIMESTAMP(timezone=True), server_default=func.now())
+    token_publico = Column(String(32), unique=True, index=True)
 
     paciente = relationship("Paciente", back_populates="solicitacoes")
     itens = relationship(
@@ -174,17 +175,24 @@ class SolicitacaoExame(Base):
     flag_resultado = Column(String(1))
     observacoes_resultado = Column(Text)
     liberado_por_id = Column(Integer, ForeignKey("usuarios.id", ondelete="SET NULL"))
+    lancado_por_id = Column(Integer, ForeignKey("usuarios.id", ondelete="SET NULL"))
+    lancado_em = Column(TIMESTAMP(timezone=True))
 
     solicitacao = relationship("Solicitacao", back_populates="itens")
     exame = relationship("Exame")
     amostra = relationship("Amostra", back_populates="itens")
-    liberado_por = relationship("Usuario")
+    liberado_por = relationship("Usuario", foreign_keys=[liberado_por_id])
+    lancado_por = relationship("Usuario", foreign_keys=[lancado_por_id])
 
     LIMITE_PROXIMO_MINUTOS = 30
 
     @property
     def liberado_por_nome(self):
         return self.liberado_por.nome if self.liberado_por else None
+
+    @property
+    def lancado_por_nome(self):
+        return self.lancado_por.nome if self.lancado_por else None
 
     @property
     def paciente(self):
@@ -224,7 +232,7 @@ class SolicitacaoExame(Base):
 
     __table_args__ = (
         CheckConstraint(
-            "status_resultado IN ('aguardando_resultado', 'disponivel')",
+            "status_resultado IN ('aguardando_resultado', 'aguardando_confirmacao', 'disponivel')",
             name="check_status_resultado_valido"),
     )
 

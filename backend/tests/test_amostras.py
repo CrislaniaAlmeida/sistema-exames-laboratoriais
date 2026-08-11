@@ -259,8 +259,31 @@ def test_lancar_resultado_dentro_da_referencia_nao_gera_flag(cliente, token_admi
     assert dados["valor_resultado"] == "85"
     assert dados["unidade_resultado"] == "mg/dL"
     assert dados["flag_resultado"] is None
+    assert dados["status_resultado"] == "aguardando_confirmacao"
+    assert dados["lancado_por_nome"] == "Admin de Teste"
+    assert dados["liberado_por_nome"] is None
+
+
+def test_confirmar_liberacao_libera_o_resultado(cliente, token_admin, sessao_db):
+    item_id = _criar_paciente_com_exame_com_referencia(sessao_db, cliente, token_admin)
+    headers = {"Authorization": f"Bearer {token_admin}"}
+
+    cliente.put(f"/amostras/itens/{item_id}/resultado", json={"valor_resultado": "85"}, headers=headers)
+    resposta = cliente.put(f"/amostras/itens/{item_id}/confirmar", headers=headers)
+
+    assert resposta.status_code == 200, resposta.text
+    dados = resposta.json()
     assert dados["status_resultado"] == "disponivel"
     assert dados["liberado_por_nome"] == "Admin de Teste"
+    assert dados["lancado_por_nome"] == "Admin de Teste"
+
+
+def test_confirmar_liberacao_sem_lancamento_previo_e_rejeitado(cliente, token_admin, sessao_db):
+    item_id = _criar_paciente_com_exame_com_referencia(sessao_db, cliente, token_admin)
+    headers = {"Authorization": f"Bearer {token_admin}"}
+
+    resposta = cliente.put(f"/amostras/itens/{item_id}/confirmar", headers=headers)
+    assert resposta.status_code == 400
 
 
 def test_lancar_resultado_acima_da_referencia_gera_flag_alto(cliente, token_admin, sessao_db):
@@ -327,4 +350,5 @@ def test_voltar_status_para_pendente_limpa_valor_lancado(cliente, token_admin, s
     assert resposta.status_code == 200, resposta.text
     dados = resposta.json()
     assert dados["valor_resultado"] is None
+    assert dados["lancado_por_nome"] is None
     assert dados["flag_resultado"] is None

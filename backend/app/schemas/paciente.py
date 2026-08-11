@@ -157,6 +157,8 @@ class ItemExameResposta(BaseModel):
     flag_resultado: Optional[str] = None
     observacoes_resultado: Optional[str] = None
     liberado_por_nome: Optional[str] = None
+    lancado_por_nome: Optional[str] = None
+    lancado_em: Optional[datetime] = None
     exame: Optional[ExameResumoResposta] = None
 
     class Config:
@@ -190,11 +192,29 @@ class SolicitacaoResposta(BaseModel):
     id: int
     paciente_id: int
     data_solicitacao: datetime
+    token_publico: Optional[str] = None
     exames: List[ExameResumoResposta]
     amostras: List[AmostraResposta]
 
     class Config:
         from_attributes = True
+
+
+class PortalPacienteResposta(BaseModel):
+    codigo: str
+    nome: str
+    cpf: str
+    data_nascimento: date
+    crm_medico_solicitante: Optional[str] = None
+
+    class Config:
+        from_attributes = True
+
+
+class PortalResposta(BaseModel):
+    """Resposta publica (sem autenticacao) do portal do paciente, acessada pelo link unico do laudo."""
+    paciente: PortalPacienteResposta
+    solicitacao: SolicitacaoResposta
 
 
 class AmostraLiberacaoResposta(BaseModel):
@@ -212,6 +232,11 @@ class AmostraLiberacaoResposta(BaseModel):
 class ItemLiberacaoResposta(BaseModel):
     id: int
     status_resultado: str
+    valor_resultado: Optional[str] = None
+    unidade_resultado: Optional[str] = None
+    observacoes_resultado: Optional[str] = None
+    lancado_por_nome: Optional[str] = None
+    lancado_em: Optional[datetime] = None
     prazo_limite: Optional[datetime] = None
     prazo_status: Literal["atrasado", "proximo_do_limite", "no_prazo", "sem_prazo"]
     exame: Optional[ExameResumoResposta] = None
@@ -227,7 +252,7 @@ class AmostraStatusAtualizar(BaseModel):
 
 
 class ItemExameStatusAtualizar(BaseModel):
-    status_resultado: Literal["aguardando_resultado", "disponivel"]
+    status_resultado: Literal["aguardando_resultado", "aguardando_confirmacao", "disponivel"]
 
 
 class AmostraConsultaResposta(BaseModel):

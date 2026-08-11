@@ -80,11 +80,29 @@ def lancar_resultado(
     """
     Lanca o valor de um resultado, calcula automaticamente a flag
     (Alto/Baixo) comparando com a faixa de referencia do exame, e
-    libera o resultado (status_resultado = disponivel).
+    deixa o item aguardando confirmacao -- a liberacao de fato so
+    acontece em PUT /itens/{item_id}/confirmar.
     """
     item = paciente_service.lancar_resultado(
         db, item_id, dados.valor_resultado, dados.observacoes_resultado, usuario_atual,
     )
+    if not item:
+        raise HTTPException(status_code=404, detail="Item de exame nao encontrado.")
+    return item
+
+
+@router.put("/itens/{item_id}/confirmar", response_model=ItemExameResposta)
+def confirmar_liberacao(
+    item_id: int,
+    db: Session = Depends(get_db),
+    usuario_atual: Usuario = Depends(exigir_permissao("amostras_gerenciar")),
+):
+    """
+    Segunda etapa do lancamento: confirma o valor ja digitado e libera
+    o resultado para o paciente. Pode ser confirmado pela mesma pessoa
+    que lancou. Dispara o aviso por e-mail ao paciente, se configurado.
+    """
+    item = paciente_service.confirmar_liberacao_resultado(db, item_id, usuario_atual)
     if not item:
         raise HTTPException(status_code=404, detail="Item de exame nao encontrado.")
     return item

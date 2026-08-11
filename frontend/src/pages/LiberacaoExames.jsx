@@ -130,13 +130,23 @@ function LiberacaoExames() {
 
   function abrirModal(item) {
     setItemModal(item);
-    setValorModal('');
-    setObservacaoModal('');
+    setValorModal(item.valor_resultado || '');
+    setObservacaoModal(item.observacoes_resultado || '');
     setErroModal('');
   }
 
   function fecharModal() {
     setItemModal(null);
+  }
+
+  async function confirmarItem(item) {
+    setErro('');
+    try {
+      await api.put(`/amostras/itens/${item.id}/confirmar`);
+      await carregar();
+    } catch (erroRequisicao) {
+      setErro(erroRequisicao.response?.data?.detail || 'Nao foi possivel confirmar a liberacao.');
+    }
   }
 
   async function confirmarLancamento(evento) {
@@ -267,6 +277,9 @@ function LiberacaoExames() {
                             {ROTULO_STATUS[item.prazo_status]}
                           </span>
                           {delta && <span className="liberacao-status-delta">{delta}</span>}
+                          {item.status_resultado === 'aguardando_confirmacao' && (
+                            <span className="liberacao-status-delta">Lancado por {item.lancado_por_nome || '-'}</span>
+                          )}
                         </td>
                         <td>
                           <span className="paciente-codigo">{item.amostra?.codigo || '-'}</span>
@@ -287,7 +300,14 @@ function LiberacaoExames() {
                         <td>{formatarDataHora(item.amostra?.recebido_em)}</td>
                         <td>{item.prazo_limite ? formatarDataHora(item.prazo_limite) : '-'}</td>
                         <td className="gerenciar-acoes">
-                          <button onClick={() => abrirModal(item)}>Lancar resultado</button>
+                          {item.status_resultado === 'aguardando_confirmacao' ? (
+                            <>
+                              <button onClick={() => confirmarItem(item)}>Confirmar</button>
+                              <button onClick={() => abrirModal(item)}>Corrigir</button>
+                            </>
+                          ) : (
+                            <button onClick={() => abrirModal(item)}>Lancar resultado</button>
+                          )}
                         </td>
                       </tr>
                     );
@@ -321,7 +341,7 @@ function LiberacaoExames() {
         {itemModal && (
           <div className="liberacao-modal-fundo" onClick={fecharModal}>
             <form className="liberacao-modal" onClick={(e) => e.stopPropagation()} onSubmit={confirmarLancamento}>
-              <h2>Lancar resultado</h2>
+              <h2>{itemModal.status_resultado === 'aguardando_confirmacao' ? 'Corrigir valor' : 'Lancar resultado'}</h2>
               <p className="liberacao-modal-paciente">
                 {itemModal.paciente?.nome} · {itemModal.exame?.sigla || itemModal.exame?.nome}
               </p>
@@ -349,7 +369,7 @@ function LiberacaoExames() {
 
               <div className="form-acoes">
                 <button type="submit" disabled={salvandoModal || !valorModal.trim()}>
-                  {salvandoModal ? 'Salvando...' : 'Confirmar'}
+                  {salvandoModal ? 'Salvando...' : 'Salvar valor'}
                 </button>
                 <button type="button" className="form-cancelar" onClick={fecharModal}>Cancelar</button>
               </div>

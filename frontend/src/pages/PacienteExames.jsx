@@ -25,6 +25,12 @@ const iconePdf = (
 const iconeVazio = (
   <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><path d="M9 2v6.34a2 2 0 0 1-.4 1.2L4 16a2 2 0 0 0 1.6 3.2h12.8A2 2 0 0 0 20 16l-4.6-6.46a2 2 0 0 1-.4-1.2V2" /><path d="M8.5 2h7" /></svg>
 );
+const iconeLink = (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1" /><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1" /></svg>
+);
+const iconeWhatsapp = (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.87.5 3.62 1.44 5.13L2 22l5.15-1.53a9.85 9.85 0 0 0 4.89 1.3h.01c5.46 0 9.9-4.45 9.9-9.91C21.95 6.45 17.5 2 12.04 2Zm0 18.1h-.01a8.2 8.2 0 0 1-4.2-1.15l-.3-.18-3.06.91.92-2.98-.2-.31a8.19 8.19 0 0 1-1.26-4.38c0-4.53 3.68-8.21 8.22-8.21 2.2 0 4.26.86 5.81 2.41a8.16 8.16 0 0 1 2.4 5.81c0 4.53-3.69 8.08-8.32 8.08Zm4.5-6.13c-.25-.12-1.47-.72-1.69-.81-.23-.08-.4-.12-.56.13-.17.25-.64.81-.79.97-.14.17-.29.19-.54.06-.25-.12-1.04-.38-1.98-1.22-.73-.65-1.22-1.46-1.37-1.7-.14-.25-.02-.38.11-.5.12-.12.27-.31.4-.46.14-.16.18-.27.27-.45.09-.19.05-.34-.02-.47-.08-.12-.62-1.5-.85-2.05-.17-.42-.35-.36-.48-.37h-.4c-.14 0-.36.05-.55.27-.19.22-.73.71-.73 1.72 0 1.02.75 2 .86 2.14.11.14 1.51 2.31 3.66 3.15 1.82.71 2.19.57 2.58.53.4-.04 1.28-.52 1.46-1.03.18-.5.18-.93.13-1.02-.05-.09-.19-.14-.44-.26Z" /></svg>
+);
 
 function PacienteExames() {
   const { id } = useParams();
@@ -94,6 +100,34 @@ function PacienteExames() {
   async function gerarLaudo(solicitacao) {
     const { gerarLaudoPdf } = await import('../services/pdfSolicitacao');
     gerarLaudoPdf({ paciente, solicitacao });
+  }
+
+  function linkPortal(solicitacao) {
+    if (!solicitacao.token_publico) return null;
+    return `${window.location.origin}/portal/${solicitacao.token_publico}`;
+  }
+
+  async function copiarLink(solicitacao) {
+    const link = linkPortal(solicitacao);
+    if (!link) return;
+    await navigator.clipboard.writeText(link);
+    setMensagem('Link do paciente copiado.');
+  }
+
+  function numeroWhatsapp(celular) {
+    const digitos = (celular || '').replace(/\D/g, '');
+    if (!digitos) return null;
+    return digitos.length <= 11 ? `55${digitos}` : digitos;
+  }
+
+  function abrirWhatsapp(solicitacao) {
+    const link = linkPortal(solicitacao);
+    const numero = numeroWhatsapp(paciente.celular);
+    if (!link || !numero) return;
+    const texto = encodeURIComponent(
+      `Ola, ${paciente.nome}! Aqui esta o link para acompanhar o resultado do seu exame: ${link}`
+    );
+    window.open(`https://wa.me/${numero}?text=${texto}`, '_blank');
   }
 
   async function handleConcluir() {
@@ -290,6 +324,22 @@ function PacienteExames() {
                         onClick={() => gerarLaudo(solicitacao)}
                       >
                         {iconePdf}Gerar laudo
+                      </button>
+                      <button
+                        type="button"
+                        disabled={!solicitacao.token_publico}
+                        title="Copiar o link do portal do paciente"
+                        onClick={() => copiarLink(solicitacao)}
+                      >
+                        {iconeLink}Copiar link
+                      </button>
+                      <button
+                        type="button"
+                        disabled={!solicitacao.token_publico || !paciente.celular}
+                        title={paciente.celular ? 'Enviar o link por WhatsApp' : 'Paciente sem celular cadastrado'}
+                        onClick={() => abrirWhatsapp(solicitacao)}
+                      >
+                        {iconeWhatsapp}WhatsApp
                       </button>
                     </td>
                   </tr>

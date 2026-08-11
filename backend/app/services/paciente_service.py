@@ -1,3 +1,4 @@
+import secrets
 from datetime import datetime, timedelta, timezone
 
 from fastapi import HTTPException
@@ -6,6 +7,7 @@ from sqlalchemy import func
 from app.database.models import Paciente, Solicitacao, SolicitacaoExame, Amostra, Exame
 from app.schemas.paciente import PacienteCriar, PacienteAtualizar
 from app.validadores import validar_cpf
+from app.services.email_service import enviar_email_resultado_disponivel
 
 LIMITE_PAINEL_AMOSTRAS = 300
 
@@ -182,7 +184,7 @@ def criar_solicitacao(db: Session, paciente_id: int, exame_ids: list):
             detail=f"Exame(s) nao encontrado(s): {', '.join(str(i) for i in ids_invalidos)}",
         )
 
-    nova_solicitacao = Solicitacao(paciente_id=paciente_id)
+    nova_solicitacao = Solicitacao(paciente_id=paciente_id, token_publico=secrets.token_urlsafe(18))
     db.add(nova_solicitacao)
     db.flush()
 
@@ -228,6 +230,13 @@ def buscar_amostra_por_codigo(db: Session, codigo: str):
     return db.query(Amostra).filter(Amostra.codigo == codigo).first()
 
 
+def buscar_solicitacao_por_token(db: Session, token: str):
+    """Busca uma solicitacao pelo token publico do portal do paciente (rota sem autenticacao)."""
+    if not token:
+        return None
+    return db.query(Solicitacao).filter(Solicitacao.token_publico == token).first()
+
+
 def listar_amostras_painel(db: Session, apenas_pendentes: bool = True):
     """
     Lista amostras para o painel de coleta/resultado, mais recentes
@@ -262,7 +271,7 @@ def listar_itens_liberacao(db: Session):
     itens = (
         db.query(SolicitacaoExame)
         .join(Exame, SolicitacaoExame.exame_id == Exame.id)
-        .filter(SolicitacaoExame.status_resultado == "aguardando_resultado")
+        .filter(SolicitacaoExame.status_resultado.in_(["aguardando_resultado", "aguardando_confirmacao"]))
         .filter(Exame.laboratorio_id.is_(None))
         .all()
     )
@@ -317,6 +326,8 @@ def atualizar_status_resultado_item(db: Session, item_id: int, status_resultado:
         item.flag_resultado = None
         item.observacoes_resultado = None
         item.liberado_por_id = None
+        item.lancado_por_id = None
+        item.lancado_em = None
 
     db.commit()
     db.refresh(item)
@@ -345,6 +356,12 @@ def calcular_flag_resultado(valor_resultado: str, exame: Exame):
 
 
 def lancar_resultado(db: Session, item_id: int, valor_resultado: str, observacoes_resultado: str, usuario_atual):
+    """
+    Primeira etapa do lancamento: registra o valor digitado e deixa o
+    item aguardando confirmacao. Ainda nao libera o resultado -- isso
+    so acontece em confirmar_liberacao_resultado, mesmo que seja a
+    mesma pessoa a confirmar.
+    """
     item = buscar_item_exame_por_id(db, item_id)
     if not item:
         return None
@@ -353,10 +370,39 @@ def lancar_resultado(db: Session, item_id: int, valor_resultado: str, observacoe
     item.unidade_resultado = item.exame.unidade_resultado if item.exame else None
     item.flag_resultado = calcular_flag_resultado(valor_resultado, item.exame)
     item.observacoes_resultado = observacoes_resultado
+    item.status_resultado = "aguardando_confirmacao"
+    item.lancado_por_id = usuario_atual.id
+    item.lancado_em = datetime.now(timezone.utc)
+    item.resultado_disponivel_em = None
+    item.liberado_por_id = None
+
+    db.commit()
+    db.refresh(item)
+    return item
+
+
+def confirmar_liberacao_resultado(db: Session, item_id: int, usuario_atual):
+    """
+    Segunda etapa: confirma o valor ja lancado e libera o resultado
+    para o paciente/medico verem. Pode ser confirmado pela mesma
+    pessoa que lancou.
+    """
+    item = buscar_item_exame_por_id(db, item_id)
+    if not item:
+        return None
+    if item.status_resultado != "aguardando_confirmacao":
+        raise HTTPException(
+            status_code=400,
+            detail="Este item nao esta aguardando confirmacao.",
+        )
+
     item.status_resultado = "disponivel"
     item.resultado_disponivel_em = datetime.now(timezone.utc)
     item.liberado_por_id = usuario_atual.id
 
     db.commit()
     db.refresh(item)
+
+    enviar_email_resultado_disponivel(item)
+
     return item

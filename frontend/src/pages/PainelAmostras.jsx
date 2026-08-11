@@ -104,6 +104,19 @@ function PainelAmostras() {
     }
   }
 
+  async function confirmarLiberacao(item) {
+    setAtualizandoId(`item-${item.id}`);
+    setErro('');
+    try {
+      await api.put(`/amostras/itens/${item.id}/confirmar`);
+      await carregar();
+    } catch (erroRequisicao) {
+      setErro(erroRequisicao.response?.data?.detail || 'Nao foi possivel confirmar a liberacao.');
+    } finally {
+      setAtualizandoId(null);
+    }
+  }
+
   return (
     <Layout>
       <div className="gerenciar painel-amostras">
@@ -201,27 +214,44 @@ function PainelAmostras() {
                           </div>
                         ) : (
                           <div className="painel-item-lancamento">
+                            {item.status_resultado === 'aguardando_confirmacao' && (
+                              <span className="painel-item-liberado-meta">
+                                Lancado por {item.lancado_por_nome || '-'} em {formatarDataHoraBr(item.lancado_em)} · aguardando confirmacao
+                              </span>
+                            )}
                             <input
                               type="text"
                               placeholder="Valor do resultado..."
-                              value={valoresDigitados[item.id] || ''}
+                              value={valoresDigitados[item.id] ?? item.valor_resultado ?? ''}
                               onChange={(e) => setValoresDigitados((atual) => ({ ...atual, [item.id]: e.target.value }))}
                             />
                             <input
                               type="text"
                               placeholder="Observacao (opcional)"
                               className="painel-item-observacao"
-                              value={observacoesDigitadas[item.id] || ''}
+                              value={observacoesDigitadas[item.id] ?? item.observacoes_resultado ?? ''}
                               onChange={(e) => setObservacoesDigitadas((atual) => ({ ...atual, [item.id]: e.target.value }))}
                             />
-                            <button
-                              type="button"
-                              className="painel-status-botao painel-status-pendente"
-                              onClick={() => lancarResultado(item)}
-                              disabled={atualizandoId === `item-${item.id}` || !(valoresDigitados[item.id] || '').trim()}
-                            >
-                              Lancar resultado
-                            </button>
+                            <div className="painel-item-lancamento-acoes">
+                              <button
+                                type="button"
+                                className="painel-status-botao painel-status-pendente"
+                                onClick={() => lancarResultado(item)}
+                                disabled={atualizandoId === `item-${item.id}` || !(valoresDigitados[item.id] ?? item.valor_resultado ?? '').trim()}
+                              >
+                                {item.status_resultado === 'aguardando_confirmacao' ? 'Corrigir valor' : 'Lancar resultado'}
+                              </button>
+                              {item.status_resultado === 'aguardando_confirmacao' && (
+                                <button
+                                  type="button"
+                                  className="painel-status-botao painel-status-feito"
+                                  onClick={() => confirmarLiberacao(item)}
+                                  disabled={atualizandoId === `item-${item.id}`}
+                                >
+                                  Confirmar liberacao
+                                </button>
+                              )}
+                            </div>
                           </div>
                         )}
                       </li>

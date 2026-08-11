@@ -222,6 +222,17 @@
   flex: 2;
 }
 
+.painel-item-lancamento .painel-item-liberado-meta {
+  flex-basis: 100%;
+}
+
+.painel-item-lancamento-acoes {
+  flex-basis: 100%;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
 .painel-item-resultado {
   display: flex;
   align-items: center;

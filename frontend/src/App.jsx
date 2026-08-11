@@ -14,6 +14,7 @@ import MateriaisGerenciar from './pages/MateriaisGerenciar';
 import PainelAmostras from './pages/PainelAmostras';
 import TriagemAmostras from './pages/TriagemAmostras';
 import LiberacaoExames from './pages/LiberacaoExames';
+import PortalPaciente from './pages/PortalPaciente';
 import RelatorioAtendimentos from './pages/RelatorioAtendimentos';
 import RotaProtegida from './components/RotaProtegida';
 import RotaAdmin from './components/RotaAdmin';
@@ -24,6 +25,7 @@ function App() {
     <Routes>
       <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={<Login />} />
+      <Route path="/portal/:token" element={<PortalPaciente />} />
       <Route
         path="/trocar-senha"
         element={
