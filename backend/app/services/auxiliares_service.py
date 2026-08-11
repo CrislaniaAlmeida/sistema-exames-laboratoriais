@@ -177,24 +177,38 @@ async def enviar_foto_tubo_para_github(arquivo: UploadFile) -> str:
 
     conteudo_base64 = base64.b64encode(conteudo).decode("utf-8")
 
-    async with httpx.AsyncClient(timeout=20.0) as cliente:
-        resposta = await cliente.put(
-            f"https://api.github.com/repos/{GITHUB_REPO}/contents/{caminho_repo}",
-            headers={
-                "Authorization": f"Bearer {GITHUB_TOKEN}",
-                "Accept": "application/vnd.github+json",
-            },
-            json={
-                "message": f"Adiciona foto de tubo via upload: {nome_arquivo}",
-                "content": conteudo_base64,
-                "branch": GITHUB_BRANCH,
-            },
+    try:
+        async with httpx.AsyncClient(timeout=20.0) as cliente:
+            resposta = await cliente.put(
+                f"https://api.github.com/repos/{GITHUB_REPO}/contents/{caminho_repo}",
+                headers={
+                    "Authorization": f"Bearer {GITHUB_TOKEN}",
+                    "Accept": "application/vnd.github+json",
+                },
+                json={
+                    "message": f"Adiciona foto de tubo via upload: {nome_arquivo}",
+                    "content": conteudo_base64,
+                    "branch": GITHUB_BRANCH,
+                },
+            )
+    except httpx.HTTPError as erro:
+        raise HTTPException(
+            status_code=502,
+            detail=f"Nao foi possivel conectar ao GitHub para enviar a foto ({erro.__class__.__name__}).",
         )
 
     if resposta.status_code not in (200, 201):
+        detalhe_github = ""
+        try:
+            detalhe_github = resposta.json().get("message", "")
+        except ValueError:
+            pass
         raise HTTPException(
             status_code=502,
-            detail="Nao foi possivel enviar a foto para o repositorio. Tente novamente.",
+            detail=(
+                f"Nao foi possivel enviar a foto para o repositorio "
+                f"(GitHub respondeu {resposta.status_code}{': ' + detalhe_github if detalhe_github else ''})."
+            ),
         )
 
     return f"/tubos/{nome_arquivo}"
