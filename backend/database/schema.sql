@@ -149,9 +149,11 @@ COMMENT ON TABLE exames IS 'Tabela principal com todas as informações de cada 
 -- TABELA: solicitacoes_exames (pedido de exames de um paciente)
 -- =========================================================
 CREATE TABLE solicitacoes_exames (
-    id                  INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    paciente_id         INTEGER NOT NULL REFERENCES pacientes(id) ON DELETE CASCADE,
-    data_solicitacao    TIMESTAMPTZ NOT NULL DEFAULT now()
+    id                          INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    paciente_id                 INTEGER NOT NULL REFERENCES pacientes(id) ON DELETE CASCADE,
+    data_solicitacao            TIMESTAMPTZ NOT NULL DEFAULT now(),
+    token_publico               VARCHAR(32) UNIQUE,
+    token_publico_expira_em     TIMESTAMPTZ
 );
 
 CREATE TABLE amostras (
@@ -198,6 +200,27 @@ CREATE TABLE historico_alteracoes (
     detalhes        JSONB,
     criado_em       TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
+-- =========================================================
+-- TABELA: log_auditoria (trilha de acesso exigida pela LGPD)
+-- Alimentada por um middleware que observa toda requisicao a
+-- rotas de dados sensiveis (pacientes, amostras/resultados,
+-- usuarios, portal do paciente) -- nao precisa ser chamada
+-- manualmente em cada rota.
+-- =========================================================
+CREATE TABLE log_auditoria (
+    id              INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    usuario_id      INTEGER REFERENCES usuarios(id) ON DELETE SET NULL,
+    usuario_nome    VARCHAR(150),
+    metodo          VARCHAR(10) NOT NULL,
+    caminho         VARCHAR(300) NOT NULL,
+    status_code     INTEGER NOT NULL,
+    ip              VARCHAR(50),
+    criado_em       TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX idx_log_auditoria_criado_em ON log_auditoria (criado_em DESC);
+CREATE INDEX idx_log_auditoria_usuario   ON log_auditoria (usuario_id);
 
 -- =========================================================
 -- ÍNDICES para busca rápida (pesquisa por nome, sigla, código)

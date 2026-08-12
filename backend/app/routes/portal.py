@@ -19,7 +19,7 @@ def consultar_portal_paciente(request: Request, token: str, db: Session = Depend
     solicitacao de exames, e funciona como a credencial de acesso.
     """
     solicitacao = paciente_service.buscar_solicitacao_por_token(db, token)
-    if not solicitacao or not solicitacao.paciente:
+    if not solicitacao or not solicitacao.paciente or solicitacao.token_expirado:
         raise HTTPException(status_code=404, detail="Link invalido ou expirado.")
 
     return {"paciente": solicitacao.paciente, "solicitacao": solicitacao}

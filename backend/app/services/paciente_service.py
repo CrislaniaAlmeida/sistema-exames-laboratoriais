@@ -4,14 +4,25 @@ from datetime import datetime, timedelta, timezone
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy import func
-from app.database.models import Paciente, Solicitacao, SolicitacaoExame, Amostra, Exame
+from app.database.models import Paciente, Solicitacao, SolicitacaoExame, Amostra, Exame, LogAuditoria
 from app.schemas.paciente import PacienteCriar, PacienteAtualizar
 from app.validadores import validar_cpf
 from app.services.email_service import enviar_email_resultado_disponivel
 
 LIMITE_PAINEL_AMOSTRAS = 300
+DIAS_VALIDADE_TOKEN_PORTAL = 90
 
 FUSO_BRASIL = timezone(timedelta(hours=-3))
+
+
+def _gerar_token_portal():
+    """
+    Gera um novo token do portal do paciente e sua data de expiracao --
+    usado tanto ao criar uma solicitacao quanto ao renovar o link de
+    uma existente (o que invalida o link antigo, ja que o token e
+    unico e a busca e por igualdade exata).
+    """
+    return secrets.token_urlsafe(18), datetime.now(timezone.utc) + timedelta(days=DIAS_VALIDADE_TOKEN_PORTAL)
 
 
 def _data_local_brasil(momento):
@@ -51,11 +62,16 @@ def validar_medicamentos(medicamentos):
 
 
 def listar_pacientes(db: Session):
-    return db.query(Paciente).order_by(Paciente.criado_em.desc()).all()
+    return (
+        db.query(Paciente)
+        .filter(Paciente.ativo == True)
+        .order_by(Paciente.criado_em.desc())
+        .all()
+    )
 
 
 def buscar_paciente_por_id(db: Session, paciente_id: int):
-    return db.query(Paciente).filter(Paciente.id == paciente_id).first()
+    return db.query(Paciente).filter(Paciente.id == paciente_id, Paciente.ativo == True).first()
 
 
 def buscar_paciente_por_cpf(db: Session, cpf: str):
@@ -106,11 +122,17 @@ def atualizar_paciente(db: Session, paciente_id: int, dados: PacienteAtualizar):
 
 
 def excluir_paciente(db: Session, paciente_id: int):
+    """
+    Exclusao logica: o cadastro e marcado como inativo (some da lista e
+    das buscas), mas o paciente, suas solicitacoes, amostras e
+    resultados continuam no banco -- excluir de verdade apagaria em
+    cascata todo o historico de exames e laudos, sem volta.
+    """
     paciente = buscar_paciente_por_id(db, paciente_id)
     if not paciente:
         return None
 
-    db.delete(paciente)
+    paciente.ativo = False
     db.commit()
     return paciente
 
@@ -138,6 +160,31 @@ def listar_solicitacoes_do_dia(db: Session, data):
         .all()
     )
     return [s for s in candidatas if _data_local_brasil(s.data_solicitacao) == data]
+
+
+LIMITE_LOG_AUDITORIA = 500
+
+
+def listar_log_auditoria_do_dia(db: Session, data):
+    """
+    Lista a trilha de auditoria (quem acessou/alterou dados sensiveis)
+    de um determinado dia, no horario de Brasilia, mais recente
+    primeiro -- para o relatorio de auditoria do administrador.
+    """
+    inicio_aproximado = datetime(data.year, data.month, data.day, tzinfo=timezone.utc) - timedelta(days=1)
+    fim_aproximado = datetime(data.year, data.month, data.day, tzinfo=timezone.utc) + timedelta(days=2)
+
+    candidatos = (
+        db.query(LogAuditoria)
+        .filter(
+            LogAuditoria.criado_em >= inicio_aproximado,
+            LogAuditoria.criado_em <= fim_aproximado,
+        )
+        .order_by(LogAuditoria.criado_em.desc())
+        .all()
+    )
+    filtrados = [l for l in candidatos if _data_local_brasil(l.criado_em) == data]
+    return filtrados[:LIMITE_LOG_AUDITORIA]
 
 
 def listar_solicitacoes(db: Session, paciente_id: int):
@@ -184,7 +231,12 @@ def criar_solicitacao(db: Session, paciente_id: int, exame_ids: list):
             detail=f"Exame(s) nao encontrado(s): {', '.join(str(i) for i in ids_invalidos)}",
         )
 
-    nova_solicitacao = Solicitacao(paciente_id=paciente_id, token_publico=secrets.token_urlsafe(18))
+    token_publico, token_publico_expira_em = _gerar_token_portal()
+    nova_solicitacao = Solicitacao(
+        paciente_id=paciente_id,
+        token_publico=token_publico,
+        token_publico_expira_em=token_publico_expira_em,
+    )
     db.add(nova_solicitacao)
     db.flush()
 
@@ -235,6 +287,26 @@ def buscar_solicitacao_por_token(db: Session, token: str):
     if not token:
         return None
     return db.query(Solicitacao).filter(Solicitacao.token_publico == token).first()
+
+
+def buscar_solicitacao_por_id(db: Session, solicitacao_id: int):
+    return db.query(Solicitacao).filter(Solicitacao.id == solicitacao_id).first()
+
+
+def renovar_link_portal(db: Session, paciente_id: int, solicitacao_id: int):
+    """
+    Gera um novo token para o link do portal dessa solicitacao,
+    invalidando o anterior -- usado tanto para renovar um link que
+    expirou quanto para revogar um link ja compartilhado por engano.
+    """
+    solicitacao = buscar_solicitacao_por_id(db, solicitacao_id)
+    if not solicitacao or solicitacao.paciente_id != paciente_id:
+        return None
+
+    solicitacao.token_publico, solicitacao.token_publico_expira_em = _gerar_token_portal()
+    db.commit()
+    db.refresh(solicitacao)
+    return solicitacao
 
 
 def listar_amostras_painel(db: Session, apenas_pendentes: bool = True):

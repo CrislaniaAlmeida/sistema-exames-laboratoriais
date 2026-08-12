@@ -104,3 +104,70 @@ def test_relatorio_requer_admin(cliente, sessao_db):
         headers={"Authorization": f"Bearer {token}"},
     )
     assert resposta.status_code == 403
+
+
+def test_auditoria_registra_acesso_a_rota_sensivel(cliente, token_admin, sessao_db):
+    """
+    O middleware de auditoria deve gravar em log_auditoria toda
+    requisicao a rotas de dados sensiveis (pacientes, amostras,
+    usuarios, portal), com o usuario identificado pelo token.
+    """
+    hoje = _hoje_brasil()
+
+    resposta = cliente.get(
+        "/pacientes/",
+        headers={"Authorization": f"Bearer {token_admin}"},
+    )
+    assert resposta.status_code == 200
+
+    resposta_log = cliente.get(
+        "/relatorios/auditoria",
+        params={"data": hoje},
+        headers={"Authorization": f"Bearer {token_admin}"},
+    )
+    assert resposta_log.status_code == 200, resposta_log.text
+    registros = resposta_log.json()
+
+    registro_da_consulta = next(
+        (r for r in registros if r["metodo"] == "GET" and r["caminho"] == "/pacientes/"), None
+    )
+    assert registro_da_consulta is not None, "a consulta a /pacientes/ deveria ter sido auditada"
+    assert registro_da_consulta["usuario_nome"] == "Admin de Teste"
+    assert registro_da_consulta["status_code"] == 200
+
+
+def test_auditoria_nao_registra_rota_fora_do_escopo_sensivel(cliente, token_admin, sessao_db):
+    hoje = _hoje_brasil()
+
+    cliente.get("/exames/", headers={"Authorization": f"Bearer {token_admin}"})
+
+    resposta_log = cliente.get(
+        "/relatorios/auditoria",
+        params={"data": hoje},
+        headers={"Authorization": f"Bearer {token_admin}"},
+    )
+    registros = resposta_log.json()
+    assert not any(r["caminho"] == "/exames/" for r in registros)
+
+
+def test_relatorio_auditoria_requer_admin(cliente, sessao_db):
+    recepcao = Usuario(
+        nome="Recepcao Auditoria",
+        email="recepcao-auditoria@teste.com",
+        senha_hash=criptografar_senha("senha-123456"),
+        perfil="recepcao",
+        permissoes=["pacientes_gerenciar"],
+        ativo=True,
+    )
+    sessao_db.add(recepcao)
+    sessao_db.commit()
+
+    login = cliente.post("/login", json={"email": "recepcao-auditoria@teste.com", "senha": "senha-123456"})
+    token = login.json()["access_token"]
+
+    resposta = cliente.get(
+        "/relatorios/auditoria",
+        params={"data": _hoje_brasil()},
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert resposta.status_code == 403

@@ -276,7 +276,9 @@ function PacientesGerenciar() {
   }
 
   async function handleExcluir(paciente) {
-    const confirmar = window.confirm(`Excluir o cadastro de "${paciente.nome}"?`);
+    const confirmar = window.confirm(
+      `Excluir o cadastro de "${paciente.nome}"? Ele sai da lista e das buscas, mas o historico de exames e laudos ja emitidos e mantido.`
+    );
     if (!confirmar) return;
 
     try {

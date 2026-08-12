@@ -88,3 +88,21 @@ def criar_solicitacao(
     if not solicitacao:
         raise HTTPException(status_code=404, detail="Paciente nao encontrado.")
     return solicitacao
+
+
+@router.put("/{paciente_id}/solicitacoes/{solicitacao_id}/renovar-link", response_model=SolicitacaoResposta)
+def renovar_link_portal(
+    paciente_id: int,
+    solicitacao_id: int,
+    db: Session = Depends(get_db),
+    usuario_atual: Usuario = Depends(exigir_permissao("pacientes_gerenciar")),
+):
+    """
+    Gera um novo link do portal para essa solicitacao, invalidando o
+    anterior -- usado para renovar um link vencido ou para revogar um
+    link ja compartilhado por engano.
+    """
+    solicitacao = paciente_service.renovar_link_portal(db, paciente_id, solicitacao_id)
+    if not solicitacao:
+        raise HTTPException(status_code=404, detail="Solicitacao nao encontrada.")
+    return solicitacao
