@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Layout from '../components/Layout';
 import api from '../services/api';
+import { extrairMensagemErro } from '../services/erros';
 import './TubosGerenciar.css';
 
 const LABORATORIO_VAZIO = { nome: '', telefone: '', email: '', cidade: '', estado: '', site: '' };
@@ -95,10 +96,7 @@ function LaboratoriosGerenciar() {
       fecharForm();
       carregarLaboratorios();
     } catch (erroRequisicao) {
-      setErro(
-        erroRequisicao.response?.data?.detail ||
-        'Nao foi possivel salvar o laboratorio. Verifique os campos.'
-      );
+      setErro(extrairMensagemErro(erroRequisicao, 'Nao foi possivel salvar o laboratorio. Verifique os campos.'));
     } finally {
       setSalvando(false);
     }

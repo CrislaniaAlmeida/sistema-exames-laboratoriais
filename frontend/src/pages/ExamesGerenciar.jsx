@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import Layout from '../components/Layout';
 import api from '../services/api';
+import { extrairMensagemErro } from '../services/erros';
 import './ExamesGerenciar.css';
 
 const ITENS_POR_PAGINA = 25;
@@ -169,10 +170,7 @@ function ExamesGerenciar() {
       fecharForm();
       carregarTudo();
     } catch (erroRequisicao) {
-      setErro(
-        erroRequisicao.response?.data?.detail ||
-        'Nao foi possivel salvar o exame. Verifique os campos.'
-      );
+      setErro(extrairMensagemErro(erroRequisicao, 'Nao foi possivel salvar o exame. Verifique os campos.'));
     } finally {
       setSalvando(false);
     }

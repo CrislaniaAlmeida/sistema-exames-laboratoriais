@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Layout from '../components/Layout';
 import api from '../services/api';
+import { extrairMensagemErro } from '../services/erros';
 import { useAuth } from '../context/AuthContext';
 import './PacientesGerenciar.css';
 
@@ -266,10 +267,7 @@ function PacientesGerenciar() {
       }
       carregarPacientes();
     } catch (erroRequisicao) {
-      setErro(
-        erroRequisicao.response?.data?.detail ||
-        'Nao foi possivel salvar o paciente. Verifique os campos.'
-      );
+      setErro(extrairMensagemErro(erroRequisicao, 'Nao foi possivel salvar o paciente. Verifique os campos.'));
     } finally {
       setSalvando(false);
     }
@@ -285,7 +283,7 @@ function PacientesGerenciar() {
       await api.delete(`/pacientes/${paciente.id}`);
       carregarPacientes();
     } catch (erroRequisicao) {
-      setErro(erroRequisicao.response?.data?.detail || 'Nao foi possivel excluir o paciente.');
+      setErro(extrairMensagemErro(erroRequisicao, 'Nao foi possivel excluir o paciente.'));
     }
   }
 

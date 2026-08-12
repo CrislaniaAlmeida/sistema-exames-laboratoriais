@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import Layout from '../components/Layout';
 import api from '../services/api';
+import { extrairMensagemErro } from '../services/erros';
 import './PacientesGerenciar.css';
 
 function formatarDataBr(data) {
@@ -143,7 +144,7 @@ function PacienteExames() {
       setMensagem('Link do paciente renovado. O link anterior parou de funcionar.');
       carregarTudo();
     } catch (erroRequisicao) {
-      setErro(erroRequisicao.response?.data?.detail || 'Nao foi possivel renovar o link.');
+      setErro(extrairMensagemErro(erroRequisicao, 'Nao foi possivel renovar o link.'));
     } finally {
       setRenovandoId(null);
     }
@@ -193,7 +194,7 @@ function PacienteExames() {
       setExamesSelecionados([]);
       carregarTudo();
     } catch (erroRequisicao) {
-      setErro(erroRequisicao.response?.data?.detail || 'Nao foi possivel concluir a solicitacao.');
+      setErro(extrairMensagemErro(erroRequisicao, 'Nao foi possivel concluir a solicitacao.'));
     } finally {
       setConcluindo(false);
     }

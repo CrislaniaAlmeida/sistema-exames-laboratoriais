@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Layout from '../components/Layout';
 import api from '../services/api';
+import { extrairMensagemErro } from '../services/erros';
 import './TubosGerenciar.css';
 
 const TUBO_VAZIO = { cor: '', descricao: '', foto_url: '' };
@@ -99,10 +100,7 @@ function TubosGerenciar() {
       handleChange('foto_url', resposta.data.foto_url);
       setMensagem('Foto enviada. A imagem pode levar 1-2 minutos para aparecer no site.');
     } catch (erroRequisicao) {
-      setErro(
-        erroRequisicao.response?.data?.detail ||
-        'Nao foi possivel enviar a foto. Tente novamente.'
-      );
+      setErro(extrairMensagemErro(erroRequisicao, 'Nao foi possivel enviar a foto. Tente novamente.'));
     } finally {
       setEnviandoFoto(false);
     }
@@ -135,10 +133,7 @@ function TubosGerenciar() {
       fecharForm();
       carregarTubos();
     } catch (erroRequisicao) {
-      setErro(
-        erroRequisicao.response?.data?.detail ||
-        'Nao foi possivel salvar o tubo. Verifique os campos.'
-      );
+      setErro(extrairMensagemErro(erroRequisicao, 'Nao foi possivel salvar o tubo. Verifique os campos.'));
     } finally {
       setSalvando(false);
     }
