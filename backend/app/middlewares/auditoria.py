@@ -2,8 +2,6 @@ import logging
 
 from fastapi import Request
 
-from app.database.connection import get_db
-from app.database.models import LogAuditoria, Usuario
 from app.auth.jwt import decodificar_token
 
 logger = logging.getLogger("nexlab.auditoria")
@@ -17,11 +15,16 @@ def caminho_deve_ser_auditado(metodo: str, caminho: str) -> bool:
 
 async def middleware_auditoria(request: Request, call_next):
     """
-    Registra em log_auditoria quem acessou ou alterou dados sensiveis
+    Registra no log da aplicacao quem acessou ou alterou dados sensiveis
     (pacientes, amostras/resultados, usuarios, portal do paciente) --
-    trilha exigida pela LGPD. Roda depois da requisicao seguir seu
-    curso normal e nunca impede a resposta de voltar ao cliente, mesmo
-    que a gravacao do log falhe.
+    trilha de acesso pensada para a LGPD.
+
+    Escreve so no logger (nao no banco): abrir uma sessao de banco extra
+    a cada requisicao -- em cima da sessao que a propria rota ja usa --
+    dobra o consumo de conexoes exatamente nessas rotas, e um banco com
+    limite baixo de conexoes simultaneas (comum em plano gratuito) passa
+    a recusar conexao para todo mundo. Nunca impede a resposta de voltar
+    ao cliente.
     """
     resposta = await call_next(request)
 
@@ -32,43 +35,24 @@ async def middleware_auditoria(request: Request, call_next):
 
 
 def _registrar(request: Request, status_code: int) -> None:
-    # Usa a mesma fabrica de sessao que as rotas usam (respeitando o
-    # dependency_override dos testes), em vez de abrir conexao direto
-    # com o banco configurado no ambiente.
-    fabrica_sessao = request.app.dependency_overrides.get(get_db, get_db)
     try:
-        gerador = fabrica_sessao()
-        db = next(gerador)
+        usuario_email = _identificar_usuario(request)
+        logger.info(
+            "auditoria usuario=%s metodo=%s caminho=%s status=%s ip=%s",
+            usuario_email or "nao_autenticado",
+            request.method,
+            request.url.path,
+            status_code,
+            request.client.host if request.client else None,
+        )
     except Exception:
-        logger.exception("Falha ao abrir sessao para o log de auditoria")
-        return
-
-    try:
-        usuario_id, usuario_nome = _identificar_usuario(db, request)
-        db.add(LogAuditoria(
-            usuario_id=usuario_id,
-            usuario_nome=usuario_nome,
-            metodo=request.method,
-            caminho=request.url.path,
-            status_code=status_code,
-            ip=request.client.host if request.client else None,
-        ))
-        db.commit()
-    except Exception:
-        logger.exception("Falha ao gravar log de auditoria para %s %s", request.method, request.url.path)
-    finally:
-        gerador.close()
+        logger.exception("Falha ao registrar log de auditoria para %s %s", request.method, request.url.path)
 
 
-def _identificar_usuario(db, request: Request):
+def _identificar_usuario(request: Request):
     autorizacao = request.headers.get("authorization", "")
     if not autorizacao.lower().startswith("bearer "):
-        return None, None
+        return None
 
     payload = decodificar_token(autorizacao[7:])
-    email = payload.get("sub") if payload else None
-    if not email:
-        return None, None
-
-    usuario = db.query(Usuario).filter(Usuario.email == email).first()
-    return (usuario.id, usuario.nome) if usuario else (None, None)
+    return payload.get("sub") if payload else None
