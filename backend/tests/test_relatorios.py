@@ -106,48 +106,34 @@ def test_relatorio_requer_admin(cliente, sessao_db):
     assert resposta.status_code == 403
 
 
-def test_auditoria_registra_acesso_a_rota_sensivel(cliente, token_admin, sessao_db):
+def test_auditoria_loga_acesso_a_rota_sensivel(cliente, token_admin, caplog):
     """
-    O middleware de auditoria deve gravar em log_auditoria toda
-    requisicao a rotas de dados sensiveis (pacientes, amostras,
-    usuarios, portal), com o usuario identificado pelo token.
-    """
-    hoje = _hoje_brasil()
+    O middleware de auditoria registra no log da aplicacao (o logger
+    "nexlab.auditoria") toda requisicao a rotas de dados sensiveis
+    (pacientes, amostras, usuarios, portal), identificando o usuario
+    pelo token.
 
-    resposta = cliente.get(
-        "/pacientes/",
-        headers={"Authorization": f"Bearer {token_admin}"},
-    )
+    Isso NAO grava mais em log_auditoria: abrir uma sessao de banco
+    extra a cada requisicao -- em cima da sessao que a propria rota ja
+    usa -- dobrava o consumo de conexoes exatamente nessas rotas, e
+    esgotava o limite de conexoes simultaneas do banco em producao,
+    derrubando pacientes/amostras/liberacao para todo mundo. Ver
+    app/middlewares/auditoria.py.
+    """
+    with caplog.at_level("INFO", logger="nexlab.auditoria"):
+        resposta = cliente.get("/pacientes/", headers={"Authorization": f"Bearer {token_admin}"})
     assert resposta.status_code == 200
 
-    resposta_log = cliente.get(
-        "/relatorios/auditoria",
-        params={"data": hoje},
-        headers={"Authorization": f"Bearer {token_admin}"},
-    )
-    assert resposta_log.status_code == 200, resposta_log.text
-    registros = resposta_log.json()
-
-    registro_da_consulta = next(
-        (r for r in registros if r["metodo"] == "GET" and r["caminho"] == "/pacientes/"), None
-    )
-    assert registro_da_consulta is not None, "a consulta a /pacientes/ deveria ter sido auditada"
-    assert registro_da_consulta["usuario_nome"] == "Admin de Teste"
-    assert registro_da_consulta["status_code"] == 200
+    mensagens = [r.message for r in caplog.records if r.name == "nexlab.auditoria"]
+    assert any("admin@teste.com" in m and "/pacientes/" in m for m in mensagens)
 
 
-def test_auditoria_nao_registra_rota_fora_do_escopo_sensivel(cliente, token_admin, sessao_db):
-    hoje = _hoje_brasil()
+def test_auditoria_nao_loga_rota_fora_do_escopo_sensivel(cliente, token_admin, caplog):
+    with caplog.at_level("INFO", logger="nexlab.auditoria"):
+        cliente.get("/exames/", headers={"Authorization": f"Bearer {token_admin}"})
 
-    cliente.get("/exames/", headers={"Authorization": f"Bearer {token_admin}"})
-
-    resposta_log = cliente.get(
-        "/relatorios/auditoria",
-        params={"data": hoje},
-        headers={"Authorization": f"Bearer {token_admin}"},
-    )
-    registros = resposta_log.json()
-    assert not any(r["caminho"] == "/exames/" for r in registros)
+    mensagens = [r.message for r in caplog.records if r.name == "nexlab.auditoria"]
+    assert not any("/exames/" in m for m in mensagens)
 
 
 def test_relatorio_auditoria_requer_admin(cliente, sessao_db):
