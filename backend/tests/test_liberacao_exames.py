@@ -1,6 +1,6 @@
 from datetime import date, datetime, timedelta, timezone
 
-from app.database.models import Paciente, Exame, Laboratorio, Amostra, SolicitacaoExame
+from app.database.models import Paciente, Exame, Laboratorio, Amostra, SolicitacaoExame, Tubo
 
 
 def _criar_paciente_com_exame_interno(sessao_db, cliente, token_admin, prazo_liberacao_horas=None, setor="Bioquimica"):
@@ -172,3 +172,59 @@ def test_recebido_em_nao_marcado_para_exame_terceirizado(cliente, token_admin, s
 
     amostra = sessao_db.query(Amostra).filter(Amostra.id == amostra_id).first()
     assert amostra.recebido_em is None
+
+
+def test_recebido_em_marcado_quando_tubo_mistura_exame_interno_e_terceirizado(cliente, token_admin, sessao_db):
+    """
+    Quando um mesmo tubo carrega um exame interno e um terceirizado, a
+    coleta precisa marcar a amostra como recebida mesmo assim -- senao
+    o exame interno fica com prazo indefinido e some da priorizacao da
+    tela de Liberacao de Exames.
+    """
+    headers = {"Authorization": f"Bearer {token_admin}"}
+
+    paciente = Paciente(
+        codigo="PAC-000202",
+        nome="Paciente Tubo Misto",
+        cpf="52998224725",
+        data_nascimento=date(1990, 1, 1),
+    )
+    laboratorio = Laboratorio(nome="Laboratorio Apoio Misto")
+    tubo = Tubo(cor="Amarelo")
+    sessao_db.add_all([paciente, laboratorio, tubo])
+    sessao_db.commit()
+
+    exame_interno = Exame(
+        nome="Ureia", sigla="URE", setor_responsavel="Bioquimica",
+        tubo_id=tubo.id, prazo_liberacao_horas=4,
+    )
+    exame_terceirizado = Exame(
+        nome="Exame Raro", sigla="RARO", setor_responsavel="Bioquimica",
+        tubo_id=tubo.id, laboratorio_id=laboratorio.id,
+    )
+    sessao_db.add_all([exame_interno, exame_terceirizado])
+    sessao_db.commit()
+
+    resposta = cliente.post(
+        f"/pacientes/{paciente.id}/solicitacoes",
+        json={"exame_ids": [exame_interno.id, exame_terceirizado.id]},
+        headers=headers,
+    )
+    assert resposta.status_code == 201, resposta.text
+    solicitacao = resposta.json()
+    assert len(solicitacao["amostras"]) == 1, "os dois exames deveriam cair no mesmo tubo"
+    amostra_id = solicitacao["amostras"][0]["id"]
+    item_interno = next(
+        i for i in solicitacao["amostras"][0]["itens"] if i["exame"]["id"] == exame_interno.id
+    )
+
+    resposta = cliente.put(f"/amostras/{amostra_id}/status", json={"status": "coletado"}, headers=headers)
+    assert resposta.status_code == 200, resposta.text
+
+    amostra = sessao_db.query(Amostra).filter(Amostra.id == amostra_id).first()
+    assert amostra.recebido_em is not None
+
+    resposta = cliente.get("/amostras/liberacao", headers=headers)
+    item = next(i for i in resposta.json() if i["id"] == item_interno["id"])
+    assert item["prazo_status"] != "sem_prazo"
+    assert item["prazo_limite"] is not None

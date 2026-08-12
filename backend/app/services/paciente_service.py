@@ -298,7 +298,7 @@ def atualizar_status_amostra(db: Session, amostra_id: int, status: str):
     amostra.status = status
     amostra.coletado_em = datetime.now(timezone.utc) if status == "coletado" else None
 
-    if status == "coletado" and not amostra.terceirizada and amostra.recebido_em is None:
+    if status == "coletado" and amostra.possui_exame_interno and amostra.recebido_em is None:
         amostra.recebido_em = amostra.coletado_em
     elif status == "aguardando_coleta":
         amostra.recebido_em = None

@@ -142,6 +142,16 @@ class Amostra(Base):
         return any(item.exame and item.exame.laboratorio_id for item in self.itens)
 
     @property
+    def possui_exame_interno(self):
+        """
+        True quando ao menos um exame desta amostra e realizado
+        internamente (nao terceirizado). Usado para saber se a amostra
+        deve ser marcada como recebida no setor ao ser coletada, mesmo
+        quando o mesmo tubo tambem carrega algum exame terceirizado.
+        """
+        return any(item.exame and not item.exame.laboratorio_id for item in self.itens)
+
+    @property
     def destino(self):
         """
         Para onde essa amostra deve ir na triagem: o nome do(s)
