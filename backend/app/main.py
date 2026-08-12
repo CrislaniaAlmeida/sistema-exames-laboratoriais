@@ -5,6 +5,7 @@ from slowapi.errors import RateLimitExceeded
 from sqlalchemy import text
 from app.database.connection import engine
 from app.limiter import limiter
+from app.middlewares.auditoria import middleware_auditoria
 from app.routes import exames, auxiliares, auth, usuarios, pacientes, amostras, relatorios, portal
 
 app = FastAPI(
@@ -26,6 +27,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.middleware("http")(middleware_auditoria)
 
 app.include_router(auth.router)
 app.include_router(exames.router)

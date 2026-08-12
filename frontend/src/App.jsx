@@ -16,6 +16,7 @@ import TriagemAmostras from './pages/TriagemAmostras';
 import LiberacaoExames from './pages/LiberacaoExames';
 import PortalPaciente from './pages/PortalPaciente';
 import RelatorioAtendimentos from './pages/RelatorioAtendimentos';
+import RelatorioAuditoria from './pages/RelatorioAuditoria';
 import RotaProtegida from './components/RotaProtegida';
 import RotaAdmin from './components/RotaAdmin';
 import RotaComPermissao from './components/RotaComPermissao';
@@ -111,6 +112,14 @@ function App() {
         element={
           <RotaAdmin>
             <RelatorioAtendimentos />
+          </RotaAdmin>
+        }
+      />
+      <Route
+        path="/relatorios/auditoria"
+        element={
+          <RotaAdmin>
+            <RelatorioAuditoria />
           </RotaAdmin>
         }
       />

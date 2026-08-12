@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Layout from '../components/Layout';
 import api from '../services/api';
+import { extrairMensagemErro } from '../services/erros';
 import { useAuth } from '../context/AuthContext';
 import './UsuariosGerenciar.css';
 
@@ -158,10 +159,7 @@ function UsuariosGerenciar() {
       fecharForm();
       carregarUsuarios();
     } catch (erroRequisicao) {
-      setErro(
-        erroRequisicao.response?.data?.detail ||
-        'Nao foi possivel salvar o usuario. Verifique os campos.'
-      );
+      setErro(extrairMensagemErro(erroRequisicao, 'Nao foi possivel salvar o usuario. Verifique os campos.'));
     } finally {
       setSalvando(false);
     }
@@ -184,10 +182,7 @@ function UsuariosGerenciar() {
       await api.delete(`/usuarios/${usuarioLinha.id}`);
       carregarUsuarios();
     } catch (erroRequisicao) {
-      setErro(
-        erroRequisicao.response?.data?.detail ||
-        'Nao foi possivel excluir o usuario.'
-      );
+      setErro(extrairMensagemErro(erroRequisicao, 'Nao foi possivel excluir o usuario.'));
     }
   }
 

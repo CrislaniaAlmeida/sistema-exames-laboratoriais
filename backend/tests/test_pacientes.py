@@ -90,3 +90,28 @@ def test_atualizar_paciente_trocando_para_cpf_invalido_e_bloqueado(cliente, toke
         headers={"Authorization": f"Bearer {token_admin}"},
     )
     assert resposta.status_code == 400
+
+
+def test_excluir_paciente_e_exclusao_logica(cliente, token_admin, sessao_db):
+    """
+    Excluir um paciente nao pode apagar de verdade o registro (e em
+    cascata as solicitacoes/amostras/resultados dele) -- so marca como
+    inativo, para sumir da lista sem perder o historico clinico.
+    """
+    headers = {"Authorization": f"Bearer {token_admin}"}
+    resposta = cliente.post("/pacientes/", json=_payload_paciente(), headers=headers)
+    paciente_id = resposta.json()["id"]
+
+    resposta = cliente.delete(f"/pacientes/{paciente_id}", headers=headers)
+    assert resposta.status_code == 200, resposta.text
+
+    paciente = sessao_db.query(Paciente).filter(Paciente.id == paciente_id).first()
+    assert paciente is not None, "o registro nao deveria ter sido apagado do banco"
+    assert paciente.ativo is False
+
+    resposta = cliente.get("/pacientes/", headers=headers)
+    ids_listados = [p["id"] for p in resposta.json()]
+    assert paciente_id not in ids_listados
+
+    resposta = cliente.get(f"/pacientes/{paciente_id}", headers=headers)
+    assert resposta.status_code == 404

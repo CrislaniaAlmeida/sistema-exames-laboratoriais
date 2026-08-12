@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
 import api from '../services/api';
+import { extrairMensagemErro } from '../services/erros';
 import './PainelAmostras.css';
 
 const iconeTubo = (
@@ -85,7 +86,7 @@ function PainelAmostras() {
       });
       await carregar();
     } catch (erroRequisicao) {
-      setErro(erroRequisicao.response?.data?.detail || 'Nao foi possivel lancar o resultado.');
+      setErro(extrairMensagemErro(erroRequisicao, 'Nao foi possivel lancar o resultado.'));
     } finally {
       setAtualizandoId(null);
     }
@@ -111,7 +112,7 @@ function PainelAmostras() {
       await api.put(`/amostras/itens/${item.id}/confirmar`);
       await carregar();
     } catch (erroRequisicao) {
-      setErro(erroRequisicao.response?.data?.detail || 'Nao foi possivel confirmar a liberacao.');
+      setErro(extrairMensagemErro(erroRequisicao, 'Nao foi possivel confirmar a liberacao.'));
     } finally {
       setAtualizandoId(null);
     }

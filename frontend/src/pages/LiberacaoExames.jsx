@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import Layout from '../components/Layout';
 import api from '../services/api';
+import { extrairMensagemErro } from '../services/erros';
 import './LiberacaoExames.css';
 
 const ITENS_POR_PAGINA = 15;
@@ -145,7 +146,7 @@ function LiberacaoExames() {
       await api.put(`/amostras/itens/${item.id}/confirmar`);
       await carregar();
     } catch (erroRequisicao) {
-      setErro(erroRequisicao.response?.data?.detail || 'Nao foi possivel confirmar a liberacao.');
+      setErro(extrairMensagemErro(erroRequisicao, 'Nao foi possivel confirmar a liberacao.'));
     }
   }
 
@@ -163,7 +164,7 @@ function LiberacaoExames() {
       fecharModal();
       await carregar();
     } catch (erroRequisicao) {
-      setErroModal(erroRequisicao.response?.data?.detail || 'Nao foi possivel lancar o resultado.');
+      setErroModal(extrairMensagemErro(erroRequisicao, 'Nao foi possivel lancar o resultado.'));
     } finally {
       setSalvandoModal(false);
     }

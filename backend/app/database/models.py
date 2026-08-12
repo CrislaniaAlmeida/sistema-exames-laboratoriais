@@ -84,6 +84,7 @@ class Solicitacao(Base):
     paciente_id = Column(Integer, ForeignKey("pacientes.id", ondelete="CASCADE"), nullable=False)
     data_solicitacao = Column(TIMESTAMP(timezone=True), server_default=func.now())
     token_publico = Column(String(32), unique=True, index=True)
+    token_publico_expira_em = Column(TIMESTAMP(timezone=True))
 
     paciente = relationship("Paciente", back_populates="solicitacoes")
     itens = relationship(
@@ -94,6 +95,16 @@ class Solicitacao(Base):
     @property
     def exames(self):
         return [item.exame for item in self.itens if item.exame]
+
+    @property
+    def token_expirado(self):
+        """True quando o link do portal do paciente ja passou da validade."""
+        if self.token_publico_expira_em is None:
+            return False
+        expira_em = self.token_publico_expira_em
+        if expira_em.tzinfo is None:
+            expira_em = expira_em.replace(tzinfo=timezone.utc)
+        return datetime.now(timezone.utc) > expira_em
 
 
 class Amostra(Base):
@@ -140,6 +151,16 @@ class Amostra(Base):
     def terceirizada(self):
         """True quando algum exame desta amostra e enviado a laboratorio de apoio."""
         return any(item.exame and item.exame.laboratorio_id for item in self.itens)
+
+    @property
+    def possui_exame_interno(self):
+        """
+        True quando ao menos um exame desta amostra e realizado
+        internamente (nao terceirizado). Usado para saber se a amostra
+        deve ser marcada como recebida no setor ao ser coletada, mesmo
+        quando o mesmo tubo tambem carrega algum exame terceirizado.
+        """
+        return any(item.exame and not item.exame.laboratorio_id for item in self.itens)
 
     @property
     def destino(self):

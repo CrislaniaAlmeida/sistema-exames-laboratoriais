@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Layout from '../components/Layout';
 import api from '../services/api';
+import { extrairMensagemErro } from '../services/erros';
 import './MateriaisGerenciar.css';
 
 const MATERIAL_VAZIO = { nome: '' };
@@ -92,10 +93,7 @@ function MateriaisGerenciar() {
       fecharForm();
       carregarMateriais();
     } catch (erroRequisicao) {
-      setErro(
-        erroRequisicao.response?.data?.detail ||
-        'Nao foi possivel salvar o material. Verifique se ele ja nao existe.'
-      );
+      setErro(extrairMensagemErro(erroRequisicao, 'Nao foi possivel salvar o material. Verifique se ele ja nao existe.'));
     } finally {
       setSalvando(false);
     }

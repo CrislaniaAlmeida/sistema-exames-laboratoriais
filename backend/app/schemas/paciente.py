@@ -193,6 +193,8 @@ class SolicitacaoResposta(BaseModel):
     paciente_id: int
     data_solicitacao: datetime
     token_publico: Optional[str] = None
+    token_publico_expira_em: Optional[datetime] = None
+    token_expirado: bool = False
     exames: List[ExameResumoResposta]
     amostras: List[AmostraResposta]
 
@@ -271,6 +273,20 @@ class AmostraConsultaResposta(BaseModel):
     coletado_em: Optional[datetime] = None
     exames: List[ExameResumoResposta]
     paciente: PacienteResumoResposta
+
+    class Config:
+        from_attributes = True
+
+
+class LogAuditoriaResposta(BaseModel):
+    """Um registro da trilha de auditoria (LGPD): quem acessou/alterou o que, e quando."""
+    id: int
+    usuario_nome: Optional[str] = None
+    metodo: str
+    caminho: str
+    status_code: int
+    ip: Optional[str] = None
+    criado_em: datetime
 
     class Config:
         from_attributes = True

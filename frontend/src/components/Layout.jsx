@@ -14,6 +14,7 @@ const navItems = [
   { label: 'Tubos', path: '/tubos', icon: 'tubos', disponivel: true, adminOnly: true },
   { label: 'Usuarios', path: '/usuarios', icon: 'usuarios', disponivel: true, adminOnly: true },
   { label: 'Relatorio de Atendimentos', path: '/relatorios/atendimentos', icon: 'relatorio', disponivel: true, adminOnly: true },
+  { label: 'Auditoria', path: '/relatorios/auditoria', icon: 'auditoria', disponivel: true, adminOnly: true },
 ];
 
 const titulosPagina = {
@@ -28,6 +29,7 @@ const titulosPagina = {
   '/usuarios': { titulo: 'Gerenciar Usuarios', subtitulo: 'Cadastre usuarios e defina o que cada um pode acessar' },
   '/materiais': { titulo: 'Gerenciar Materiais', subtitulo: 'Cadastre os materiais biologicos usados nos exames' },
   '/relatorios/atendimentos': { titulo: 'Relatorio de Atendimentos', subtitulo: 'Consulte os atendimentos registrados por dia' },
+  '/relatorios/auditoria': { titulo: 'Auditoria', subtitulo: 'Trilha de acesso a dados sensiveis, exigida pela LGPD' },
 };
 
 const PERFIS_LABEL = {
@@ -102,6 +104,12 @@ const icons = {
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
       <circle cx="12" cy="12" r="9" />
       <path d="M8.5 12.5 11 15l4.5-5.5" />
+    </svg>
+  ),
+  auditoria: (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M9 12h6M9 16h4" />
+      <path d="M12 3 4 6v5c0 5 3.4 8.4 8 10 4.6-1.6 8-5 8-10V6l-8-3Z" />
     </svg>
   ),
 };
