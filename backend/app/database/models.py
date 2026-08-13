@@ -188,7 +188,7 @@ class SolicitacaoExame(Base):
         "solicitacoes_exames.id", ondelete="CASCADE"), nullable=False)
     exame_id = Column(Integer, ForeignKey("exames.id", ondelete="SET NULL"))
     amostra_id = Column(Integer, ForeignKey("amostras.id", ondelete="SET NULL"))
-    status_resultado = Column(String(20), nullable=False, default="aguardando_resultado")
+    status_resultado = Column(String(30), nullable=False, default="aguardando_resultado")
     resultado_disponivel_em = Column(TIMESTAMP(timezone=True))
 
     valor_resultado = Column(String(100))
