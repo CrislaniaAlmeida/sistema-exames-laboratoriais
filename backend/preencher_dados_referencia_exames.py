@@ -41,6 +41,7 @@ Uso:
 
 import sys
 import os
+import re
 import json
 import unicodedata
 from collections import defaultdict
@@ -79,11 +80,17 @@ CAMPO_PARA_COLUNA_GUIA = {
 
 
 def normalizar(texto):
-    """Remove acentos e caixa, colapsa espacos (ex: 'Líquor (LCR)' -> 'LIQUOR (LCR)')."""
+    """Remove acentos e caixa, colapsa espacos e padroniza aspas/hifen/barra
+    (ex: 'Líquor (LCR)' -> 'LIQUOR (LCR)'; 'ADA - ADA' e 'ADA- ADA' e 'ADA -ADA'
+    todos viram 'ADA-ADA'). So usada para casar nomes, nunca para gravar."""
     if not texto:
         return ""
     sem_acento = unicodedata.normalize("NFKD", texto).encode("ascii", "ignore").decode("ascii")
-    return " ".join(sem_acento.upper().split())
+    upper = sem_acento.upper()
+    upper = re.sub(r"[\"'’‘´`]", "", upper)
+    upper = re.sub(r"\s*-\s*", "-", upper)
+    upper = re.sub(r"\s*/\s*", "/", upper)
+    return " ".join(upper.split())
 
 
 def stem_de(texto_bruto):
