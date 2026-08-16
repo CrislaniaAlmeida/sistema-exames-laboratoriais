@@ -239,7 +239,11 @@ def main():
                 print(f"    ... e mais {len(itens) - 10}")
 
     if nao_encontrados:
+        caminho_relatorio = os.path.join(os.path.dirname(__file__), "exames_sem_correspondencia.txt")
+        with open(caminho_relatorio, "w", encoding="utf-8") as f:
+            f.write("\n".join(sorted(nao_encontrados, key=normalizar)))
         print(f"\nExames cadastrados sem correspondencia exata no guia ({len(nao_encontrados)}):")
+        print(f"Lista completa salva em: {caminho_relatorio}")
         for nome in nao_encontrados[:30]:
             print(f"  - {nome}")
         if len(nao_encontrados) > 30:
