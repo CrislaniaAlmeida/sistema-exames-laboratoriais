@@ -68,6 +68,11 @@ def tokens(nome_normalizado):
 
 
 def tokens_criticos(lista_tokens):
+    """Palavras cuja troca nunca deve ser sugerida como 'so erro de
+    digitacao', mesmo com distancia de edicao baixa -- siglas curtas
+    como DNA/ENA/RNA/ANA, CD16/CD19, IgA/IgG, C3/C4, Hepatite B/C
+    costumam diferir por 1-2 caracteres e ainda assim serem exames
+    clinicamente diferentes."""
     criticos = set()
     for tok in lista_tokens:
         if any(c.isdigit() for c in tok):
@@ -78,7 +83,7 @@ def tokens_criticos(lista_tokens):
             criticos.add(tok)
         elif tok in SIGLAS_VIRUS:
             criticos.add(tok)
-        elif len(tok) == 1 and tok.isalpha():
+        elif tok.isalpha() and len(tok) <= 3:
             criticos.add(tok)
     return criticos
 

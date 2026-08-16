@@ -4680,7 +4680,7 @@
     "observacoes": "Marcador genético associado à Doença Celíaca (complementar ao HLA-DQ2)"
   },
   {
-    "exame": "DHEA, DEHIDROPIANDROSTE RONA/DHA",
+    "exame": "DHEA, DEHIDROPIANDROSTERONA/DHA",
     "material": "Soro",
     "tubo_recipiente": "Tubo seco ou gel separador",
     "vol_minimo": "0,5 mL",
@@ -4860,7 +4860,7 @@
     "observacoes": "Investigação de Gangliosidose GM1"
   },
   {
-    "exame": "DOSAGEM DE BETA-GLUCOC EREBROSIDASE POR ENSAIO FLUOROMÉTRICO - SANGUE TOTAL",
+    "exame": "DOSAGEM DE BETA-GLUCOCEREBROSIDASE POR ENSAIO FLUOROMÉTRICO - SANGUE TOTAL",
     "material": "Sangue total (leucócitos)",
     "tubo_recipiente": "EDTA ou Heparina",
     "vol_minimo": "3 mL",
@@ -6432,7 +6432,7 @@
     "observacoes": "Diagnóstico e monitorização de Fenilcetonúria (PKU)"
   },
   {
-    "exame": "FENILCETONÚRIA/FENILALA NINA - PESQUISA",
+    "exame": "FENILCETONÚRIA/FENILALANINA - PESQUISA",
     "material": "Sangue em papel filtro (teste do pezinho)",
     "tubo_recipiente": "Cartão de papel filtro",
     "vol_minimo": "Conforme protocolo neonatal",
@@ -6444,7 +6444,7 @@
     "observacoes": "Triagem neonatal para Fenilcetonúria"
   },
   {
-    "exame": "FENITOÍNA/DIFENILHIDANTOI NA",
+    "exame": "FENITOÍNA/DIFENILHIDANTOINA",
     "material": "Soro ou Plasma",
     "tubo_recipiente": "Tubo seco/gel separador ou heparina",
     "vol_minimo": "0,5 mL",
@@ -10176,7 +10176,7 @@
     "observacoes": "Sequenciamento do gene FBN1; diagnóstico de Síndrome de Marfan"
   },
   {
-    "exame": "SERICA DE BENZODIAZEPINI CO/CLOBAZAM",
+    "exame": "SERICA DE BENZODIAZEPINICO/CLOBAZAM",
     "material": "Soro",
     "tubo_recipiente": "Tubo seco ou gel separador",
     "vol_minimo": "0,5 mL",
