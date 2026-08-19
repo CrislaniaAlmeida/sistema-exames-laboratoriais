@@ -311,17 +311,15 @@ def renovar_link_portal(db: Session, paciente_id: int, solicitacao_id: int):
 
 def listar_amostras_painel(db: Session, apenas_pendentes: bool = True):
     """
-    Lista amostras para o painel de coleta/resultado, mais recentes
-    primeiro. Uma amostra "pendente" e' aquela que ainda nao foi
-    coletada, ou que tem algum exame ainda aguardando resultado.
+    Lista amostras para o painel de coleta, mais recentes primeiro. Uma
+    amostra "pendente" e' aquela que ainda nao foi coletada/triada --
+    assim que passa pela triagem ela sai daqui e passa a aparecer na
+    Liberacao de Exames.
     """
     consulta = db.query(Amostra)
 
     if apenas_pendentes:
-        consulta = consulta.filter(
-            (Amostra.status == "aguardando_coleta")
-            | Amostra.itens.any(SolicitacaoExame.status_resultado == "aguardando_resultado")
-        )
+        consulta = consulta.filter(Amostra.status == "aguardando_coleta")
 
     return (
         consulta.order_by(Amostra.criado_em.desc())
