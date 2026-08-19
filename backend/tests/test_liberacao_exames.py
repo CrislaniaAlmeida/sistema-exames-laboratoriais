@@ -58,6 +58,11 @@ def test_liberacao_lista_apenas_exames_internos(cliente, token_admin, sessao_db)
     interno = _criar_paciente_com_exame_interno(sessao_db, cliente, token_admin)
     terceirizado = _criar_paciente_com_exame_terceirizado(sessao_db, cliente, token_admin)
 
+    cliente.put(
+        f"/amostras/{interno['amostras'][0]['id']}/status",
+        json={"status": "coletado"}, headers=headers,
+    )
+
     resposta = cliente.get("/amostras/liberacao", headers=headers)
     assert resposta.status_code == 200, resposta.text
 
@@ -66,14 +71,15 @@ def test_liberacao_lista_apenas_exames_internos(cliente, token_admin, sessao_db)
     assert terceirizado["amostras"][0]["itens"][0]["id"] not in ids_retornados
 
 
-def test_liberacao_sem_prazo_quando_amostra_ainda_nao_recebida(cliente, token_admin, sessao_db):
+def test_liberacao_nao_lista_item_com_amostra_ainda_nao_recebida(cliente, token_admin, sessao_db):
+    """Antes da triagem confirmar o recebimento da amostra, o exame nao deve aparecer na tela de Liberacao."""
     headers = {"Authorization": f"Bearer {token_admin}"}
     solicitacao = _criar_paciente_com_exame_interno(sessao_db, cliente, token_admin, prazo_liberacao_horas=1)
+    item_id = solicitacao["amostras"][0]["itens"][0]["id"]
 
     resposta = cliente.get("/amostras/liberacao", headers=headers)
-    item = next(i for i in resposta.json() if i["id"] == solicitacao["amostras"][0]["itens"][0]["id"])
-    assert item["prazo_status"] == "sem_prazo"
-    assert item["prazo_limite"] is None
+    ids_retornados = [item["id"] for item in resposta.json()]
+    assert item_id not in ids_retornados
 
 
 def test_liberacao_marca_atrasado_quando_prazo_passou(cliente, token_admin, sessao_db):
@@ -110,6 +116,10 @@ def test_liberacao_lista_item_aguardando_confirmacao(cliente, token_admin, sessa
     solicitacao = _criar_paciente_com_exame_interno(sessao_db, cliente, token_admin)
     item_id = solicitacao["amostras"][0]["itens"][0]["id"]
 
+    cliente.put(
+        f"/amostras/{solicitacao['amostras'][0]['id']}/status",
+        json={"status": "coletado"}, headers=headers,
+    )
     cliente.put(f"/amostras/itens/{item_id}/resultado", json={"valor_resultado": "90"}, headers=headers)
 
     resposta = cliente.get("/amostras/liberacao", headers=headers)
@@ -123,6 +133,10 @@ def test_liberacao_nao_lista_item_ja_confirmado(cliente, token_admin, sessao_db)
     solicitacao = _criar_paciente_com_exame_interno(sessao_db, cliente, token_admin)
     item_id = solicitacao["amostras"][0]["itens"][0]["id"]
 
+    cliente.put(
+        f"/amostras/{solicitacao['amostras'][0]['id']}/status",
+        json={"status": "coletado"}, headers=headers,
+    )
     cliente.put(f"/amostras/itens/{item_id}/resultado", json={"valor_resultado": "90"}, headers=headers)
     cliente.put(f"/amostras/itens/{item_id}/confirmar", headers=headers)
 

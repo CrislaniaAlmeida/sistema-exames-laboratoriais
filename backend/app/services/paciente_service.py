@@ -339,12 +339,18 @@ def listar_itens_liberacao(db: Session):
     internamente (nao enviados a laboratorio de apoio) -- para a tela
     de Liberacao de Exames, organizada por setor. Ordenados pela
     urgencia do prazo (atrasados primeiro).
+
+    So entram itens cuja amostra ja passou pela triagem do setor
+    (recebido_em preenchido) -- antes disso o exame ainda esta em
+    coleta/triagem e nao deve aparecer aqui.
     """
     itens = (
         db.query(SolicitacaoExame)
         .join(Exame, SolicitacaoExame.exame_id == Exame.id)
+        .join(Amostra, SolicitacaoExame.amostra_id == Amostra.id)
         .filter(SolicitacaoExame.status_resultado.in_(["aguardando_resultado", "aguardando_confirmacao"]))
         .filter(Exame.laboratorio_id.is_(None))
+        .filter(Amostra.recebido_em.is_not(None))
         .all()
     )
 
