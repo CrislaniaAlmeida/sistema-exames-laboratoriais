@@ -17,7 +17,7 @@ with engine.connect() as conn:
     print()
     print("Exames pendentes de liberacao e seu prazo_liberacao_horas:")
     rows = conn.execute(text("""
-        SELECT e.nome, e.prazo_liberacao_horas, e.prazo_liberacao_resultado, a.recebido_em
+        SELECT e.nome, e.prazo_liberacao_horas, a.id AS amostra_id, a.status AS amostra_status, a.recebido_em
         FROM solicitacao_exames se
         JOIN exames e ON e.id = se.exame_id
         LEFT JOIN amostras a ON a.id = se.amostra_id
