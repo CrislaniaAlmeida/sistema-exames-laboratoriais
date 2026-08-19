@@ -20,7 +20,7 @@ const navItems = [
 const titulosPagina = {
   '/exames': { titulo: 'Dashboard', subtitulo: 'Visao geral e consulta de exames' },
   '/pacientes': { titulo: 'Gerenciar Pacientes', subtitulo: 'Cadastre e edite os dados dos pacientes' },
-  '/painel-amostras': { titulo: 'Painel de Amostras', subtitulo: 'Coleta e liberacao de resultado por amostra' },
+  '/painel-amostras': { titulo: 'Painel de Amostras', subtitulo: 'Status de coleta e resultado por paciente' },
   '/triagem': { titulo: 'Triagem de Amostras', subtitulo: 'Bipe o codigo de barras para identificar o destino da amostra' },
   '/liberacao': { titulo: 'Liberacao de Exames', subtitulo: 'Exames internos aguardando liberacao, organizados por setor' },
   '/exames/gerenciar': { titulo: 'Gerenciar Exames', subtitulo: 'Cadastre, edite ou remova exames do sistema' },
